@@ -46,12 +46,40 @@ def stars(addr, message=""):
         c = c + "\n\n" + message + "\n\n*************************************************************************************"
     comment(addr, c)
 
+def ten_by_four(addr, lab):
+    blank(addr)
+    label(addr, lab)
+    byte(addr, 10)
+    byte(addr+10, 10)
+    byte(addr+20, 10)
+    byte(addr+30, 10)
+
+def message(start_addr, end_addr):
+    string_length = 0
+    for i in range(start_addr, end_addr):
+        b = get_u8_binary(i)
+        if b >= ord('A') and b <= ord('Z'):
+            if string_length == 0:
+                string_start = i
+            string_length += 1
+        else:
+            if string_length > 0:
+                string(string_start, string_length)
+                string_length = 0
+            byte(i)
+            if b in sprites:
+                expr(i, sprites)
+    if string_length > 0:
+        string(string_start, string_length)
+        string_length = 0
+
 load(0x1300, "original/___1___", "6502")
 
 comment(0x1300, """
 Caves: A-P + Four bonus caves
 
 tile_map:
+
 $00 = empty
 $01 = earth
 $02 = wall
@@ -259,6 +287,7 @@ label(0x005c, "sub_second_ticks")
 label(0x0069, "status_text_address_low")
 label(0x0073, "grid_x")
 label(0x0077, "loop_counter")
+label(0x0079, "initial_cell_fill_value")
 label(0x0080, "screen_addr2_low")
 label(0x0081, "screen_addr2_high")
 label(0x0082, "next_ptr_low")
@@ -412,8 +441,8 @@ entry(0x29df)
 
 label(0x2a00, "increment_ptr")
 label(0x2a19, "return6")
-expr(0x2a1b, make_lo("special_cave_3"))
-expr(0x2a1f, make_hi("special_cave_3"))
+expr(0x2a1b, make_lo("map_row_0"))
+expr(0x2a1f, make_hi("map_row_0"))
 label(0x2a29, "palette_block")
 label(0x2a35, "set_palette_colour_ax")
 label(0x2a4d, "reset_clock")
@@ -648,42 +677,65 @@ byte(0x5000+20, 10)
 byte(0x5000+30, 10)
 label(0x5028, "backwards_status_bar")
 label(0x503f, "special_cave_2")
-label(0x5040, "special_cave_3")
-byte(0x5040, 10)
-byte(0x5040+10, 10)
-byte(0x5040+20, 10)
-byte(0x5040+30, 10)
+
+ten_by_four(0x5040, "map_row_0")
 label(0x5068, "default_status_bar")
 string(0x5079, 1)
-byte(0x507c, 10)
-byte(0x507c+10, 10)
-byte(0x507c+20, 10)
-byte(0x507c+30, 10)
-byte(0x507c+40, 10)
-byte(0x507c+50, 10)
-byte(0x507c+60, 10)
-byte(0x507c+70, 10)
-byte(0x507c+80, 10)
-byte(0x507c+90, 10)
-byte(0x507c+100, 10)
-byte(0x507c+110, 10)
-byte(0x507c+120, 10)
-byte(0x507c+130, 10)
-byte(0x507c+140, 10)
-byte(0x507c+150, 10)
-byte(0x507c+160, 10)
+blank(0x507c)
+unused(0x507c)
 
+ten_by_four(0x5080, "map_row_1")
+blank(0x50a8)
+unused(0x50a8)
+
+ten_by_four(0x50c0, "map_row_2")
+blank(0x50e8)
+unused(0x50e8)
+
+ten_by_four(0x5100, "map_row_3")
+blank(0x5128)
 label(0x5128, "unused_fragment_of_basic1")
 byte(0x512c, 4)
-blank(0x5140)
-byte(0x5140, 4)
-byte(0x5144, 10)
-byte(0x5144+10, 10)
-byte(0x5144+20, 10)
+
+ten_by_four(0x5140, "map_row_5")
+blank(0x5168)
 label(0x5168, "unused_fragment_of_basic2")
 byte(0x517b, 5)
-blank(0x5180)
 
+ten_by_four(0x5180, "map_row_6")
+blank(0x51a8)
+unused(0x51a8)
+ten_by_four(0x51c0, "map_row_7")
+blank(0x51e8)
+unused(0x51e8)
+ten_by_four(0x5200, "map_row_8")
+blank(0x5228)
+unused(0x5228)
+ten_by_four(0x5240, "map_row_9")
+blank(0x5268)
+unused(0x5268)
+ten_by_four(0x5280, "map_row_10")
+blank(0x52a8)
+unused(0x52a8)
+ten_by_four(0x52c0, "map_row_11")
+blank(0x52e8)
+unused(0x52e8)
+ten_by_four(0x5300, "map_row_12")
+blank(0x5328)
+unused(0x5328)
+ten_by_four(0x5340, "map_row_13")
+blank(0x5368)
+unused(0x5368)
+ten_by_four(0x5380, "map_row_14")
+blank(0x53a8)
+unused(0x53a8)
+ten_by_four(0x53c0, "map_row_15")
+blank(0x53e8)
+unused(0x53e8)
+
+message(0x5400, 0x5500)
+
+blank(0x5400)
 label(0x5400, "credits")
 
 comment(0x5568, "unused copy of routine at $5700")
