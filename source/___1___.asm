@@ -993,7 +993,7 @@ loop_c226b
     bne loop_c226b                                                    ; 2272: d0 f7       ..
 c2274
     sta loop_counter                                                  ; 2274: 85 77       .w
-loop_c2276
+increment_ptr_using_40_bytes_out_of_every_64
     inc ptr_low                                                       ; 2276: e6 8c       ..
     lda ptr_low                                                       ; 2278: a5 8c       ..
     and #$3f                                                          ; 227a: 29 3f       )?
@@ -1005,17 +1005,17 @@ loop_c2276
     beq return1                                                       ; 2286: f0 c1       ..
 c2288
     dec loop_counter                                                  ; 2288: c6 77       .w
-    bpl loop_c2276                                                    ; 228a: 10 ea       ..
+    bpl increment_ptr_using_40_bytes_out_of_every_64                  ; 228a: 10 ea       ..
     lda l0079                                                         ; 228c: a5 79       .y
     sta (ptr_low),y                                                   ; 228e: 91 8c       ..
     bpl c2264                                                         ; 2290: 10 d2       ..
-sub_c2292
+reset_grid_of_sprites
     ldx #$f0                                                          ; 2292: a2 f0       ..
     lda #$ff                                                          ; 2294: a9 ff       ..
-loop_c2296
+reset_grid_of_sprites_loop
     dex                                                               ; 2296: ca          .
     sta grid_of_screen_sprites,x                                      ; 2297: 9d 00 0c    ...
-    bne loop_c2296                                                    ; 229a: d0 fa       ..
+    bne reset_grid_of_sprites_loop                                    ; 229a: d0 fa       ..
     ldx #$14                                                          ; 229c: a2 14       ..
 clear_backwards_status_bar_loop
     dex                                                               ; 229e: ca          .
@@ -3554,19 +3554,19 @@ c3a00
     jsr draw_big_rockford                                             ; 3a00: 20 b5 2a     .*
     jsr c5700                                                         ; 3a03: 20 00 57     .W
     jsr reset_clock                                                   ; 3a06: 20 4d 2a     M*
-    jsr sub_c2292                                                     ; 3a09: 20 92 22     ."
+    jsr reset_grid_of_sprites                                         ; 3a09: 20 92 22     ."
     lda #<highscore_last_status_bar                                   ; 3a0c: a9 dc       ..
     sta status_text_address_low                                       ; 3a0e: 85 69       .i
     lda #$7b                                                          ; 3a10: a9 7b       .{
     ldy #0                                                            ; 3a12: a0 00       ..
     jsr sub_c2329                                                     ; 3a14: 20 29 23     )#
-    jsr sub_c2292                                                     ; 3a17: 20 92 22     ."
+    jsr reset_grid_of_sprites                                         ; 3a17: 20 92 22     ."
     lda #<highscore_high_status_bar                                   ; 3a1a: a9 50       .P
     sta status_text_address_low                                       ; 3a1c: 85 69       .i
     lda #$7d                                                          ; 3a1e: a9 7d       .}
     ldy #$80                                                          ; 3a20: a0 80       ..
     jsr sub_c2329                                                     ; 3a22: 20 29 23     )#
-    jsr sub_c2292                                                     ; 3a25: 20 92 22     ."
+    jsr reset_grid_of_sprites                                         ; 3a25: 20 92 22     ."
     ldx #0                                                            ; 3a28: a2 00       ..
     ldy #1                                                            ; 3a2a: a0 01       ..
 c3a2c
@@ -3667,7 +3667,7 @@ c3abe
 
 c3ad1
     jsr draw_big_rockford                                             ; 3ad1: 20 b5 2a     .*
-    jsr sub_c2292                                                     ; 3ad4: 20 92 22     ."
+    jsr reset_grid_of_sprites                                         ; 3ad4: 20 92 22     ."
     lda #$ff                                                          ; 3ad7: a9 ff       ..
     sta l0065                                                         ; 3ad9: 85 65       .e
     jsr sub_c3b00                                                     ; 3adb: 20 00 3b     .;
