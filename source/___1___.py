@@ -40,6 +40,12 @@ def unused_entry(addr):
     entry(addr, "unused"+str(unused_count))
     unused_count += 1
 
+def stars(addr, message=""):
+    c = "*************************************************************************************"
+    if message != "":
+        c = c + "\n\n" + message + "\n\n*************************************************************************************"
+    comment(addr, c)
+
 load(0x1300, "original/___1___", "6502")
 
 comment(0x1300, """
@@ -64,22 +70,78 @@ $0e = butterfly
 $0f = player
 """)
 
+sprites = {
+    0x0: "sprite_space",
+    0x1: "sprite_boulder1",
+    0x2: "sprite_boulder2",
+    0x3: "sprite_diamond1",
+    0x4: "sprite_diamond2",
+    0x5: "sprite_diamond3",
+    0x6: "sprite_diamond4",
+    0x7: "sprite_titanium_wall1",
+    0x8: "sprite_titanium_wall2",
+    0x9: "sprite_box",
 
-sprites = { 0x0: "sprite_space",
-            0x3: "sprite_diamond",
-            0x32: "sprite_0",
-            0x33: "sprite_1",
-            0x34: "sprite_2",
-            0x35: "sprite_3",
-            0x36: "sprite_4",
-            0x37: "sprite_5",
-            0x38: "sprite_6",
-            0x39: "sprite_7",
-            0x3a: "sprite_8",
-            0x3b: "sprite_9",
+    0x0a: "sprite_wall1",
+    0x0b: "sprite_wall2",
+    0x0c: "sprite_explosion1",
+    0x0d: "sprite_explosion2",
+    0x0e: "sprite_explosion3",
+    0x0f: "sprite_explosion4",
+    0x10: "sprite_magic_wall1",
+    0x11: "sprite_magic_wall2",
+    0x12: "sprite_magic_wall3",
+    0x13: "sprite_magic_wall4",
 
-            0x3e: "sprite_slash",
-            0x3f: "sprite_comma",
+    0x14: "sprite_fungus1",
+    0x15: "sprite_fungus2",
+    0x16: "sprite_butterfly1",
+    0x17: "sprite_butterfly2",
+    0x18: "sprite_butterfly3",
+    0x19: "sprite_boxy1",
+    0x1a: "sprite_boxy2",
+    0x1b: "sprite_boxy3",
+    0x1c: "sprite_boxy4",
+    0x1d: "sprite_earth1",
+
+    0x1e: "sprite_earth2",
+    0x1f: "sprite_pathway",
+    0x20: "sprite_rockford_blinking1",
+    0x21: "sprite_rockford_blinking2",
+    0x22: "sprite_rockford_blinking3",
+    0x23: "sprite_rockford_winking1",
+    0x24: "sprite_rockford_winking2",
+    0x25: "sprite_rockford_moving_down1",
+    0x26: "sprite_rockford_moving_down2",
+    0x27: "sprite_rockford_moving_down3",
+
+    0x28: "sprite_rockford_moving_up1",
+    0x29: "sprite_rockford_moving_up2",
+    0x2a: "sprite_rockford_moving_left1",
+    0x2b: "sprite_rockford_moving_left2",
+    0x2c: "sprite_rockford_moving_left3",
+    0x2d: "sprite_rockford_moving_left4",
+    0x2e: "sprite_rockford_moving_right1",
+    0x2f: "sprite_rockford_moving_right2",
+    0x30: "sprite_rockford_moving_right3",
+    0x31: "sprite_rockford_moving_right4",
+
+    0x32: "sprite_0",
+    0x33: "sprite_1",
+    0x34: "sprite_2",
+    0x35: "sprite_3",
+    0x36: "sprite_4",
+    0x37: "sprite_5",
+    0x38: "sprite_6",
+    0x39: "sprite_7",
+    0x3a: "sprite_8",
+    0x3b: "sprite_9",
+
+    0x3c: "sprite_white",
+    0x3d: "sprite_dash",
+    0x3e: "sprite_slash",
+    0x3f: "sprite_comma",
+    0x40: "sprite_full_stop",
 }
 for i in sprites:
     constant(i, sprites[i])
@@ -236,6 +298,7 @@ label(0x2238, "increment_ptr_and_clear_carry")
 label(0x223e, "skip_increment")
 label(0x2240, "add_a_to_ptr")
 label(0x2249, "return1")
+label(0x224a, "reverse_nybbles_and_add_one")
 expr(0x2257, make_lo("special_cave_2"))
 expr(0x225b, make_hi("special_cave_2"))
 label(0x229e, "clear_backwards_status_bar_loop")
@@ -255,8 +318,8 @@ expr(0x2312, make_lo("grid_of_screen_sprites"))
 expr(0x231a, make_hi("grid_of_screen_sprites"))
 ab(0x2323)
 blank(0x2325)
-expr(0x2326, make_lo("start_of_screen"))
-expr(0x2328, make_hi("start_of_screen"))
+expr(0x2326, make_lo("start_of_grid_screen_address"))
+expr(0x2328, make_hi("start_of_grid_screen_address"))
 expr(0x232c, make_hi("backwards_status_bar"))
 expr(0x232e, make_lo("backwards_status_bar"))
 expr(0x233c, make_hi("tile_map"))
@@ -265,10 +328,10 @@ expr(0x2345, make_lo("players_and_men_status_bar"))
 label(0x234c, "draw_grid_loop")
 label(0x2350, "grid_draw_row_loop")
 label(0x2357, "opcode_to_change")
-label(0x235c, "start_of_grid_addr1_low")
-label(0x235d, "start_of_grid_addr1_high")
-label(0x2361, "start_of_grid_addr2_low")
-label(0x2362, "start_of_grid_addr2_high")
+label(0x235c, "grid_addr1_low")
+label(0x235d, "grid_addr1_high")
+label(0x2361, "grid_addr2_low")
+label(0x2362, "grid_addr2_high")
 comment(0x2375, "Each sprite is two character rows tall. screen_addr2_low/high is the destination screen address for the second character row of the sprite", indent=1)
 comment(0x2381, "This next loop draws a single sprite in the grid.\nIt draws two character rows at the same time, with 16 bytes in each row.", indent=1)
 label(0x2383, "draw_sprite_loop")
@@ -331,13 +394,18 @@ expr(0x2983, make_lo("special_cave_0"))
 expr(0x2987, make_hi("special_cave_0"))
 nonentry(0x299a)
 nonentry(0x299c)
-unused(0x299c)
 label(0x29ac, "set_palette")
 label(0x29b0, "set_palette_loop")
 unused_entry(0x29c3)
 label(0x29d4, "return5")
 unused_entry(0x29d5)
+nonentry(0x29dd)
+byte(0x29dd, 2)
+comment(0x29dd, "bne l299a", indent=1)
 unused(0x29e0)
+nonentry(0x29d2)
+comment(0x29d2, "beq l299c")
+entry(0x29df)
 
 label(0x2a00, "increment_ptr")
 label(0x2a19, "return6")
@@ -348,9 +416,25 @@ label(0x2a35, "set_palette_colour_ax")
 label(0x2a4d, "reset_clock")
 expr(0x2a7d, "sprite_0")
 expr(0x2a8f, "sprite_0")
+label(0x2ab5, "draw_big_rockford")
+label(0x2ac3, "draw_big_rockford_loop")
+stars(0x2ab5)
+expr(0x2ab6, make_hi("big_rockford_destination_screen_address"))
+expr(0x2aba, make_lo("big_rockford_destination_screen_address"))
 label(0x2ab4, "return7")
+expr(0x2abe, make_hi("big_rockford_sprite"))
+label(0x2aca, "check_if_byte_is_an_rle_byte_loop")
+label(0x2ad4, "get_repeat_count")
+label(0x2ae6, "skip_inc_high")
+label(0x2adc, "copy_x_bytes_in_rle_loop")
+blank(0x2af8)
+label(0x2af8, "rle_bytes_table")
+label(0x2aeb, "get_next_ptr_byte")
 label(0x2af3, "return8")
+blank(0x2aff)
+unused(0x2aff)
 unused(0x2af4)
+byte(0x2af8, 7)
 ab(0x2ad2)
 blank(0x2ad4)
 ab(0x2ae9)
@@ -414,6 +498,7 @@ string(0x3225, 1)
 blank(0x323c)
 expr(0x324d, "'B'")
 blank(0x3250)
+label(0x3250, "highscore_high_status_bar")
 blank(0x3264)
 string(0x3264, 1)
 string(0x3266, 1)
@@ -449,10 +534,10 @@ label(0x32a0, "scrolling_pause_text")
 label(0x32f0, "zeroed_status_bar")
 label(0x329e, "player_number_on_game_over_text")
 
-#expr(0x2ab1, make_lo("players_and_men_status_bar"))
+label(0x3400, "big_rockford_sprite")
+byte(0x3400, 6*256)
+
 expr(0x3a0d, make_lo("highscore_last_status_bar"))
-#expr(0x2345, make_lo("players_and_men_status_bar"))
-label(0x3250, "highscore_high_status_bar")
 expr(0x3a1b, make_lo("highscore_high_status_bar"))
 
 blank(0x3300)
@@ -515,19 +600,33 @@ label(0x3bcc, "return15")
 
 label(0x4700, "special_cave_0")
 
-label(0x4b28, "required_diamonds_for_each_cave")
+blank(0x4b28)
+stars(0x4b28)
+label(0x4b28, "required_diamonds_for_each_cave_difficulty_level_1")
+blank(0x4b50)
+label(0x4b50, "required_diamonds_for_each_cave_difficulty_level_2")
+blank(0x4b78)
+label(0x4b78, "required_diamonds_for_each_cave_difficulty_level_3")
+blank(0x4ba0)
+label(0x4ba0, "required_diamonds_for_each_cave_difficulty_level_4")
+blank(0x4bc8)
+label(0x4bc8, "required_diamonds_for_each_cave_difficulty_level_5")
 label(0x4b3c, "time_limit_for_each_cave_difficulty_level_1")
-byte(0x4b3c, 20)
+#byte(0x4b3c, 20)
 label(0x4b64, "time_limit_for_each_cave_difficulty_level_2")
-byte(0x4b64, 20)
+#byte(0x4b64, 20)
 label(0x4b8c, "time_limit_for_each_cave_difficulty_level_3")
-byte(0x4b8c, 20)
+#byte(0x4b8c, 20)
 label(0x4bb4, "time_limit_for_each_cave_difficulty_level_4")
-byte(0x4bb4, 20)
+#byte(0x4bb4, 20)
 label(0x4bdc, "time_limit_for_each_cave_difficulty_level_5")
-byte(0x4bdc, 20)
+#byte(0x4bdc, 20)
+blank(0x4bf0)
+stars(0x4bf0)
 for i in range(240):
     decimal(0x4b00+i)
+    if (i % 10) == 0:
+        byte(0x4b00+i, 10)
 
 label(0x4ca4, "colour_one_for_each_cave")
 label(0x4ca4+20*1, "colour_two_for_each_cave")
@@ -584,8 +683,12 @@ blank(0x5180)
 
 label(0x5400, "credits")
 
+comment(0x5568, "unused copy of routine at $5700")
 entry(0x5568)
+unused(0x5568)
 unused(0x557b)
+
+byte(0x5600, 14)
 acorn.sound(0x56b8, "sound1")
 label(0x56bc, "sound1_pitch")
 label(0x56be, "sound1_duration")
@@ -595,8 +698,8 @@ acorn.sound(0x56c8, "sound3")
 expr(0x5784, make_lo("sound1"))
 expr(0x5787, make_hi("sound1"))
 
-label(0x5bc0, "start_of_screen")
-
+label(0x5bc0, "start_of_grid_screen_address")
+label(0x5800, "big_rockford_destination_screen_address")
 acorn.bbc()
 
 print(""";

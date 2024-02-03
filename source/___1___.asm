@@ -30,96 +30,147 @@ sprite_6                               = 56
 sprite_7                               = 57
 sprite_8                               = 58
 sprite_9                               = 59
+sprite_boulder1                        = 1
+sprite_boulder2                        = 2
+sprite_box                             = 9
+sprite_boxy1                           = 25
+sprite_boxy2                           = 26
+sprite_boxy3                           = 27
+sprite_boxy4                           = 28
+sprite_butterfly1                      = 22
+sprite_butterfly2                      = 23
+sprite_butterfly3                      = 24
 sprite_comma                           = 63
-sprite_diamond                         = 3
+sprite_dash                            = 61
+sprite_diamond1                        = 3
+sprite_diamond2                        = 4
+sprite_diamond3                        = 5
+sprite_diamond4                        = 6
+sprite_earth1                          = 29
+sprite_earth2                          = 30
+sprite_explosion1                      = 12
+sprite_explosion2                      = 13
+sprite_explosion3                      = 14
+sprite_explosion4                      = 15
+sprite_full_stop                       = 64
+sprite_fungus1                         = 20
+sprite_fungus2                         = 21
+sprite_magic_wall1                     = 16
+sprite_magic_wall2                     = 17
+sprite_magic_wall3                     = 18
+sprite_magic_wall4                     = 19
+sprite_pathway                         = 31
+sprite_rockford_blinking1              = 32
+sprite_rockford_blinking2              = 33
+sprite_rockford_blinking3              = 34
+sprite_rockford_moving_down1           = 37
+sprite_rockford_moving_down2           = 38
+sprite_rockford_moving_down3           = 39
+sprite_rockford_moving_left1           = 42
+sprite_rockford_moving_left2           = 43
+sprite_rockford_moving_left3           = 44
+sprite_rockford_moving_left4           = 45
+sprite_rockford_moving_right1          = 46
+sprite_rockford_moving_right2          = 47
+sprite_rockford_moving_right3          = 48
+sprite_rockford_moving_right4          = 49
+sprite_rockford_moving_up1             = 40
+sprite_rockford_moving_up2             = 41
+sprite_rockford_winking1               = 35
+sprite_rockford_winking2               = 36
 sprite_slash                           = 62
 sprite_space                           = 0
+sprite_titanium_wall1                  = 7
+sprite_titanium_wall2                  = 8
+sprite_wall1                           = 10
+sprite_wall2                           = 11
+sprite_white                           = 60
 total_caves                            = 20
 
 ; Memory locations
-l0000                   = $00
-data_set_ptr_low        = $46
-data_set_ptr_high       = $47
-l0048                   = $48
-l0049                   = $49
-l004a                   = $4a
-l004b                   = $4b
-l004c                   = $4c
-l004d                   = $4d
-l004e                   = $4e
-l0050                   = $50
-l0051                   = $51
-l0052                   = $52
-l0053                   = $53
-l0054                   = $54
-l0055                   = $55
-l0056                   = $56
-l0057                   = $57
-l0058                   = $58
-l0059                   = $59
-l005a                   = $5a
-l005b                   = $5b
-sub_second_ticks        = $5c
-l005d                   = $5d
-l005e                   = $5e
-l005f                   = $5f
-l0060                   = $60
-l0062                   = $62
-l0064                   = $64
-l0065                   = $65
-l0066                   = $66
-l0067                   = $67
-status_text_address_low = $69
-l006a                   = $6a
-l006b                   = $6b
-l006c                   = $6c
-l006d                   = $6d
-l006f                   = $6f
-l0070                   = $70
-l0071                   = $71
-l0072                   = $72
-grid_x                  = $73
-l0074                   = $74
-l0075                   = $75
-l0076                   = $76
-loop_counter            = $77
-l0078                   = $78
-l0079                   = $79
-l007a                   = $7a
-l007b                   = $7b
-l007c                   = $7c
-l007e                   = $7e
-l007f                   = $7f
-screen_addr2_low        = $80
-screen_addr2_high       = $81
-next_ptr_low            = $82
-next_ptr_high           = $83
-l0084                   = $84
-tile_map_ptr_low        = $85
-tile_map_ptr_high       = $86
-cave_number             = $87
-l0088                   = $88
-difficulty_level        = $89
-screen_addr1_low        = $8a
-screen_addr1_high       = $8b
-ptr_low                 = $8c
-ptr_high                = $8d
-l008e                   = $8e
-offset_to_sound         = $8f
-l0ba9                   = $0ba9
-grid_of_screen_sprites  = $0c00
-start_of_screen         = $5bc0
-data_8_6                = $bf06
-data_11_8               = $c00d
-data_7_4                = $c00d
-data_9_2                = $c00d
-data_1_4                = $c021
-data_11_6               = $c22d
-data_5_2                = $c309
-data_5_4                = $c30e
-osword                  = $fff1
-osbyte                  = $fff4
-lfff6                   = $fff6
+l0000                       = $00
+data_set_ptr_low            = $46
+data_set_ptr_high           = $47
+l0048                       = $48
+l0049                       = $49
+l004a                       = $4a
+l004b                       = $4b
+l004c                       = $4c
+l004d                       = $4d
+l004e                       = $4e
+l0050                       = $50
+l0051                       = $51
+l0052                       = $52
+l0053                       = $53
+l0054                       = $54
+l0055                       = $55
+l0056                       = $56
+l0057                       = $57
+l0058                       = $58
+l0059                       = $59
+l005a                       = $5a
+l005b                       = $5b
+sub_second_ticks            = $5c
+l005d                       = $5d
+l005e                       = $5e
+l005f                       = $5f
+l0060                       = $60
+l0062                       = $62
+l0064                       = $64
+l0065                       = $65
+l0066                       = $66
+l0067                       = $67
+status_text_address_low     = $69
+l006a                       = $6a
+l006b                       = $6b
+l006c                       = $6c
+l006d                       = $6d
+l006f                       = $6f
+l0070                       = $70
+l0071                       = $71
+l0072                       = $72
+grid_x                      = $73
+l0074                       = $74
+l0075                       = $75
+l0076                       = $76
+loop_counter                = $77
+l0078                       = $78
+l0079                       = $79
+l007a                       = $7a
+l007b                       = $7b
+l007c                       = $7c
+l007e                       = $7e
+l007f                       = $7f
+screen_addr2_low            = $80
+screen_addr2_high           = $81
+next_ptr_low                = $82
+next_ptr_high               = $83
+l0084                       = $84
+tile_map_ptr_low            = $85
+tile_map_ptr_high           = $86
+cave_number                 = $87
+l0088                       = $88
+difficulty_level            = $89
+screen_addr1_low            = $8a
+screen_addr1_high           = $8b
+ptr_low                     = $8c
+ptr_high                    = $8d
+l008e                       = $8e
+offset_to_sound             = $8f
+l0ba9                       = $0ba9
+grid_of_screen_sprites      = $0c00
+start_of_grid_screen_address = $5bc0
+data_8_6                    = $bf06
+data_11_8                   = $c00d
+data_7_4                    = $c00d
+data_9_2                    = $c00d
+data_1_4                    = $c021
+data_11_6                   = $c22d
+data_5_2                    = $c309
+data_5_4                    = $c30e
+osword                      = $fff1
+osbyte                      = $fff4
+lfff6                       = $fff6
 
     * = $1300
 
@@ -530,7 +581,7 @@ sprite_addr_94
 unused2
     !byte sprite_0                                                    ; 1ee0: 32          2
     !byte sprite_0                                                    ; 1ee1: 32          2
-    !byte sprite_diamond                                              ; 1ee2: 03          .
+    !byte sprite_diamond1                                             ; 1ee2: 03          .
     !byte sprite_0                                                    ; 1ee3: 32          2
     !byte sprite_0                                                    ; 1ee4: 32          2
     !byte sprite_space                                                ; 1ee5: 00          .
@@ -566,7 +617,7 @@ l1f00
 
     !byte sprite_0                                                    ; 1f32: 32          2
     !byte sprite_0                                                    ; 1f33: 32          2
-    !byte sprite_diamond                                              ; 1f34: 03          .
+    !byte sprite_diamond1                                             ; 1f34: 03          .
     !byte sprite_0                                                    ; 1f35: 32          2
     !byte sprite_0                                                    ; 1f36: 32          2
     !byte $0a                                                         ; 1f37: 0a          .
@@ -911,7 +962,7 @@ add_a_to_ptr
 return1
     rts                                                               ; 2249: 60          `
 
-sub_c224a
+reverse_nybbles_and_add_one
     lda l0088                                                         ; 224a: a5 88       ..
     asl                                                               ; 224c: 0a          .
     asl                                                               ; 224d: 0a          .
@@ -933,7 +984,7 @@ sub_c2256
 c2264
     lda l0078                                                         ; 2264: a5 78       .x
     beq c2274                                                         ; 2266: f0 0c       ..
-    jsr sub_c224a                                                     ; 2268: 20 4a 22     J"
+    jsr reverse_nybbles_and_add_one                                   ; 2268: 20 4a 22     J"
 loop_c226b
     cmp l0078                                                         ; 226b: c5 78       .x
     bcc c2274                                                         ; 226d: 90 05       ..
@@ -995,7 +1046,7 @@ c22bd
     and #$3f                                                          ; 22bf: 29 3f       )?
     cmp #$28                                                          ; 22c1: c9 28       .(
     bpl c22dc                                                         ; 22c3: 10 17       ..
-    jsr sub_c224a                                                     ; 22c5: 20 4a 22     J"
+    jsr reverse_nybbles_and_add_one                                   ; 22c5: 20 4a 22     J"
     lsr                                                               ; 22c8: 4a          J
     lsr                                                               ; 22c9: 4a          J
     lsr                                                               ; 22ca: 4a          J
@@ -1044,25 +1095,25 @@ draw_grid_of_sprites
     lda #opcode_lda_abs_y                                             ; 230c: a9 b9       ..
     sta opcode_to_change                                              ; 230e: 8d 57 23    .W#
     lda #<grid_of_screen_sprites                                      ; 2311: a9 00       ..
-    sta start_of_grid_addr1_low                                       ; 2313: 8d 5c 23    .\#
-    sta start_of_grid_addr2_low                                       ; 2316: 8d 61 23    .a#
+    sta grid_addr1_low                                                ; 2313: 8d 5c 23    .\#
+    sta grid_addr2_low                                                ; 2316: 8d 61 23    .a#
     lda #>grid_of_screen_sprites                                      ; 2319: a9 0c       ..
-    sta start_of_grid_addr1_high                                      ; 231b: 8d 5d 23    .]#
-    sta start_of_grid_addr2_high                                      ; 231e: 8d 62 23    .b#
+    sta grid_addr1_high                                               ; 231b: 8d 5d 23    .]#
+    sta grid_addr2_high                                               ; 231e: 8d 62 23    .b#
     ldx #$f0                                                          ; 2321: a2 f0       ..
     bne c234a                                                         ; 2323: d0 25       .%             ; ALWAYS branch
 
 sub_c2325
-    ldy #<start_of_screen                                             ; 2325: a0 c0       ..
-    lda #>start_of_screen                                             ; 2327: a9 5b       .[
+    ldy #<start_of_grid_screen_address                                ; 2325: a0 c0       ..
+    lda #>start_of_grid_screen_address                                ; 2327: a9 5b       .[
 sub_c2329
     sta screen_addr1_high                                             ; 2329: 85 8b       ..
     lda #>backwards_status_bar                                        ; 232b: a9 50       .P
     ldx #<backwards_status_bar                                        ; 232d: a2 28       .(
-    stx start_of_grid_addr1_low                                       ; 232f: 8e 5c 23    .\#
-    stx start_of_grid_addr2_low                                       ; 2332: 8e 61 23    .a#
-    sta start_of_grid_addr1_high                                      ; 2335: 8d 5d 23    .]#
-    sta start_of_grid_addr2_high                                      ; 2338: 8d 62 23    .b#
+    stx grid_addr1_low                                                ; 232f: 8e 5c 23    .\#
+    stx grid_addr2_low                                                ; 2332: 8e 61 23    .a#
+    sta grid_addr1_high                                               ; 2335: 8d 5d 23    .]#
+    sta grid_addr2_high                                               ; 2338: 8d 62 23    .b#
 sub_c233b
 l233c = sub_c233b+1
     lda #>tile_map                                                    ; 233b: a9 32       .2
@@ -1086,13 +1137,13 @@ opcode_to_change
     ldy l1f80                                                         ; 2357: ac 80 1f    ...
     dex                                                               ; 235a: ca          .
 sub_c235b
-start_of_grid_addr1_low = sub_c235b+1
-start_of_grid_addr1_high = sub_c235b+2
+grid_addr1_low = sub_c235b+1
+grid_addr1_high = sub_c235b+2
     cmp backwards_status_bar,x                                        ; 235b: dd 28 50    .(P
     beq skip_draw_sprite                                              ; 235e: f0 49       .I
 sub_c2360
-start_of_grid_addr2_low = sub_c2360+1
-start_of_grid_addr2_high = sub_c2360+2
+grid_addr2_low = sub_c2360+1
+grid_addr2_high = sub_c2360+2
     sta backwards_status_bar,x                                        ; 2360: 9d 28 50    .(P
     tay                                                               ; 2363: a8          .
     clc                                                               ; 2364: 18          .
@@ -2027,11 +2078,7 @@ c2982
 loop_c2995
     dey                                                               ; 2995: 88          .
     bmi c29a1                                                         ; 2996: 30 09       0.
-sub_c2998
-l299a = sub_c2998+2
     lda l4c7c,y                                                       ; 2998: b9 7c 4c    .|L
-sub_c299b
-unused34 = sub_c299b+1
     jsr add_a_to_ptr                                                  ; 299b: 20 40 22     @"
     jmp loop_c2995                                                    ; 299e: 4c 95 29    L.)
 
@@ -2057,7 +2104,7 @@ set_palette_loop
     bne set_palette_loop                                              ; 29c0: d0 ee       ..
     rts                                                               ; 29c2: 60          `
 
-unused35
+unused34
     cmp (l0060),y                                                     ; 29c3: d1 60       .`
     beq return5                                                       ; 29c5: f0 0d       ..
     lda #4                                                            ; 29c7: a9 04       ..
@@ -2065,20 +2112,24 @@ unused35
     and #$3f                                                          ; 29cc: 29 3f       )?
     cmp #$28                                                          ; 29ce: c9 28       .(
     bne c29a1                                                         ; 29d0: d0 cf       ..
-    beq unused34                                                      ; 29d2: f0 c8       ..
+; beq l299c
+    !byte $f0, $c8                                                    ; 29d2: f0 c8       ..
+
 return5
     rts                                                               ; 29d4: 60          `
 
-unused36
+unused35
     inc screen_addr1_low                                              ; 29d5: e6 8a       ..
     bne c29db                                                         ; 29d7: d0 02       ..
     inc screen_addr1_high                                             ; 29d9: e6 8b       ..
 c29db
     lda l007a                                                         ; 29db: a5 7a       .z
-    bne l299a                                                         ; 29dd: d0 bb       ..
+    ; bne l299a
+    !byte $d0, $bb                                                    ; 29dd: d0 bb       ..
+
     rts                                                               ; 29df: 60          `
 
-unused37
+unused36
     !byte $7a, $d0, $bb, $60, $f0, $16, $8a, $18, $69,   8, $aa, $29  ; 29e0: 7a d0 bb... z..
     !byte $3f, $c9, $28, $d0, $d9, $18, $8a, $69, $18, $aa, $90, $d2  ; 29ec: 3f c9 28... ?.(
     !byte $e6, $8d, $d0, $ce, $60, $8d, $d0, $cc                      ; 29f8: e6 8d d0... ...
@@ -2203,43 +2254,44 @@ c2a9c
 return7
     rts                                                               ; 2ab4: 60          `
 
-sub_c2ab5
-    lda #$58                                                          ; 2ab5: a9 58       .X
+; *************************************************************************************
+draw_big_rockford
+    lda #>big_rockford_destination_screen_address                     ; 2ab5: a9 58       .X
     sta ptr_high                                                      ; 2ab7: 85 8d       ..
-    ldy #0                                                            ; 2ab9: a0 00       ..
+    ldy #<big_rockford_destination_screen_address                     ; 2ab9: a0 00       ..
     sty ptr_low                                                       ; 2abb: 84 8c       ..
-    lda #$34                                                          ; 2abd: a9 34       .4
+    lda #>big_rockford_sprite                                         ; 2abd: a9 34       .4
     sta next_ptr_high                                                 ; 2abf: 85 83       ..
     sty next_ptr_low                                                  ; 2ac1: 84 82       ..
-c2ac3
+draw_big_rockford_loop
     ldx #1                                                            ; 2ac3: a2 01       ..
-    jsr sub_c2aeb                                                     ; 2ac5: 20 eb 2a     .*
+    jsr get_next_ptr_byte                                             ; 2ac5: 20 eb 2a     .*
     ldy #6                                                            ; 2ac8: a0 06       ..
-loop_c2aca
-    cmp l2af8,y                                                       ; 2aca: d9 f8 2a    ..*
-    beq c2ad4                                                         ; 2acd: f0 05       ..
+check_if_byte_is_an_rle_byte_loop
+    cmp rle_bytes_table,y                                             ; 2aca: d9 f8 2a    ..*
+    beq get_repeat_count                                              ; 2acd: f0 05       ..
     dey                                                               ; 2acf: 88          .
-    bne loop_c2aca                                                    ; 2ad0: d0 f8       ..
-    beq c2adc                                                         ; 2ad2: f0 08       ..             ; ALWAYS branch
+    bne check_if_byte_is_an_rle_byte_loop                             ; 2ad0: d0 f8       ..
+    beq copy_x_bytes_in_rle_loop                                      ; 2ad2: f0 08       ..             ; ALWAYS branch
 
-c2ad4
+get_repeat_count
     ldy #0                                                            ; 2ad4: a0 00       ..
     pha                                                               ; 2ad6: 48          H
-    jsr sub_c2aeb                                                     ; 2ad7: 20 eb 2a     .*
+    jsr get_next_ptr_byte                                             ; 2ad7: 20 eb 2a     .*
     tax                                                               ; 2ada: aa          .
     pla                                                               ; 2adb: 68          h
-c2adc
+copy_x_bytes_in_rle_loop
     sta (ptr_low),y                                                   ; 2adc: 91 8c       ..
     inc ptr_low                                                       ; 2ade: e6 8c       ..
-    bne c2ae6                                                         ; 2ae0: d0 04       ..
+    bne skip_inc_high                                                 ; 2ae0: d0 04       ..
     inc ptr_high                                                      ; 2ae2: e6 8d       ..
     bmi return8                                                       ; 2ae4: 30 0d       0.
-c2ae6
+skip_inc_high
     dex                                                               ; 2ae6: ca          .
-    bne c2adc                                                         ; 2ae7: d0 f3       ..
-    beq c2ac3                                                         ; 2ae9: f0 d8       ..             ; ALWAYS branch
+    bne copy_x_bytes_in_rle_loop                                      ; 2ae7: d0 f3       ..
+    beq draw_big_rockford_loop                                        ; 2ae9: f0 d8       ..             ; ALWAYS branch
 
-sub_c2aeb
+get_next_ptr_byte
     lda (next_ptr_low),y                                              ; 2aeb: b1 82       ..
     inc next_ptr_low                                                  ; 2aed: e6 82       ..
     bne return8                                                       ; 2aef: d0 02       ..
@@ -2249,8 +2301,12 @@ return8
 
 unused38
     !byte $f0, $e5, $a9,   0                                          ; 2af4: f0 e5 a9... ...
-l2af8
-    !byte $85, $48, $10, $ec, $ff, $0f,   0, $27                      ; 2af8: 85 48 10... .H.
+
+rle_bytes_table
+    !byte $85, $48, $10, $ec, $ff, $0f,   0                           ; 2af8: 85 48 10... .H.
+
+unused37
+    !byte $27                                                         ; 2aff: 27          '
 
 sub_c2b00
     lda ptr_high                                                      ; 2b00: a5 8d       ..
@@ -2453,7 +2509,7 @@ sub_c2c80
     ldx #$88                                                          ; 2c9b: a2 88       ..
     jsr c2c2c                                                         ; 2c9d: 20 2c 2c     ,,
 c2ca0
-    jsr sub_c224a                                                     ; 2ca0: 20 4a 22     J"
+    jsr reverse_nybbles_and_add_one                                   ; 2ca0: 20 4a 22     J"
     and #$0c                                                          ; 2ca3: 29 0c       ).
     sta l2c02                                                         ; 2ca5: 8d 02 2c    ..,
     ldx #5                                                            ; 2ca8: a2 05       ..
@@ -2879,7 +2935,7 @@ loop_c2fba
     dey                                                               ; 2fc3: 88          .
     bne loop_c2fba                                                    ; 2fc4: d0 f4       ..
 c2fc6
-    lda required_diamonds_for_each_cave,x                             ; 2fc6: bd 28 4b    .(K
+    lda required_diamonds_for_each_cave_difficulty_level_1,x          ; 2fc6: bd 28 4b    .(K
     sta l006c                                                         ; 2fc9: 85 6c       .l
     ldy #1                                                            ; 2fcb: a0 01       ..
     jsr add_a_to_status_bar_number_at_y                               ; 2fcd: 20 c0 28     .(
@@ -3084,7 +3140,7 @@ status_bar_sprite_numbers
     !byte sprite_4                                                    ; 3200: 36          6
 required_diamonds_on_status_bar
     !byte sprite_2                                                    ; 3201: 34          4
-    !byte sprite_diamond                                              ; 3202: 03          .
+    !byte sprite_diamond1                                             ; 3202: 03          .
 total_diamonds_on_status_bar_high_digit
     !byte sprite_1                                                    ; 3203: 33          3
 total_diamonds_on_status_bar_low_digit
@@ -3129,7 +3185,7 @@ difficulty_level_on_status_bar
 l3228
     !byte sprite_6                                                    ; 3228: 38          8
     !byte sprite_0                                                    ; 3229: 32          2
-    !byte sprite_diamond                                              ; 322a: 03          .
+    !byte sprite_diamond1                                             ; 322a: 03          .
     !byte sprite_0                                                    ; 322b: 32          2
     !byte sprite_5                                                    ; 322c: 37          7
     !byte sprite_space                                                ; 322d: 00          .
@@ -3291,7 +3347,7 @@ highscore_last_status_bar
 zeroed_status_bar
     !byte sprite_0                                                    ; 32f0: 32          2
     !byte sprite_0                                                    ; 32f1: 32          2
-    !byte sprite_diamond                                              ; 32f2: 03          .
+    !byte sprite_diamond1                                             ; 32f2: 03          .
     !byte sprite_0                                                    ; 32f3: 32          2
     !byte sprite_0                                                    ; 32f4: 32          2
     !byte sprite_space                                                ; 32f5: 00          .
@@ -3364,6 +3420,7 @@ unused52
     !byte $0d,   0, $82, $1b                                          ; 33ef: 0d 00 82... ...
     !text " JSR 8850:LDX"                                             ; 33f3: 20 4a 53...  JS
 
+big_rockford_sprite
     !byte   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0  ; 3400: 00 00 00... ...
     !byte   0,   0,   0,   0,   0,   0,   0, $1a, $10,   1, $11,   0  ; 340c: 00 00 00... ...
     !byte   2,   3, $21,   0,   2,   8,   6, $ca, $cb, $87, $69,   0  ; 3418: 02 03 21... ..!
@@ -3372,129 +3429,93 @@ unused52
     !byte $6d, $0f,   1,   0,   2,   1, $12, $35, $3d, $1e, $69,   0  ; 343c: 6d 0f 01... m..
     !byte   2, $80, $88,   0,   2, $0c, $68,   0, $fd, $10,   1,   0  ; 3448: 02 80 88... ...
     !byte   2, $32, $11,   1,   7, $69, $32, $b1, $52, $7e, $97, $cb  ; 3454: 02 32 11... .2.
-    !text "O-<x"                                                      ; 3460: 4f 2d 3c... O-<
-    !byte $e1, $2d, $3e, $97, $ad, $78, $f0, $0f,   1, $69, $3e, $1e  ; 3464: e1 2d 3e... .->
-    !text "Z|>"                                                       ; 3470: 5a 7c 3e    Z|>
-    !byte $96, $78, $0f,   1, $c7, $87, $a5, $e3, $c7, $96, $e1, $0f  ; 3473: 96 78 0f... .x.
-    !byte   1, $4b, $c7, $9e, $5b, $e1, $f0, $0f,   1, $69, $e7, $9e  ; 347f: 01 4b c7... .K.
-    !text "=/K"                                                       ; 348b: 3d 2f 4b    =/K
-    !byte $c3, $e1, $78, $c4, $88,   8, $0e, $3e, $2d, $c4, $8e,   0  ; 348e: c3 e1 78... ..x
-    !byte   6,   8,   0, $f3,   1,   0,   4,   1                      ; 349a: 06 08 00... ...
-    !text "GK2"                                                       ; 34a2: 47 4b 32    GK2
-    !byte $17,   7                                                    ; 34a5: 17 07       ..
-    !text "->Z"                                                       ; 34a7: 2d 3e 5a    ->Z
-    !byte $cb, $5a, $96, $87, $96, $96, $1e, $1e, $f0, $96, $69, $96  ; 34aa: cb 5a 96... .Z.
-    !byte $1e, $4b, $1e, $69, $0f,   1, $87, $4b, $0f,   1, $87, $87  ; 34b6: 1e 4b 1e... .K.
-    !byte $87, $4b, $0f,   1, $1e, $1e, $2d, $1e, $1e, $1e, $1e, $f0  ; 34c2: 87 4b 0f... .K.
-    !byte $96, $69, $96, $1e, $4b, $1e, $69, $0f,   1, $87, $87, $0f  ; 34ce: 96 69 96... .i.
-    !byte   1, $87, $87, $87                                          ; 34da: 01 87 87... ...
-    !text "K>-"                                                       ; 34de: 4b 3e 2d    K>-
-    !byte $c4, $8e, $0e, $4b, $c7, $a5,   0,   2,   8,   0,   4,   8  ; 34e1: c4 8e 0e... ...
-    !byte   0, $f0,   1,   1, $12, $13, $10,   4, $e1, $cb, $87, $87  ; 34ed: 00 f0 01... ...
-    !byte $0f,   4                                                    ; 34f9: 0f 04       ..
-    !text "-<<====="                                                  ; 34fb: 2d 3c 3c... -<<
-    !byte $f6, $ff,   2, $ee, $dc, $dc, $b8, $b9, $4b, $87, $87, $87  ; 3503: f6 ff 02... ...
-    !byte $87, $87, $96, $87                                          ; 350f: 87 87 96... ...
-    !text "-<<==="                                                    ; 3513: 2d 3c 3c... -<<
-    !byte $b5, $79, $f6, $ff,   2, $ee, $dc, $dc, $b8, $b9, $4b, $87  ; 3519: b5 79 f6... .y.
-    !byte $87, $87, $87, $87, $87, $87, $78, $3d, $1e, $1e, $0f,   4  ; 3525: 87 87 87... ...
-    !byte   8,   8, $84, $8c, $80, $80, $80, $80,   0, $f0            ; 3531: 08 08 84... ...
-    !text "!!!!!!!!"                                                  ; 353b: 21 21 21... !!!
-    !byte $0f,   8, $3d, $1e, $0f,   6, $b9, $b8, $e1, $0f,   5, $97  ; 3543: 0f 08 3d... ..=
-    !byte $0f,   2                                                    ; 354f: 0f 02       ..
-    !text "KK-"                                                       ; 3551: 4b 4b 2d    KK-
-    !byte $1e, $0f,   1, $79, $bc, $ad                                ; 3554: 1e 0f 01... ...
-    !text "-KK"                                                       ; 355a: 2d 4b 4b    -KK
-    !byte $87, $0f,   1, $b9, $b8, $e1, $0f,   5, $87, $0f,   5, $a5  ; 355d: 87 0f 01... ...
-    !byte $4b, $0f,   8, $48,   8,   0, $f0, $10,   3,   0,   5, $0f  ; 3569: 4b 0f 08... K..
-    !byte   3, $87, $87, $43, $21, $10,   1, $0f,   7, $87, $4b, $c3  ; 3575: 03 87 87... ...
-    !byte $4b, $a5, $1e, $0f,   7, $87, $78, $0f,   6, $3c, $c3, $0f  ; 3581: 4b a5 1e... K..
-    !byte   4, $1e, $69, $87, $0f,   3, $69, $87, $0f,   5, $1e, $0f  ; 358d: 04 1e 69... ..i
-    !byte   3, $1e, $1e, $2c, $48,   1, $80, $80, $80, $80,   0,   0  ; 3599: 03 1e 1e... ...
-    !byte   0,   5, $52, $30,   0,   6, $0f,   2, $87                 ; 35a5: 00 05 52... ..R
-    !text "C!!"                                                       ; 35ae: 43 21 21    C!!
-    !byte $10,   1,   0,   1, $0f,   7, $87, $0f,   7, $1e, $0f,   2  ; 35b1: 10 01 00... ...
-    !byte $1e, $2c, $48,   2, $80,   0,   1, $a4, $c0,   0, $33, $11  ; 35bd: 1e 2c 48... .,H
-    !byte $33, $77,   0,   4, $88, $cc, $ee, $ff,   1,   0, $d5, $10  ; 35c9: 33 77 00... 3w.
-    !byte   2, $31,   0,   3, $70, $f6, $ff,   3,   0,   1, $10,   1  ; 35d5: 02 31 00... .1.
-    !byte $f1, $3d, $fc, $f6, $fe, $f7, $f0, $8f, $8f, $cb, $fc, $ff  ; 35e1: f1 3d fc... .=.
-    !byte   2, $f3, $f0                                               ; 35ed: 02 f3 f0    ...
-    !text "==="                                                       ; 35f0: 3d 3d 3d    ===
-    !byte $f3, $ff,   2, $fc,   0,   1, $80, $c8, $e8, $fa, $f5, $f7  ; 35f3: f3 ff 02... ...
-    !byte $9f,   0,   5, $80, $80, $c8,   0, $1d, $11, $33, $77,   0  ; 35ff: 9f 00 05... ...
-    !byte   1, $11, $33, $77, $ff,   1, $dd, $bb, $cc, $ff,   1, $55  ; 360b: 01 11 33... ..3
-    !byte $aa, $ff,   2, $55,   0,   1, $a0, $ee, $55, $bb, $ff,   2  ; 3617: aa ff 02... ...
-    !text "wU "                                                       ; 3623: 77 55 20    wU
-    !byte $88, $44, $ee, $ff,   2, $ee, $bb, $e0,   0,   4, $88, $cc  ; 3626: 88 44 ee... .D.
-    !byte $22, $73,   0, $bb, $10,   2                                ; 3632: 22 73 00... "s.
-    !text "!ssCC"                                                     ; 3638: 21 73 73... !ss
-    !byte $87, $0f,   3, $8f, $cf, $ff,   2                           ; 363d: 87 0f 03... ...
-    !text "~=<z"                                                      ; 3644: 7e 3d 3c... ~=<
-    !byte $d4, $f6, $ff,   1, $87, $87, $87                           ; 3648: d4 f6 ff... ...
-    !text "KK-"                                                       ; 364f: 4b 4b 2d    KK-
-    !byte $b5, $fc, $7f, $0f,   5, $ff,   1, $e3, $8f, $0f,   4, $1f  ; 3652: b5 fc 7f... ...
-    !byte $ff,   1, $1e, $1f, $1e, $0f,   1, $3e, $6f, $fe, $ff,   1  ; 365e: ff 01 1e... ...
-    !byte $c8, $48,   1                                               ; 366a: c8 48 01    .H.
-    !text ",,,,"                                                      ; 366d: 2c 2c 2c... ,,,
-    !byte $fe, $fe,   0, $18                                          ; 3671: fe fe 00... ...
-    !text "UDDD", '"'                                                 ; 3675: 55 44 44... UDD
-    !byte $11, $10,   1, $31, $b8, $a8, $55, $33, $11,   0,   1, $b0  ; 367a: 11 10 01... ...
-    !byte $f3,   0,   1, $aa, $55, $ff,   2, $fe, $f5, $fb, $90, $31  ; 3686: f3 00 01... ...
-    !byte $75, $fb, $fb, $f3, $fd, $ff,   1, $fe, $fe, $fe, $fd, $ed  ; 3692: 75 fb fb... u..
-    !byte $ed, $cb, $da, $a3, $47, $8f, $1f, $78, $f6, $f6, $fe, $80  ; 369e: ed cb da... ...
-    !byte $c8, $c8, $c8, $80,   0, $aa, $10,   1,   0,   1, $10,   2  ; 36aa: c8 c8 c8... ...
-    !text "!CC"                                                       ; 36b6: 21 43 43    !CC
-    !byte $87, $0f,   1, $f7, $ff,   2, $3f, $1f, $1f, $1e, $1e, $fe  ; 36b9: 87 0f 01... ...
-    !byte $fe, $fd, $ec,   1, $fb, $c0, $72, $31, $dc, $b9,   0,   1  ; 36c5: fe fd ec... ...
-    !byte $fb, $32, $d5, $fe, $64, $96, $da, $cb, $40, $d8, $b1, $73  ; 36d1: fb 32 d5... .2.
-    !byte $f7, $ff,   2, $f5, $f4, $fb, $db, $c5, $b7, $ff,   3, $ef  ; 36dd: f7 ff 02... ...
-    !byte $87, $cb, $ed, $be, $fe, $ff,   1, $9e, $1e, $1e, $1e, $0e  ; 36e9: 87 cb ed... ...
-    !byte $0e, $fe, $ff,   1, $ef, $8f, $0f,   2, $87, $87,   0,   1  ; 36f5: 0e fe ff... ...
-    !byte $80, $80, $80, $48,   4,   0,   5, $10,   1, $31, $f3,   0  ; 3701: 80 80 80... ...
-    !byte   2, $10,   1, $21, $c3, $cf, $cf, $cf, $73, $72, $f6, $f6  ; 370d: 02 10 01... ...
-    !byte $f6, $f6, $f7, $7b, $f7, $ff,   4, $fd, $d0, $80, $fb, $ff  ; 3719: f6 f6 f7... ...
-    !byte   4, $fe, $e0,   0,   1, $ff,   1, $fe, $fd, $f9, $90,   0  ; 3725: 04 fe e0... ...
-    !byte   3, $f5, $fa, $ff,   3, $f0,   0,   2, $fe, $ec,   2, $c8  ; 3731: 03 f5 fa... ...
-    !byte $80,   0, $ab, $10,   1                                     ; 373d: 80 00 ab... ...
-    !text "1sss"                                                      ; 3742: 31 73 73... 1ss
-    !byte $f7, $f7, $e7, $0f,   1, $cf, $ef, $ef, $fe, $fc, $ef, $0f  ; 3746: f7 f7 e7... ...
-    !byte   1, $2c, $48,   2, $80,   0,   1, $10,   1, $b1, $7b, $31  ; 3752: 01 2c 48... .,H
-    !byte $10,   1, $31, $73, $e7, $df, $af, $ce, $d8, $a1, $c3, $cb  ; 375e: 10 01 31... ..1
-    !text ")6^"                                                       ; 376a: 29 36 5e    )6^
-    !byte $fe, $1e, $1e                                               ; 376d: fe 1e 1e    ...
-    !text "-=k"                                                       ; 3770: 2d 3d 6b    -=k
-    !byte $ea, $c6, $e7, $9b, $af, $77, $3f, $df, $7f, $fc, $7b, $9f  ; 3773: ea c6 e7... ...
-    !byte $cf, $9d, $0d, $9b, $3e, $1a, $e5, $f6, $a6, $96, $96, $96  ; 377f: cf 9d 0d... ...
-    !text "<<z"                                                       ; 378b: 3c 3c 7a    <<z
-    !byte $97, $b7                                                    ; 378e: 97 b7       ..
-    !text "sssq1"                                                     ; 3790: 73 73 73... sss
-    !byte $10,   1, $f8, $cb, $c7, $cf, $c7, $ef, $ef, $f4, $3f, $1f  ; 3795: 10 01 f8... ...
-    !byte $1f, $1f, $1e, $2c, $c0,   0,   1, $ef, $fe, $ec,   1, $c0  ; 37a1: 1f 1f 1e... ...
-    !byte   0,   4, $78, $80,   0, $d6, $e7                           ; 37ad: 00 04 78... ..x
-    !text "CC!1"                                                      ; 37b4: 43 43 21... CC!
-    !byte $10,   1,   0,   2, $0f,   3, $3f, $ff,   2, $f7            ; 37b8: 10 01 00... ...
-    !text "s-~"                                                       ; 37c2: 73 2d 7e    s-~
-    !byte $fe, $ff,   2, $ef, $cf, $8f, $9b, $8d, $3b, $d6            ; 37c5: fe ff 02... ...
-    !text "yj<="                                                      ; 37cf: 79 6a 3c... yj<
-    !byte $bc, $fa, $f7, $bb, $55, $e2, $ec,   1, $fa, $df, $8d, $d6  ; 37d3: bc fa f7... ...
-    !byte $fa, $fd, $fd, $f3, $ff,   1, $f7, $f6, $fe, $fd, $fd, $fa  ; 37df: fa fd fd... ...
-    !byte $fa, $e1, $e5, $cb, $cb, $96, $96                           ; 37eb: fa e1 e5... ...
-    !text "<=yZ"                                                      ; 37f2: 3c 3d 79... <=y
-    !byte $96, $96, $1e, $d2, $fc, $fc, $fc,   0,   8, $c0,   0, $f7  ; 37f6: 96 96 1e... ...
-    !byte $31, $10,   1,   0,   6, $0f,   2, $87                      ; 3802: 31 10 01... 1..
-    !text "R0111{"                                                    ; 380a: 52 30 31... R01
-    !byte $f7, $f6, $fe, $fd, $fd, $fb, $fb, $fb, $f7, $ff, $0e, $ed  ; 3810: f7 f6 fe... ...
-    !byte $fe, $fe, $ff,   5, $7b, $f7, $ff,   3, $fe, $fc, $f9, $fa  ; 381c: fe fe ff... ...
-    !byte $fa, $da, $96, $b5, $f3, $ff,   2,   0,   4, $80, $80, $80  ; 3828: fa da 96... ...
-    !byte $80,   0,   0                                               ; 3834: 80 00 00    ...
-    !text "111"                                                       ; 3837: 31 31 31    111
-    !byte $10,   1,   0,   4, $fb, $fb, $fb, $b0                      ; 383a: 10 01 00... ...
-    !text "1111"                                                      ; 3842: 31 31 31... 111
-    !byte $ff,   4, $f7, $fb, $fd, $fe, $ff,   4, $fd, $fe, $ff,   2  ; 3846: ff 04 f7... ...
-    !byte $f6, $f9, $ff,   3, $f0, $ff,   2, $f5, $fd, $fd, $fb, $f7  ; 3852: f6 f9 ff... ...
-    !byte $f7, $f7, $f7, $ff,   2, $fe, $fe, $fe, $fe, $fe, $fe, $80  ; 385e: f7 f7 f7... ...
-    !byte $80,   0,   0,   0, $0e                                     ; 386a: 80 00 00... ...
-    !text "11111"                                                     ; 386f: 31 31 31... 111
+    !byte $4f, $2d, $3c, $78, $e1, $2d, $3e, $97, $ad, $78, $f0, $0f  ; 3460: 4f 2d 3c... O-<
+    !byte   1, $69, $3e, $1e, $5a, $7c, $3e, $96, $78, $0f,   1, $c7  ; 346c: 01 69 3e... .i>
+    !byte $87, $a5, $e3, $c7, $96, $e1, $0f,   1, $4b, $c7, $9e, $5b  ; 3478: 87 a5 e3... ...
+    !byte $e1, $f0, $0f,   1, $69, $e7, $9e, $3d, $2f, $4b, $c3, $e1  ; 3484: e1 f0 0f... ...
+    !byte $78, $c4, $88,   8, $0e, $3e, $2d, $c4, $8e,   0,   6,   8  ; 3490: 78 c4 88... x..
+    !byte   0, $f3,   1,   0,   4,   1, $47, $4b, $32, $17,   7, $2d  ; 349c: 00 f3 01... ...
+    !byte $3e, $5a, $cb, $5a, $96, $87, $96, $96, $1e, $1e, $f0, $96  ; 34a8: 3e 5a cb... >Z.
+    !byte $69, $96, $1e, $4b, $1e, $69, $0f,   1, $87, $4b, $0f,   1  ; 34b4: 69 96 1e... i..
+    !byte $87, $87, $87, $4b, $0f,   1, $1e, $1e, $2d, $1e, $1e, $1e  ; 34c0: 87 87 87... ...
+    !byte $1e, $f0, $96, $69, $96, $1e, $4b, $1e, $69, $0f,   1, $87  ; 34cc: 1e f0 96... ...
+    !byte $87, $0f,   1, $87, $87, $87, $4b, $3e, $2d, $c4, $8e, $0e  ; 34d8: 87 0f 01... ...
+    !byte $4b, $c7, $a5,   0,   2,   8,   0,   4,   8,   0, $f0,   1  ; 34e4: 4b c7 a5... K..
+    !byte   1, $12, $13, $10,   4, $e1, $cb, $87, $87, $0f,   4, $2d  ; 34f0: 01 12 13... ...
+    !byte $3c, $3c, $3d, $3d, $3d, $3d, $3d, $f6, $ff,   2, $ee, $dc  ; 34fc: 3c 3c 3d... <<=
+    !byte $dc, $b8, $b9, $4b, $87, $87, $87, $87, $87, $96, $87, $2d  ; 3508: dc b8 b9... ...
+    !byte $3c, $3c, $3d, $3d, $3d, $b5, $79, $f6, $ff,   2, $ee, $dc  ; 3514: 3c 3c 3d... <<=
+    !byte $dc, $b8, $b9, $4b, $87, $87, $87, $87, $87, $87, $87, $78  ; 3520: dc b8 b9... ...
+    !byte $3d, $1e, $1e, $0f,   4,   8,   8, $84, $8c, $80, $80, $80  ; 352c: 3d 1e 1e... =..
+    !byte $80,   0, $f0, $21, $21, $21, $21, $21, $21, $21, $21, $0f  ; 3538: 80 00 f0... ...
+    !byte   8, $3d, $1e, $0f,   6, $b9, $b8, $e1, $0f,   5, $97, $0f  ; 3544: 08 3d 1e... .=.
+    !byte   2, $4b, $4b, $2d, $1e, $0f,   1, $79, $bc, $ad, $2d, $4b  ; 3550: 02 4b 4b... .KK
+    !byte $4b, $87, $0f,   1, $b9, $b8, $e1, $0f,   5, $87, $0f,   5  ; 355c: 4b 87 0f... K..
+    !byte $a5, $4b, $0f,   8, $48,   8,   0, $f0, $10,   3,   0,   5  ; 3568: a5 4b 0f... .K.
+    !byte $0f,   3, $87, $87, $43, $21, $10,   1, $0f,   7, $87, $4b  ; 3574: 0f 03 87... ...
+    !byte $c3, $4b, $a5, $1e, $0f,   7, $87, $78, $0f,   6, $3c, $c3  ; 3580: c3 4b a5... .K.
+    !byte $0f,   4, $1e, $69, $87, $0f,   3, $69, $87, $0f,   5, $1e  ; 358c: 0f 04 1e... ...
+    !byte $0f,   3, $1e, $1e, $2c, $48,   1, $80, $80, $80, $80,   0  ; 3598: 0f 03 1e... ...
+    !byte   0,   0,   5, $52, $30,   0,   6, $0f,   2, $87, $43, $21  ; 35a4: 00 00 05... ...
+    !byte $21, $10,   1,   0,   1, $0f,   7, $87, $0f,   7, $1e, $0f  ; 35b0: 21 10 01... !..
+    !byte   2, $1e, $2c, $48,   2, $80,   0,   1, $a4, $c0,   0, $33  ; 35bc: 02 1e 2c... ..,
+    !byte $11, $33, $77,   0,   4, $88, $cc, $ee, $ff,   1,   0, $d5  ; 35c8: 11 33 77... .3w
+    !byte $10,   2, $31,   0,   3, $70, $f6, $ff,   3,   0,   1, $10  ; 35d4: 10 02 31... ..1
+    !byte   1, $f1, $3d, $fc, $f6, $fe, $f7, $f0, $8f, $8f, $cb, $fc  ; 35e0: 01 f1 3d... ..=
+    !byte $ff,   2, $f3, $f0, $3d, $3d, $3d, $f3, $ff,   2, $fc,   0  ; 35ec: ff 02 f3... ...
+    !byte   1, $80, $c8, $e8, $fa, $f5, $f7, $9f,   0,   5, $80, $80  ; 35f8: 01 80 c8... ...
+    !byte $c8,   0, $1d, $11, $33, $77,   0,   1, $11, $33, $77, $ff  ; 3604: c8 00 1d... ...
+    !byte   1, $dd, $bb, $cc, $ff,   1, $55, $aa, $ff,   2, $55,   0  ; 3610: 01 dd bb... ...
+    !byte   1, $a0, $ee, $55, $bb, $ff,   2, $77, $55, $20, $88, $44  ; 361c: 01 a0 ee... ...
+    !byte $ee, $ff,   2, $ee, $bb, $e0,   0,   4, $88, $cc, $22, $73  ; 3628: ee ff 02... ...
+    !byte   0, $bb, $10,   2, $21, $73, $73, $43, $43, $87, $0f,   3  ; 3634: 00 bb 10... ...
+    !byte $8f, $cf, $ff,   2, $7e, $3d, $3c, $7a, $d4, $f6, $ff,   1  ; 3640: 8f cf ff... ...
+    !byte $87, $87, $87, $4b, $4b, $2d, $b5, $fc, $7f, $0f,   5, $ff  ; 364c: 87 87 87... ...
+    !byte   1, $e3, $8f, $0f,   4, $1f, $ff,   1, $1e, $1f, $1e, $0f  ; 3658: 01 e3 8f... ...
+    !byte   1, $3e, $6f, $fe, $ff,   1, $c8, $48,   1, $2c, $2c, $2c  ; 3664: 01 3e 6f... .>o
+    !byte $2c, $fe, $fe,   0, $18, $55, $44, $44, $44, $22, $11, $10  ; 3670: 2c fe fe... ,..
+    !byte   1, $31, $b8, $a8, $55, $33, $11,   0,   1, $b0, $f3,   0  ; 367c: 01 31 b8... .1.
+    !byte   1, $aa, $55, $ff,   2, $fe, $f5, $fb, $90, $31, $75, $fb  ; 3688: 01 aa 55... ..U
+    !byte $fb, $f3, $fd, $ff,   1, $fe, $fe, $fe, $fd, $ed, $ed, $cb  ; 3694: fb f3 fd... ...
+    !byte $da, $a3, $47, $8f, $1f, $78, $f6, $f6, $fe, $80, $c8, $c8  ; 36a0: da a3 47... ..G
+    !byte $c8, $80,   0, $aa, $10,   1,   0,   1, $10,   2, $21, $43  ; 36ac: c8 80 00... ...
+    !byte $43, $87, $0f,   1, $f7, $ff,   2, $3f, $1f, $1f, $1e, $1e  ; 36b8: 43 87 0f... C..
+    !byte $fe, $fe, $fd, $ec,   1, $fb, $c0, $72, $31, $dc, $b9,   0  ; 36c4: fe fe fd... ...
+    !byte   1, $fb, $32, $d5, $fe, $64, $96, $da, $cb, $40, $d8, $b1  ; 36d0: 01 fb 32... ..2
+    !byte $73, $f7, $ff,   2, $f5, $f4, $fb, $db, $c5, $b7, $ff,   3  ; 36dc: 73 f7 ff... s..
+    !byte $ef, $87, $cb, $ed, $be, $fe, $ff,   1, $9e, $1e, $1e, $1e  ; 36e8: ef 87 cb... ...
+    !byte $0e, $0e, $fe, $ff,   1, $ef, $8f, $0f,   2, $87, $87,   0  ; 36f4: 0e 0e fe... ...
+    !byte   1, $80, $80, $80, $48,   4,   0,   5, $10,   1, $31, $f3  ; 3700: 01 80 80... ...
+    !byte   0,   2, $10,   1, $21, $c3, $cf, $cf, $cf, $73, $72, $f6  ; 370c: 00 02 10... ...
+    !byte $f6, $f6, $f6, $f7, $7b, $f7, $ff,   4, $fd, $d0, $80, $fb  ; 3718: f6 f6 f6... ...
+    !byte $ff,   4, $fe, $e0,   0,   1, $ff,   1, $fe, $fd, $f9, $90  ; 3724: ff 04 fe... ...
+    !byte   0,   3, $f5, $fa, $ff,   3, $f0,   0,   2, $fe, $ec,   2  ; 3730: 00 03 f5... ...
+    !byte $c8, $80,   0, $ab, $10,   1, $31, $73, $73, $73, $f7, $f7  ; 373c: c8 80 00... ...
+    !byte $e7, $0f,   1, $cf, $ef, $ef, $fe, $fc, $ef, $0f,   1, $2c  ; 3748: e7 0f 01... ...
+    !byte $48,   2, $80,   0,   1, $10,   1, $b1, $7b, $31, $10,   1  ; 3754: 48 02 80... H..
+    !byte $31, $73, $e7, $df, $af, $ce, $d8, $a1, $c3, $cb, $29, $36  ; 3760: 31 73 e7... 1s.
+    !byte $5e, $fe, $1e, $1e, $2d, $3d, $6b, $ea, $c6, $e7, $9b, $af  ; 376c: 5e fe 1e... ^..
+    !byte $77, $3f, $df, $7f, $fc, $7b, $9f, $cf, $9d, $0d, $9b, $3e  ; 3778: 77 3f df... w?.
+    !byte $1a, $e5, $f6, $a6, $96, $96, $96, $3c, $3c, $7a, $97, $b7  ; 3784: 1a e5 f6... ...
+    !byte $73, $73, $73, $71, $31, $10,   1, $f8, $cb, $c7, $cf, $c7  ; 3790: 73 73 73... sss
+    !byte $ef, $ef, $f4, $3f, $1f, $1f, $1f, $1e, $2c, $c0,   0,   1  ; 379c: ef ef f4... ...
+    !byte $ef, $fe, $ec,   1, $c0,   0,   4, $78, $80,   0, $d6, $e7  ; 37a8: ef fe ec... ...
+    !byte $43, $43, $21, $31, $10,   1,   0,   2, $0f,   3, $3f, $ff  ; 37b4: 43 43 21... CC!
+    !byte   2, $f7, $73, $2d, $7e, $fe, $ff,   2, $ef, $cf, $8f, $9b  ; 37c0: 02 f7 73... ..s
+    !byte $8d, $3b, $d6, $79, $6a, $3c, $3d, $bc, $fa, $f7, $bb, $55  ; 37cc: 8d 3b d6... .;.
+    !byte $e2, $ec,   1, $fa, $df, $8d, $d6, $fa, $fd, $fd, $f3, $ff  ; 37d8: e2 ec 01... ...
+    !byte   1, $f7, $f6, $fe, $fd, $fd, $fa, $fa, $e1, $e5, $cb, $cb  ; 37e4: 01 f7 f6... ...
+    !byte $96, $96, $3c, $3d, $79, $5a, $96, $96, $1e, $d2, $fc, $fc  ; 37f0: 96 96 3c... ..<
+    !byte $fc,   0,   8, $c0,   0, $f7, $31, $10,   1,   0,   6, $0f  ; 37fc: fc 00 08... ...
+    !byte   2, $87, $52, $30, $31, $31, $31, $7b, $f7, $f6, $fe, $fd  ; 3808: 02 87 52... ..R
+    !byte $fd, $fb, $fb, $fb, $f7, $ff, $0e, $ed, $fe, $fe, $ff,   5  ; 3814: fd fb fb... ...
+    !byte $7b, $f7, $ff,   3, $fe, $fc, $f9, $fa, $fa, $da, $96, $b5  ; 3820: 7b f7 ff... {..
+    !byte $f3, $ff,   2,   0,   4, $80, $80, $80, $80,   0,   0, $31  ; 382c: f3 ff 02... ...
+    !byte $31, $31, $10,   1,   0,   4, $fb, $fb, $fb, $b0, $31, $31  ; 3838: 31 31 10... 11.
+    !byte $31, $31, $ff,   4, $f7, $fb, $fd, $fe, $ff,   4, $fd, $fe  ; 3844: 31 31 ff... 11.
+    !byte $ff,   2, $f6, $f9, $ff,   3, $f0, $ff,   2, $f5, $fd, $fd  ; 3850: ff 02 f6... ...
+    !byte $fb, $f7, $f7, $f7, $f7, $ff,   2, $fe, $fe, $fe, $fe, $fe  ; 385c: fb f7 f7... ...
+    !byte $fe, $80, $80,   0,   0,   0, $0e, $31, $31, $31, $31, $31  ; 3868: fe 80 80... ...
     !byte $10,   3, $ff,   8, $f7, $f9, $fe, $ff,   1, $fe, $fe, $fe  ; 3874: 10 03 ff... ...
     !byte $ec,   1, $fe, $fd, $f3, $b1, $10,   2,   0,   2, $ff,   6  ; 3880: ec 01 fe... ...
     !byte $f7, $f7, $ec,   8,   0,   0,   0, $10, $10,   8, $ff,   8  ; 388c: f7 f7 ec... ...
@@ -3504,39 +3525,33 @@ unused52
     !byte $f7, $ec,   8,   0,   0,   0, $10, $10,   8, $ff,   8, $ec  ; 38bc: f7 ec 08... ...
     !byte   7, $fe,   0,   4, $10,   4, $f7, $f7, $f7, $f7, $ff,   4  ; 38c8: 07 fe 00... ...
     !byte $ec,   4, $fe, $fe, $fe, $ec,   1,   0,   0,   0, $0e, $10  ; 38d4: ec 04 fe... ...
-    !byte   1                                                         ; 38e0: 01          .
-    !text "11111"                                                     ; 38e1: 31 31 31... 111
-    !byte $12, $f1, $fd, $f2, $ff,   5, $f0, $ff,   1, $f8, $fe, $fe  ; 38e6: 12 f1 fd... ...
-    !byte $fe, $fe, $ec,   1, $d2, $da, $87,   0,   4, $10,   3, $90  ; 38f2: fe fe ec... ...
-    !byte $f7, $70, $f3, $b4, $0f,   1                                ; 38fe: f7 70 f3... .p.
-    !text "-KK"                                                       ; 3904: 2d 4b 4b    -KK
-    !byte $fc, $f3, $f4, $f5, $f5, $f5, $f6, $f6, $d0, $ff,   1, $f5  ; 3907: fc f3 f4... ...
-    !byte $f2, $e5, $f0, $f5, $f5,   0,   1, $80, $88,   0,   1, $c0  ; 3913: f2 e5 f0... ...
-    !byte $f8, $f5, $f2,   0,   5, $80, $f0, $7a,   0,   7, $80,   0  ; 391f: f8 f5 f2... ...
-    !byte $dc, $11, $12, $61, $f6,   0,   2, $61, $f2, $fc, $f4, $f4  ; 392b: dc 11 12... ...
-    !byte $7a, $72, $f3, $f5, $f5, $da, $da, $cb, $f0, $7a, $f2, $b5  ; 3937: 7a 72 f3... zr.
-    !byte $f9, $da, $f2, $f2, $7b, $e5, $e5, $e5, $cb, $cb, $87, $0f  ; 3943: f9 da f2... ...
-    !byte   1, $2d, $0f,   1, $2d, $1e, $1e, $1e, $2d, $0f,   2, $a1  ; 394f: 01 2d 0f... .-.
-    !byte $a1, $a1                                                    ; 395b: a1 a1       ..
-    !text "ixyX"                                                      ; 395d: 69 78 79... ixy
-    !byte $c0, $87, $87, $4b, $0f,   2, $c3, $fc, $f3, $69, $0f,   4  ; 3961: c0 87 87... ...
-    !byte $4b, $d3, $fc, $7a, $7a, $e5, $e5, $69, $ed, $db, $f3, $f5  ; 396d: 4b d3 fc... K..
-    !byte $f4, $e5, $e5, $69, $ed, $db, $b7, $e5, $e5, $e5, $e5, $e5  ; 3979: f4 e5 e5... ...
-    !byte $c3, $da, $96, $c0, $78, $f3, $f4, $f6, $f4, $fe, $e8,   0  ; 3985: c3 da 96... ...
-    !byte $d8, $f2, $f6, $f2, $f6, $f1, $f7                           ; 3991: d8 f2 f6... ...
-    !text "pszxyy"                                                    ; 3998: 70 73 7a... psz
-    !byte $96, $96, $f9, $fa, $7b, $3d, $96, $96, $f8, $f3, $fc, $c0  ; 399e: 96 96 f9... ...
-    !byte $b5, $b5, $da, $f8, $f7, $f8, $80,   0,   1, $1e, $1e, $f1  ; 39aa: b5 b5 da... ...
-    !byte $fe, $e0,   0,   3, $3c, $f3, $fc, $c0,   0,   4, $c8, $80  ; 39b6: fe e0 00... ...
-    !byte   0,   6, $30,   0,   7, $f3, $30,   0,   6, $fc, $f3, $31  ; 39c2: 00 06 30... ..0
-    !byte $10,   1,   0,   4, $7e, $f0, $ff,   1, $f0,   0,   4, $3d  ; 39ce: 10 01 00... ...
-    !byte $f3, $fe, $f0,   0,   4, $ec,   1, $c0, $80,   0,   0,   0  ; 39da: f3 fe f0... ...
-    !byte   0,   0,   0,   0,   0,   0,   0,   0, $9d, $50,   0, $fd  ; 39e6: 00 00 00... ...
-    !text "9OBON"                                                     ; 39f2: 39 4f 42... 9OB
-    !byte   0, $8e, $38, $50,   0,   0, $12, $3a, $4f                 ; 39f7: 00 8e 38... ..8
+    !byte   1, $31, $31, $31, $31, $31, $12, $f1, $fd, $f2, $ff,   5  ; 38e0: 01 31 31... .11
+    !byte $f0, $ff,   1, $f8, $fe, $fe, $fe, $fe, $ec,   1, $d2, $da  ; 38ec: f0 ff 01... ...
+    !byte $87,   0,   4, $10,   3, $90, $f7, $70, $f3, $b4, $0f,   1  ; 38f8: 87 00 04... ...
+    !byte $2d, $4b, $4b, $fc, $f3, $f4, $f5, $f5, $f5, $f6, $f6, $d0  ; 3904: 2d 4b 4b... -KK
+    !byte $ff,   1, $f5, $f2, $e5, $f0, $f5, $f5,   0,   1, $80, $88  ; 3910: ff 01 f5... ...
+    !byte   0,   1, $c0, $f8, $f5, $f2,   0,   5, $80, $f0, $7a,   0  ; 391c: 00 01 c0... ...
+    !byte   7, $80,   0, $dc, $11, $12, $61, $f6,   0,   2, $61, $f2  ; 3928: 07 80 00... ...
+    !byte $fc, $f4, $f4, $7a, $72, $f3, $f5, $f5, $da, $da, $cb, $f0  ; 3934: fc f4 f4... ...
+    !byte $7a, $f2, $b5, $f9, $da, $f2, $f2, $7b, $e5, $e5, $e5, $cb  ; 3940: 7a f2 b5... z..
+    !byte $cb, $87, $0f,   1, $2d, $0f,   1, $2d, $1e, $1e, $1e, $2d  ; 394c: cb 87 0f... ...
+    !byte $0f,   2, $a1, $a1, $a1, $69, $78, $79, $58, $c0, $87, $87  ; 3958: 0f 02 a1... ...
+    !byte $4b, $0f,   2, $c3, $fc, $f3, $69, $0f,   4, $4b, $d3, $fc  ; 3964: 4b 0f 02... K..
+    !byte $7a, $7a, $e5, $e5, $69, $ed, $db, $f3, $f5, $f4, $e5, $e5  ; 3970: 7a 7a e5... zz.
+    !byte $69, $ed, $db, $b7, $e5, $e5, $e5, $e5, $e5, $c3, $da, $96  ; 397c: 69 ed db... i..
+    !byte $c0, $78, $f3, $f4, $f6, $f4, $fe, $e8,   0, $d8, $f2, $f6  ; 3988: c0 78 f3... .x.
+    !byte $f2, $f6, $f1, $f7, $70, $73, $7a, $78, $79, $79, $96, $96  ; 3994: f2 f6 f1... ...
+    !byte $f9, $fa, $7b, $3d, $96, $96, $f8, $f3, $fc, $c0, $b5, $b5  ; 39a0: f9 fa 7b... ..{
+    !byte $da, $f8, $f7, $f8, $80,   0,   1, $1e, $1e, $f1, $fe, $e0  ; 39ac: da f8 f7... ...
+    !byte   0,   3, $3c, $f3, $fc, $c0,   0,   4, $c8, $80,   0,   6  ; 39b8: 00 03 3c... ..<
+    !byte $30,   0,   7, $f3, $30,   0,   6, $fc, $f3, $31, $10,   1  ; 39c4: 30 00 07... 0..
+    !byte   0,   4, $7e, $f0, $ff,   1, $f0,   0,   4, $3d, $f3, $fe  ; 39d0: 00 04 7e... ..~
+    !byte $f0,   0,   4, $ec,   1, $c0, $80,   0,   0,   0,   0,   0  ; 39dc: f0 00 04... ...
+    !byte   0,   0,   0,   0,   0,   0, $9d, $50,   0, $fd, $39, $4f  ; 39e8: 00 00 00... ...
+    !byte $42, $4f, $4e,   0, $8e, $38, $50,   0,   0, $12, $3a, $4f  ; 39f4: 42 4f 4e... BON
 
 c3a00
-    jsr sub_c2ab5                                                     ; 3a00: 20 b5 2a     .*
+    jsr draw_big_rockford                                             ; 3a00: 20 b5 2a     .*
     jsr c5700                                                         ; 3a03: 20 00 57     .W
     jsr reset_clock                                                   ; 3a06: 20 4d 2a     M*
     jsr sub_c2292                                                     ; 3a09: 20 92 22     ."
@@ -3651,7 +3666,7 @@ c3abe
     jmp c3a2c                                                         ; 3ace: 4c 2c 3a    L,:
 
 c3ad1
-    jsr sub_c2ab5                                                     ; 3ad1: 20 b5 2a     .*
+    jsr draw_big_rockford                                             ; 3ad1: 20 b5 2a     .*
     jsr sub_c2292                                                     ; 3ad4: 20 92 22     ."
     lda #$ff                                                          ; 3ad7: a9 ff       ..
     sta l0065                                                         ; 3ad9: 85 65       .e
@@ -4359,37 +4374,49 @@ special_cave_0
     !byte $9a, $90, $6a, $90, $0e, $0a, $f3, $23, $0b, $9a, $2a,   3  ; 4af0: 9a 90 6a... ..j
     !byte $34,   3, $3e,   3                                          ; 4afc: 34 03 3e... 4.>
 l4b00
-    !byte 10, 20, 15,  5, 50, 40, 10, 10,  5, 25, 50, 20,  5, 10, 10  ; 4b00: 0a 14 0f... ...
-    !byte 10, 30, 10, 10, 30                                          ; 4b0f: 0a 1e 0a... ...
+    !byte 10, 20, 15,  5, 50, 40, 10, 10,  5, 25                      ; 4b00: 0a 14 0f... ...
+    !byte 50, 20,  5, 10, 10, 10, 30, 10, 10, 30                      ; 4b0a: 32 14 05... 2..
 l4b14
-    !byte 15, 50,  0,  0, 90, 60, 20, 20, 10, 60,  0,  0,  8, 20, 20  ; 4b14: 0f 32 00... .2.
-    !byte 20,  0,  0,  0,  0                                          ; 4b23: 14 00 00... ...
-required_diamonds_for_each_cave
-    !byte 12, 10, 24, 36,  4,  4, 15, 10, 75, 12,  6, 19, 50, 30, 20  ; 4b28: 0c 0a 18... ...
-    !byte 12,  6, 16, 14,  6                                          ; 4b37: 0c 06 10... ...
+    !byte 15, 50,  0,  0, 90, 60, 20, 20, 10, 60                      ; 4b14: 0f 32 00... .2.
+    !byte  0,  0,  8, 20, 20, 20,  0,  0,  0,  0                      ; 4b1e: 00 00 08... ...
+
+; *************************************************************************************
+required_diamonds_for_each_cave_difficulty_level_1
+    !byte 12, 10, 24, 36,  4,  4, 15, 10, 75, 12                      ; 4b28: 0c 0a 18... ...
+    !byte  6, 19, 50, 30, 20, 12,  6, 16, 14,  6                      ; 4b32: 06 13 32... ..2
 time_limit_for_each_cave_difficulty_level_1
-    !byte 150, 150, 150, 120, 150, 150, 120, 120, 150, 150, 120, 180  ; 4b3c: 96 96 96... ...
-    !byte 160, 150, 120, 150,  15,  15,  20,  20                      ; 4b48: a0 96 78... ..x
-    !byte 12, 11, 23, 36,  5,  5, 20, 15, 75, 12,  6, 19, 55, 35, 20  ; 4b50: 0c 0b 17... ...
-    !byte 15,  6, 16, 14,  6                                          ; 4b5f: 0f 06 10... ...
+    !byte 150, 150, 150, 120, 150, 150, 120, 120, 150, 150            ; 4b3c: 96 96 96... ...
+    !byte 120, 180, 160, 150, 120, 150,  15,  15,  20,  20            ; 4b46: 78 b4 a0... x..
+
+required_diamonds_for_each_cave_difficulty_level_2
+    !byte 12, 11, 23, 36,  5,  5, 20, 15, 75, 12                      ; 4b50: 0c 0b 17... ...
+    !byte  6, 19, 55, 35, 20, 15,  6, 16, 14,  6                      ; 4b5a: 06 13 37... ..7
 time_limit_for_each_cave_difficulty_level_2
-    !byte 110, 110, 100, 100, 120, 120, 120, 110, 150, 130, 120, 170  ; 4b64: 6e 6e 64... nnd
-    !byte 155, 145, 120, 150,  10,  15,  20,  20                      ; 4b70: 9b 91 78... ..x
-    !byte 12,  9, 24, 36,  6,  6, 25, 20, 80, 12,  6, 14, 60, 40, 20  ; 4b78: 0c 09 18... ...
-    !byte 15,  6, 16, 14,  6                                          ; 4b87: 0f 06 10... ...
+    !byte 110, 110, 100, 100, 120, 120, 120, 110, 150, 130            ; 4b64: 6e 6e 64... nnd
+    !byte 120, 170, 155, 145, 120, 150,  10,  15,  20,  20            ; 4b6e: 78 aa 9b... x..
+
+required_diamonds_for_each_cave_difficulty_level_3
+    !byte 12,  9, 24, 36,  6,  6, 25, 20, 80, 12                      ; 4b78: 0c 09 18... ...
+    !byte  6, 14, 60, 40, 20, 15,  6, 16, 14,  6                      ; 4b82: 06 0e 3c... ..<
 time_limit_for_each_cave_difficulty_level_3
-    !byte  70,  70,  90,  80,  90, 100, 120, 100, 130, 120, 150, 160  ; 4b8c: 46 46 5a... FFZ
-    !byte 150, 140, 120, 150,  10,  15,  20,  20                      ; 4b98: 96 8c 78... ..x
-    !byte 12, 13, 23, 36,  7,  7, 20, 20, 85, 12,  6, 16, 70, 42, 25  ; 4ba0: 0c 0d 17... ...
-    !byte 15,  6, 16, 14,  6                                          ; 4baf: 0f 06 10... ...
+    !byte  70,  70,  90,  80,  90, 100, 120, 100, 130, 120            ; 4b8c: 46 46 5a... FFZ
+    !byte 150, 160, 150, 140, 120, 150,  10,  15,  20,  20            ; 4b96: 96 a0 96... ...
+
+required_diamonds_for_each_cave_difficulty_level_4
+    !byte 12, 13, 23, 36,  7,  7, 20, 20, 85, 12                      ; 4ba0: 0c 0d 17... ...
+    !byte  6, 16, 70, 42, 25, 15,  6, 16, 14,  6                      ; 4baa: 06 10 46... ..F
 time_limit_for_each_cave_difficulty_level_4
-    !byte  40,  70,  80,  60,  60,  90, 120,  90, 130, 110, 150, 160  ; 4bb4: 28 46 50... (FP
-    !byte 145, 135, 120, 150,  10,  15,  20,  20                      ; 4bc0: 91 87 78... ..x
-    !byte 12, 10, 21, 36,  8,  8, 25, 20, 90, 12,  6, 21, 80, 45, 30  ; 4bc8: 0c 0a 15... ...
-    !byte 12,  6, 16, 14,  6                                          ; 4bd7: 0c 06 10... ...
+    !byte  40,  70,  80,  60,  60,  90, 120,  90, 130, 110            ; 4bb4: 28 46 50... (FP
+    !byte 150, 160, 145, 135, 120, 150,  10,  15,  20,  20            ; 4bbe: 96 a0 91... ...
+
+required_diamonds_for_each_cave_difficulty_level_5
+    !byte 12, 10, 21, 36,  8,  8, 25, 20, 90, 12                      ; 4bc8: 0c 0a 15... ...
+    !byte  6, 21, 80, 45, 30, 12,  6, 16, 14,  6                      ; 4bd2: 06 15 50... ..P
 time_limit_for_each_cave_difficulty_level_5
-    !byte  30,  70,  70,  50,  30,  80, 120,  80, 120, 100, 240, 160  ; 4bdc: 1e 46 46... .FF
-    !byte 140, 130, 140, 150,  10,  15,  20,  20                      ; 4be8: 8c 82 8c... ...
+    !byte  30,  70,  70,  50,  30,  80, 120,  80, 120, 100            ; 4bdc: 1e 46 46... .FF
+    !byte 240, 160, 140, 130, 140, 150,  10,  15,  20,  20            ; 4be6: f0 a0 8c... ...
+
+; *************************************************************************************
 l4bf0
     !byte   2, $13,   2,   1,   1, $12,   1,   1, $0a,   1, $12, $12  ; 4bf0: 02 13 02... ...
     !byte   1,   1,   1,   1,   3,   2,   1,   1                      ; 4bfc: 01 01 01... ...
@@ -4800,6 +4827,8 @@ l5540
     !byte $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83  ; 5558: 83 83 83... ...
     !byte $83, $83, $83, $83                                          ; 5564: 83 83 83... ...
 
+; unused copy of routine at $5700
+unused54
     lda #osbyte_flush_buffer_class                                    ; 5568: a9 0f       ..
     ldx #0                                                            ; 556a: a2 00       ..
     jsr osbyte                                                        ; 556c: 20 f4 ff     ..            ; Flush all buffers (X=0)
@@ -4811,7 +4840,7 @@ loop_c5571
     bpl loop_c5571                                                    ; 5578: 10 f7       ..
     rts                                                               ; 557a: 60          `
 
-unused54
+unused55
     !byte $a9,   0, $85, $8e, $a9, $83, $b8, $e5, $8e, $aa, $a0, $ff  ; 557b: a9 00 85... ...
     !byte $a9, $80, $a0, $f4, $ff, $8a, $f0, $e6, $a6, $8e, $8a, $8a  ; 5587: a9 80 a0... ...
     !byte $8a, $8a, $85, $8f, $bd, $d0, $d6, $a8, $e0, $80, $d0, $84  ; 5593: 8a 8a 85... ...
@@ -4825,7 +4854,8 @@ unused54
     !byte $f1, $ff, $e6, $8e, $26, $8e, $e0,   3, $d0, $82, $60, $83  ; 55f3: f1 ff e6... ...
     !byte $83                                                         ; 55ff: 83          .
 l5600
-    !text "HX", $5c, "dX", $5c, "dp", $5c, "dpxIE"                    ; 5600: 48 58 5c... HX\
+    !byte $48, $58, $5c, $64, $58, $5c, $64, $70, $5c, $64, $70, $78  ; 5600: 48 58 5c... HX\
+    !byte $49, $45                                                    ; 560c: 49 45       IE
 l560e
     !byte $19,   5, $11, $24, $20, $19                                ; 560e: 19 05 11... ...
 l5614
@@ -4977,6 +5007,7 @@ c578d
     !byte $18,   0,   0,   0, $c3, $36,   5, $ff, $82, $40,   0,   0  ; 57de: 18 00 00... ...
     !byte   0, $ef, $ff, $9d,   0,   0,   0,   0,   0, $14,   0,   0  ; 57ea: 00 ef ff... ...
     !byte   0, $81,   0,   0,   0, $83,   0,   0,   0,   0            ; 57f6: 00 81 00... ...
+big_rockford_destination_screen_address
 pydis_end
 !if ('A') != $41 {
     !error "Assertion failed: 'A' == $41"
@@ -5001,6 +5032,9 @@ pydis_end
 }
 !if (<backwards_status_bar) != $28 {
     !error "Assertion failed: <backwards_status_bar == $28"
+}
+!if (<big_rockford_destination_screen_address) != $00 {
+    !error "Assertion failed: <big_rockford_destination_screen_address == $00"
 }
 !if (<data_sets) != $f4 {
     !error "Assertion failed: <data_sets == $f4"
@@ -5320,8 +5354,8 @@ pydis_end
 !if (<sprite_addr_94) != $c0 {
     !error "Assertion failed: <sprite_addr_94 == $c0"
 }
-!if (<start_of_screen) != $c0 {
-    !error "Assertion failed: <start_of_screen == $c0"
+!if (<start_of_grid_screen_address) != $c0 {
+    !error "Assertion failed: <start_of_grid_screen_address == $c0"
 }
 !if (>(l2c24)) != $2c {
     !error "Assertion failed: >(l2c24) == $2c"
@@ -5337,6 +5371,12 @@ pydis_end
 }
 !if (>backwards_status_bar) != $50 {
     !error "Assertion failed: >backwards_status_bar == $50"
+}
+!if (>big_rockford_destination_screen_address) != $58 {
+    !error "Assertion failed: >big_rockford_destination_screen_address == $58"
+}
+!if (>big_rockford_sprite) != $34 {
+    !error "Assertion failed: >big_rockford_sprite == $34"
 }
 !if (>data_sets) != $4c {
     !error "Assertion failed: >data_sets == $4c"
@@ -5644,8 +5684,8 @@ pydis_end
 !if (>sprite_addr_94) != $1e {
     !error "Assertion failed: >sprite_addr_94 == $1e"
 }
-!if (>start_of_screen) != $5b {
-    !error "Assertion failed: >start_of_screen == $5b"
+!if (>start_of_grid_screen_address) != $5b {
+    !error "Assertion failed: >start_of_grid_screen_address == $5b"
 }
 !if (>tile_map) != $32 {
     !error "Assertion failed: >tile_map == $32"
@@ -6097,8 +6137,8 @@ pydis_end
 !if (sprite_comma) != $3f {
     !error "Assertion failed: sprite_comma == $3f"
 }
-!if (sprite_diamond) != $03 {
-    !error "Assertion failed: sprite_diamond == $03"
+!if (sprite_diamond1) != $03 {
+    !error "Assertion failed: sprite_diamond1 == $03"
 }
 !if (sprite_slash) != $3e {
     !error "Assertion failed: sprite_slash == $3e"
