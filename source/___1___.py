@@ -43,7 +43,9 @@ def unused_entry(addr):
 load(0x1300, "original/___1___", "6502")
 
 comment(0x1300, """
-Map:
+Caves: A-P + Four bonus caves
+
+tile_map:
 $00 = empty
 $01 = earth
 $02 = wall
@@ -51,7 +53,7 @@ $03 = titanium wall
 $04 = diamond
 $05 = rock
 $06 = exit
-$07 = animated nougat?
+$07 = fungus
 $08 = player
 $09 = 4x4 earth square with monster pacing inside
 $0a = animate explosion the player
@@ -175,12 +177,12 @@ for i in range(0, 130):
 
     word(0x4cf4 + 2*i)
     if (i % 10) == 0:
-        label(0x4cf4 + 2*i, "level_set_"+ str(j))
+        label(0x4cf4 + 2*i, "data_set_"+ str(j))
         j += 1
         k = 0
 
     if level_addr != 0:
-        name = "level_" + str(j) + "_"+str(k)
+        name = "data_" + str(j) + "_"+str(k)
         label(level_addr, name)
         expr(addr, name)
         k += 1
@@ -189,8 +191,8 @@ constant(20, "total_caves")
 constant(0xac, "opcode_ldy_abs")
 constant(0xb9, "opcode_lda_abs_y")
 
-label(0x0046, "level_ptr_low")
-label(0x0047, "level_ptr_high")
+label(0x0046, "data_set_ptr_low")
+label(0x0047, "data_set_ptr_high")
 label(0x005c, "sub_second_ticks")
 label(0x0069, "status_text_address_low")
 label(0x0073, "grid_x")
@@ -322,8 +324,8 @@ label(0x28aa, "decrement_status_bar_number")
 
 label(0x2900, "prepare_level")
 expr(0x2920, "total_caves")
-expr(0x2930, make_lo("level_set_table"))
-expr(0x2934, make_hi("level_set_table"))
+expr(0x2930, make_lo("data_sets"))
+expr(0x2934, make_hi("data_sets"))
 expr(0x293b, "total_caves")
 expr(0x2983, make_lo("special_cave_0"))
 expr(0x2987, make_hi("special_cave_0"))
@@ -521,12 +523,12 @@ for i in range(20):
 label(0x4ca4, "colour_one_for_each_cave")
 label(0x4ca4+20*1, "colour_two_for_each_cave")
 label(0x4ca4+20*2, "colour_three_for_each_cave")
-label(0x4ca4+20*3, "cave_to_level_set")
+label(0x4ca4+20*3, "cave_to_data_set")
 byte(0x4ca4, 20)
 byte(0x4ca4+20*1, 20)
 byte(0x4ca4+20*2, 20)
 byte(0x4ca4+20*3, 20)
-label(0x4cf4, "level_set_table")
+label(0x4cf4, "data_sets")
 
 label(0x5000, "special_cave_1")
 byte(0x5000, 10)
