@@ -2808,7 +2808,7 @@ sub_c2f00
     sta total_diamonds_on_status_bar_high_digit                       ; 2f35: 8d 03 32    ..2
     sta total_diamonds_on_status_bar_low_digit                        ; 2f38: 8d 04 32    ..2
     ldx cave_number                                                   ; 2f3b: a6 87       ..
-    lda time_limit_for_each_cave,x                                    ; 2f3d: bd 14 4b    ..K
+    lda l4b14,x                                                       ; 2f3d: bd 14 4b    ..K
     ldy #4                                                            ; 2f40: a0 04       ..
     jsr add_a_to_status_bar_number_at_y                               ; 2f42: 20 c0 28     .(
     inc l004c                                                         ; 2f45: e6 4c       .L
@@ -2830,7 +2830,7 @@ loop_c2f59
     dey                                                               ; 2f5f: 88          .
     bpl loop_c2f59                                                    ; 2f60: 10 f7       ..
     ldx cave_number                                                   ; 2f62: a6 87       ..
-    lda required_diamonds_for_each_cave,x                             ; 2f64: bd 00 4b    ..K
+    lda l4b00,x                                                       ; 2f64: bd 00 4b    ..K
     ldy #4                                                            ; 2f67: a0 04       ..
     jsr add_a_to_status_bar_number_at_y                               ; 2f69: 20 c0 28     .(
     txa                                                               ; 2f6c: 8a          .
@@ -2879,11 +2879,11 @@ loop_c2fba
     dey                                                               ; 2fc3: 88          .
     bne loop_c2fba                                                    ; 2fc4: d0 f4       ..
 c2fc6
-    lda l4b28,x                                                       ; 2fc6: bd 28 4b    .(K
+    lda required_diamonds_for_each_cave,x                             ; 2fc6: bd 28 4b    .(K
     sta l006c                                                         ; 2fc9: 85 6c       .l
     ldy #1                                                            ; 2fcb: a0 01       ..
     jsr add_a_to_status_bar_number_at_y                               ; 2fcd: 20 c0 28     .(
-    lda l4b3c,x                                                       ; 2fd0: bd 3c 4b    .<K
+    lda time_limit_for_each_cave_difficulty_level_1,x                 ; 2fd0: bd 3c 4b    .<K
     sta l006d                                                         ; 2fd3: 85 6d       .m
     ldy #$0c                                                          ; 2fd5: a0 0c       ..
     jsr add_a_to_status_bar_number_at_y                               ; 2fd7: 20 c0 28     .(
@@ -4358,36 +4358,38 @@ special_cave_0
     !byte $a1, $2d, $0a, $a1, $20, $0a, $a1, $20, $0a, $f3, $23, $0b  ; 4ae4: a1 2d 0a... .-.
     !byte $9a, $90, $6a, $90, $0e, $0a, $f3, $23, $0b, $9a, $2a,   3  ; 4af0: 9a 90 6a... ..j
     !byte $34,   3, $3e,   3                                          ; 4afc: 34 03 3e... 4.>
-required_diamonds_for_each_cave
-    !byte $0a, $14, $0f,   5, $32, $28, $0a, $0a,   5, $19, $32, $14  ; 4b00: 0a 14 0f... ...
-    !byte   5, $0a, $0a, $0a, $1e, $0a, $0a, $1e                      ; 4b0c: 05 0a 0a... ...
-time_limit_for_each_cave
+l4b00
+    !byte 10, 20, 15,  5, 50, 40, 10, 10,  5, 25, 50, 20,  5, 10, 10  ; 4b00: 0a 14 0f... ...
+    !byte 10, 30, 10, 10, 30                                          ; 4b0f: 0a 1e 0a... ...
+l4b14
     !byte 15, 50,  0,  0, 90, 60, 20, 20, 10, 60,  0,  0,  8, 20, 20  ; 4b14: 0f 32 00... .2.
     !byte 20,  0,  0,  0,  0                                          ; 4b23: 14 00 00... ...
-l4b28
-    !byte $0c, $0a, $18, $24,   4,   4, $0f, $0a, $4b, $0c,   6, $13  ; 4b28: 0c 0a 18... ...
-    !byte $32, $1e, $14, $0c,   6, $10, $0e,   6                      ; 4b34: 32 1e 14... 2..
-l4b3c
-    !byte $96, $96, $96, $78, $96, $96, $78, $78, $96, $96, $78, $b4  ; 4b3c: 96 96 96... ...
-    !byte $a0, $96, $78, $96, $0f, $0f, $14, $14, $0c, $0b, $17, $24  ; 4b48: a0 96 78... ..x
-    !byte   5,   5, $14, $0f, $4b, $0c,   6, $13, $37, $23, $14, $0f  ; 4b54: 05 05 14... ...
-    !byte   6, $10, $0e,   6                                          ; 4b60: 06 10 0e... ...
-    !text "nnddxxxn"                                                  ; 4b64: 6e 6e 64... nnd
-    !byte $96, $82, $78, $aa, $9b, $91, $78, $96, $0a, $0f, $14, $14  ; 4b6c: 96 82 78... ..x
-    !byte $0c,   9, $18, $24,   6,   6, $19, $14, $50, $0c,   6, $0e  ; 4b78: 0c 09 18... ...
-    !byte $3c, $28, $14, $0f,   6, $10, $0e,   6                      ; 4b84: 3c 28 14... <(.
-    !text "FFZPZdxd"                                                  ; 4b8c: 46 46 5a... FFZ
-    !byte $82, $78, $96, $a0, $96, $8c, $78, $96, $0a, $0f, $14, $14  ; 4b94: 82 78 96... .x.
-    !byte $0c, $0d, $17, $24,   7,   7, $14, $14, $55, $0c,   6, $10  ; 4ba0: 0c 0d 17... ...
-    !byte $46, $2a, $19, $0f,   6, $10, $0e,   6                      ; 4bac: 46 2a 19... F*.
-    !text "(FP<<ZxZ"                                                  ; 4bb4: 28 46 50... (FP
-    !byte $82, $6e, $96, $a0, $91, $87, $78, $96, $0a, $0f, $14, $14  ; 4bbc: 82 6e 96... .n.
-    !byte $0c, $0a, $15, $24,   8,   8, $19, $14, $5a, $0c,   6, $15  ; 4bc8: 0c 0a 15... ...
-    !byte $50, $2d, $1e, $0c,   6, $10, $0e,   6, $1e                 ; 4bd4: 50 2d 1e... P-.
-    !text "FF2"                                                       ; 4bdd: 46 46 32    FF2
-    !byte $1e                                                         ; 4be0: 1e          .
-    !text "PxPxd"                                                     ; 4be1: 50 78 50... PxP
-    !byte $f0, $a0, $8c, $82, $8c, $96, $0a, $0f, $14, $14            ; 4be6: f0 a0 8c... ...
+required_diamonds_for_each_cave
+    !byte 12, 10, 24, 36,  4,  4, 15, 10, 75, 12,  6, 19, 50, 30, 20  ; 4b28: 0c 0a 18... ...
+    !byte 12,  6, 16, 14,  6                                          ; 4b37: 0c 06 10... ...
+time_limit_for_each_cave_difficulty_level_1
+    !byte 150, 150, 150, 120, 150, 150, 120, 120, 150, 150, 120, 180  ; 4b3c: 96 96 96... ...
+    !byte 160, 150, 120, 150,  15,  15,  20,  20                      ; 4b48: a0 96 78... ..x
+    !byte 12, 11, 23, 36,  5,  5, 20, 15, 75, 12,  6, 19, 55, 35, 20  ; 4b50: 0c 0b 17... ...
+    !byte 15,  6, 16, 14,  6                                          ; 4b5f: 0f 06 10... ...
+time_limit_for_each_cave_difficulty_level_2
+    !byte 110, 110, 100, 100, 120, 120, 120, 110, 150, 130, 120, 170  ; 4b64: 6e 6e 64... nnd
+    !byte 155, 145, 120, 150,  10,  15,  20,  20                      ; 4b70: 9b 91 78... ..x
+    !byte 12,  9, 24, 36,  6,  6, 25, 20, 80, 12,  6, 14, 60, 40, 20  ; 4b78: 0c 09 18... ...
+    !byte 15,  6, 16, 14,  6                                          ; 4b87: 0f 06 10... ...
+time_limit_for_each_cave_difficulty_level_3
+    !byte  70,  70,  90,  80,  90, 100, 120, 100, 130, 120, 150, 160  ; 4b8c: 46 46 5a... FFZ
+    !byte 150, 140, 120, 150,  10,  15,  20,  20                      ; 4b98: 96 8c 78... ..x
+    !byte 12, 13, 23, 36,  7,  7, 20, 20, 85, 12,  6, 16, 70, 42, 25  ; 4ba0: 0c 0d 17... ...
+    !byte 15,  6, 16, 14,  6                                          ; 4baf: 0f 06 10... ...
+time_limit_for_each_cave_difficulty_level_4
+    !byte  40,  70,  80,  60,  60,  90, 120,  90, 130, 110, 150, 160  ; 4bb4: 28 46 50... (FP
+    !byte 145, 135, 120, 150,  10,  15,  20,  20                      ; 4bc0: 91 87 78... ..x
+    !byte 12, 10, 21, 36,  8,  8, 25, 20, 90, 12,  6, 21, 80, 45, 30  ; 4bc8: 0c 0a 15... ...
+    !byte 12,  6, 16, 14,  6                                          ; 4bd7: 0c 06 10... ...
+time_limit_for_each_cave_difficulty_level_5
+    !byte  30,  70,  70,  50,  30,  80, 120,  80, 120, 100, 240, 160  ; 4bdc: 1e 46 46... .FF
+    !byte 140, 130, 140, 150,  10,  15,  20,  20                      ; 4be8: 8c 82 8c... ...
 l4bf0
     !byte   2, $13,   2,   1,   1, $12,   1,   1, $0a,   1, $12, $12  ; 4bf0: 02 13 02... ...
     !byte   1,   1,   1,   1,   3,   2,   1,   1                      ; 4bfc: 01 01 01... ...

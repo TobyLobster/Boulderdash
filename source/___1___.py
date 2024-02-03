@@ -515,10 +515,19 @@ label(0x3bcc, "return15")
 
 label(0x4700, "special_cave_0")
 
-label(0x4b00, "required_diamonds_for_each_cave")
-label(0x4b14, "time_limit_for_each_cave")
-for i in range(20):
-    decimal(0x4b14+i)
+label(0x4b28, "required_diamonds_for_each_cave")
+label(0x4b3c, "time_limit_for_each_cave_difficulty_level_1")
+byte(0x4b3c, 20)
+label(0x4b64, "time_limit_for_each_cave_difficulty_level_2")
+byte(0x4b64, 20)
+label(0x4b8c, "time_limit_for_each_cave_difficulty_level_3")
+byte(0x4b8c, 20)
+label(0x4bb4, "time_limit_for_each_cave_difficulty_level_4")
+byte(0x4bb4, 20)
+label(0x4bdc, "time_limit_for_each_cave_difficulty_level_5")
+byte(0x4bdc, 20)
+for i in range(240):
+    decimal(0x4b00+i)
 
 label(0x4ca4, "colour_one_for_each_cave")
 label(0x4ca4+20*1, "colour_two_for_each_cave")
