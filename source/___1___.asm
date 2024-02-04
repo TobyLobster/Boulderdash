@@ -115,15 +115,15 @@ l005d                       = $5d
 l005e                       = $5e
 l005f                       = $5f
 l0060                       = $60
-l0062                       = $62
+keys_to_process             = $62
 l0064                       = $64
 l0065                       = $65
 l0066                       = $66
-l0067                       = $67
+demo_key_duration           = $67
 status_text_address_low     = $69
 l006a                       = $6a
 l006b                       = $6b
-l006c                       = $6c
+diamonds_required           = $6c
 l006d                       = $6d
 l006f                       = $6f
 l0070                       = $70
@@ -138,14 +138,14 @@ l0078                       = $78
 initial_cell_fill_value     = $79
 l007a                       = $7a
 l007b                       = $7b
-l007c                       = $7c
+real_keys_pressed           = $7c
 l007e                       = $7e
 l007f                       = $7f
 screen_addr2_low            = $80
 screen_addr2_high           = $81
 next_ptr_low                = $82
 next_ptr_high               = $83
-l0084                       = $84
+wait_delay_centiseconds     = $84
 tile_map_ptr_low            = $85
 tile_map_ptr_high           = $86
 cave_number                 = $87
@@ -160,6 +160,9 @@ offset_to_sound             = $8f
 l0ba9                       = $0ba9
 grid_of_screen_sprites      = $0c00
 start_of_grid_screen_address = $5bc0
+screen_addr_row_6           = $5f80
+screen_addr_row_28          = $7b00
+screen_addr_row_30          = $7d80
 data_8_6                    = $bf06
 data_11_8                   = $c00d
 data_7_4                    = $c00d
@@ -890,14 +893,13 @@ l2120
 l2140
     !byte $b3, $b3, $b3,   0, $b3, $b3, $b3, $b3,   0,   0,   0, $b3  ; 2140: b3 b3 b3... ...
     !byte $b3, $b3, $b3, $ff                                          ; 214c: b3 b3 b3... ...
-l2150
+offset
     !byte   4, $44,   6, $16, $26, $36                                ; 2150: 04 44 06... .D.
 l2156
-    !byte $18, $1d, $0e, $1e                                          ; 2156: 18 1d 0e... ...
-    !text ".>/"                                                       ; 215a: 2e 3e 2f    .>/
-    !byte $1f,   9,   9, $0a,   0,   0,   0,   0,   0,   0,   0,   0  ; 215d: 1f 09 09... ...
-    !byte   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0  ; 2169: 00 00 00... ...
-    !byte   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0       ; 2175: 00 00 00... ...
+    !byte $18, $1d, $0e, $1e, $2e, $3e, $2f, $1f,   9                 ; 2156: 18 1d 0e... ...
+    !byte   9, $0a,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0  ; 215f: 09 0a 00... ...
+    !byte   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0  ; 216b: 00 00 00... ...
+    !byte   0,   0,   0,   0,   0,   0,   0,   0,   0                 ; 2177: 00 00 00... ...
 l2180
     !byte   0,   0,   0,   0,   0,   0, $46,   0,   0,   0,   0, $7d  ; 2180: 00 00 00... ...
     !byte   0, $3d, $4e, $7f, $91, $a1, $e1,   0, $f1, $d1, $b6, $c1  ; 218c: 00 3d 4e... .=N
@@ -1092,9 +1094,9 @@ unused8
 draw_grid_of_sprites
     jsr sub_c2b2c                                                     ; 2300: 20 2c 2b     ,+
     jsr sub_c2800                                                     ; 2303: 20 00 28     .(
-    lda #$5f                                                          ; 2306: a9 5f       ._
+    lda #>screen_addr_row_6                                           ; 2306: a9 5f       ._
     sta screen_addr1_high                                             ; 2308: 85 8b       ..
-    ldy #$80                                                          ; 230a: a0 80       ..
+    ldy #<screen_addr_row_6                                           ; 230a: a0 80       ..
     lda #opcode_lda_abs_y                                             ; 230c: a9 b9       ..
     sta opcode_to_change                                              ; 230e: 8d 57 23    .W#
     lda #<grid_of_screen_sprites                                      ; 2311: a9 00       ..
@@ -1103,13 +1105,13 @@ draw_grid_of_sprites
     lda #>grid_of_screen_sprites                                      ; 2319: a9 0c       ..
     sta grid_addr1_high                                               ; 231b: 8d 5d 23    .]#
     sta grid_addr2_high                                               ; 231e: 8d 62 23    .b#
-    ldx #$f0                                                          ; 2321: a2 f0       ..
+    ldx #<zeroed_status_bar                                           ; 2321: a2 f0       ..
     bne c234a                                                         ; 2323: d0 25       .%             ; ALWAYS branch
 
-sub_c2325
+draw_grid_at_regular_screen_address
     ldy #<start_of_grid_screen_address                                ; 2325: a0 c0       ..
     lda #>start_of_grid_screen_address                                ; 2327: a9 5b       .[
-sub_c2329
+draw_grid
     sta screen_addr1_high                                             ; 2329: 85 8b       ..
     lda #>backwards_status_bar                                        ; 232b: a9 50       .P
     ldx #<backwards_status_bar                                        ; 232d: a2 28       .(
@@ -1577,7 +1579,7 @@ unused17
     rts                                                               ; 260d: 60          `
 
 unused18
-    lda l0062                                                         ; 260e: a5 62       .b
+    lda keys_to_process                                               ; 260e: a5 62       .b
     and #$f0                                                          ; 2610: 29 f0       ).
     bne unused21                                                      ; 2612: d0 12       ..
     ldx #$0f                                                          ; 2614: a2 0f       ..
@@ -1629,7 +1631,7 @@ unused23
     sta l0053                                                         ; 2663: 85 53       .S
     inc l004a                                                         ; 2665: e6 4a       .J
 unused24
-    lda l0062                                                         ; 2667: a5 62       .b
+    lda keys_to_process                                               ; 2667: a5 62       .b
     and #8                                                            ; 2669: 29 08       ).
     beq unused26                                                      ; 266b: f0 0b       ..
     ldy grid_x                                                        ; 266d: a4 73       .s
@@ -1652,7 +1654,7 @@ sub_c2689
     ldx #7                                                            ; 2689: a2 07       ..
     stx loop_counter                                                  ; 268b: 86 77       .w
     ldx #0                                                            ; 268d: a2 00       ..
-    stx l007c                                                         ; 268f: 86 7c       .|
+    stx real_keys_pressed                                             ; 268f: 86 7c       .|
 read_keys_loop
     ldx loop_counter                                                  ; 2691: a6 77       .w
     lda inkey_keys_table,x                                            ; 2693: bd 28 22    .("
@@ -1661,12 +1663,12 @@ read_keys_loop
     lda #osbyte_inkey                                                 ; 2698: a9 81       ..
     jsr osbyte                                                        ; 269a: 20 f4 ff     ..            ; Read key within time limit, or read a specific key, or read machine type
     inx                                                               ; 269d: e8          .
-    rol l007c                                                         ; 269e: 26 7c       &|
+    rol real_keys_pressed                                             ; 269e: 26 7c       &|
     dec loop_counter                                                  ; 26a0: c6 77       .w
     bpl read_keys_loop                                                ; 26a2: 10 ed       ..
-    lda l0062                                                         ; 26a4: a5 62       .b
-    ora l007c                                                         ; 26a6: 05 7c       .|
-    sta l0062                                                         ; 26a8: 85 62       .b
+    lda keys_to_process                                               ; 26a4: a5 62       .b
+    ora real_keys_pressed                                             ; 26a6: 05 7c       .|
+    sta keys_to_process                                               ; 26a8: 85 62       .b
     rts                                                               ; 26aa: 60          `
 
     !byte $62, $60                                                    ; 26ab: 62 60       b`
@@ -1712,23 +1714,23 @@ unused31
     cpx #$18                                                          ; 26e7: e0 18       ..
     beq unused32                                                      ; 26e9: f0 12       ..
     lda #0                                                            ; 26eb: a9 00       ..
-    sta l0062                                                         ; 26ed: 85 62       .b
+    sta keys_to_process                                               ; 26ed: 85 62       .b
     lda l005a                                                         ; 26ef: a5 5a       .Z
     cmp #$f0                                                          ; 26f1: c9 f0       ..
     bpl unused32                                                      ; 26f3: 10 08       ..
     ldx #$21                                                          ; 26f5: a2 21       .!
     inc l004a                                                         ; 26f7: e6 4a       .J
-    lda #0                                                            ; 26f9: a9 00       ..
+    lda #<status_bar_sprite_numbers                                   ; 26f9: a9 00       ..
     sta status_text_address_low                                       ; 26fb: 85 69       .i
 unused32
     rts                                                               ; 26fd: 60          `
 
     !byte   0, $24                                                    ; 26fe: 00 24       .$
 
-sub_c2700
+start_demo_mode_playback
     jsr reset_clock                                                   ; 2700: 20 4d 2a     M*
     lda #1                                                            ; 2703: a9 01       ..
-    sta l0067                                                         ; 2705: 85 67       .g
+    sta demo_key_duration                                             ; 2705: 85 67       .g
     lsr                                                               ; 2707: 4a          J
     sta l0066                                                         ; 2708: 85 66       .f
 c270a
@@ -1750,29 +1752,29 @@ loop_c270e
     stx l0054                                                         ; 2725: 86 54       .T
 c2727
     stx l0060                                                         ; 2727: 86 60       .`
-    jsr sub_c2b90                                                     ; 2729: 20 90 2b     .+
+    jsr wait_for_13_centiseconds                                      ; 2729: 20 90 2b     .+
     ldx l0065                                                         ; 272c: a6 65       .e
     bmi c2752                                                         ; 272e: 30 22       0"
-    lda l0062                                                         ; 2730: a5 62       .b
-    beq c2735                                                         ; 2732: f0 01       ..
+    lda keys_to_process                                               ; 2730: a5 62       .b
+    beq update_demo_mode                                              ; 2732: f0 01       ..
     rts                                                               ; 2734: 60          `
 
-c2735
-    ldy #0                                                            ; 2735: a0 00       ..
+update_demo_mode
+    ldy #<status_bar_sprite_numbers                                   ; 2735: a0 00       ..
     lda l005a                                                         ; 2737: a5 5a       .Z
     and #$10                                                          ; 2739: 29 10       ).
     beq c273f                                                         ; 273b: f0 02       ..
-    ldy #$a0                                                          ; 273d: a0 a0       ..
+    ldy #<scrolling_pause_text                                        ; 273d: a0 a0       ..
 c273f
     sty status_text_address_low                                       ; 273f: 84 69       .i
-    lda l3100,x                                                       ; 2741: bd 00 31    ..1
-    sta l0062                                                         ; 2744: 85 62       .b
-    dec l0067                                                         ; 2746: c6 67       .g
+    lda demonstration_keys,x                                          ; 2741: bd 00 31    ..1
+    sta keys_to_process                                               ; 2744: 85 62       .b
+    dec demo_key_duration                                             ; 2746: c6 67       .g
     bne c2752                                                         ; 2748: d0 08       ..
     inc l0065                                                         ; 274a: e6 65       .e
     inx                                                               ; 274c: e8          .
-    lda l3160,x                                                       ; 274d: bd 60 31    .`1
-    sta l0067                                                         ; 2750: 85 67       .g
+    lda demonstration_key_durations,x                                 ; 274d: bd 60 31    .`1
+    sta demo_key_duration                                             ; 2750: 85 67       .g
 c2752
     jsr sub_c2400                                                     ; 2752: 20 00 24     .$
     lda l0064                                                         ; 2755: a5 64       .d
@@ -1784,7 +1786,7 @@ c2752
 
 c2762
     jsr draw_grid_of_sprites                                          ; 2762: 20 00 23     .#
-    jsr sub_c2325                                                     ; 2765: 20 25 23     %#
+    jsr draw_grid_at_regular_screen_address                           ; 2765: 20 25 23     %#
     jsr sub_c3000                                                     ; 2768: 20 00 30     .0
     lda l005b                                                         ; 276b: a5 5b       .[
     beq c2787                                                         ; 276d: f0 18       ..
@@ -1797,7 +1799,7 @@ c2762
     jsr decrement_status_bar_number                                   ; 2779: 20 aa 28     .(
     dec l006d                                                         ; 277c: c6 6d       .m
     bne c2787                                                         ; 277e: d0 07       ..
-    lda #$b4                                                          ; 2780: a9 b4       ..
+    lda #<out_of_time_message                                         ; 2780: a9 b4       ..
     sta status_text_address_low                                       ; 2782: 85 69       .i
     jmp c3040                                                         ; 2784: 4c 40 30    L@0
 
@@ -1833,11 +1835,11 @@ c27b7
     stx l005f                                                         ; 27bc: 86 5f       ._
     cpx #$4b                                                          ; 27be: e0 4b       .K
     bmi c27c8                                                         ; 27c0: 30 06       0.
-    lda l0062                                                         ; 27c2: a5 62       .b
+    lda keys_to_process                                               ; 27c2: a5 62       .b
     bne return4                                                       ; 27c4: d0 29       .)
     dec l005f                                                         ; 27c6: c6 5f       ._
 c27c8
-    lda l0062                                                         ; 27c8: a5 62       .b
+    lda keys_to_process                                               ; 27c8: a5 62       .b
     lsr                                                               ; 27ca: 4a          J
     bcc c27d5                                                         ; 27cb: 90 08       ..
     lda l005f                                                         ; 27cd: a5 5f       ._
@@ -1852,7 +1854,7 @@ c27d5
     and #$b0                                                          ; 27dd: 29 b0       ).
     eor #$b0                                                          ; 27df: 49 b0       I.
     beq c27ec                                                         ; 27e1: f0 09       ..
-    lda l0062                                                         ; 27e3: a5 62       .b
+    lda keys_to_process                                               ; 27e3: a5 62       .b
     and #2                                                            ; 27e5: 29 02       ).
     beq c27ec                                                         ; 27e7: f0 03       ..
     jsr c3040                                                         ; 27e9: 20 40 30     @0
@@ -1870,7 +1872,7 @@ sub_c2800
     ldx #$0e                                                          ; 2800: a2 0e       ..
     stx loop_counter                                                  ; 2802: 86 77       .w
 loop_c2804
-    ldy l2150,x                                                       ; 2804: bc 50 21    .P!
+    ldy offset,x                                                      ; 2804: bc 50 21    .P!
     ldx l1f80,y                                                       ; 2807: be 80 1f    ...
     lda l1f00,x                                                       ; 280a: bd 00 1f    ...
     sta l1f80,y                                                       ; 280d: 99 80 1f    ...
@@ -1916,7 +1918,7 @@ c2848
 
 sub_c2860
     jsr sub_c2689                                                     ; 2860: 20 89 26     .&
-    lda l0062                                                         ; 2863: a5 62       .b
+    lda keys_to_process                                               ; 2863: a5 62       .b
     and #$f0                                                          ; 2865: 29 f0       ).
     tax                                                               ; 2867: aa          .
     tay                                                               ; 2868: a8          .
@@ -1926,19 +1928,19 @@ sub_c2860
     jmp c2877                                                         ; 286f: 4c 77 28    Lw(
 
 c2872
-    and l0062                                                         ; 2872: 25 62       %b
+    and keys_to_process                                               ; 2872: 25 62       %b
     bne c2877                                                         ; 2874: d0 01       ..
     txa                                                               ; 2876: 8a          .
 c2877
     tax                                                               ; 2877: aa          .
     stx l005e                                                         ; 2878: 86 5e       .^
-    lda l0062                                                         ; 287a: a5 62       .b
+    lda keys_to_process                                               ; 287a: a5 62       .b
     and #$0f                                                          ; 287c: 29 0f       ).
-    sta l0062                                                         ; 287e: 85 62       .b
+    sta keys_to_process                                               ; 287e: 85 62       .b
     txa                                                               ; 2880: 8a          .
     and #$f0                                                          ; 2881: 29 f0       ).
-    ora l0062                                                         ; 2883: 05 62       .b
-    sta l0062                                                         ; 2885: 85 62       .b
+    ora keys_to_process                                               ; 2883: 05 62       .b
+    sta keys_to_process                                               ; 2885: 85 62       .b
     sty l005d                                                         ; 2887: 84 5d       .]
     rts                                                               ; 2889: 60          `
 
@@ -1971,17 +1973,17 @@ c28bc
     rts                                                               ; 28bf: 60          `
 
 add_a_to_status_bar_number_at_y
-    sty l007c                                                         ; 28c0: 84 7c       .|
+    sty real_keys_pressed                                             ; 28c0: 84 7c       .|
     sta l0072                                                         ; 28c2: 85 72       .r
     cmp #0                                                            ; 28c4: c9 00       ..
     beq c28d1                                                         ; 28c6: f0 09       ..
 loop_c28c8
     jsr increment_status_bar_number                                   ; 28c8: 20 98 28     .(
-    ldy l007c                                                         ; 28cb: a4 7c       .|
+    ldy real_keys_pressed                                             ; 28cb: a4 7c       .|
     dec l0072                                                         ; 28cd: c6 72       .r
     bne loop_c28c8                                                    ; 28cf: d0 f7       ..
 c28d1
-    ldy l007c                                                         ; 28d1: a4 7c       .|
+    ldy real_keys_pressed                                             ; 28d1: a4 7c       .|
     rts                                                               ; 28d3: 60          `
 
     !byte $81, $22, $20,   1                                          ; 28d4: 81 22 20... ."
@@ -2151,7 +2153,7 @@ increment_ptr
     bcc c2a17                                                         ; 2a13: 90 02       ..
     inc ptr_high                                                      ; 2a15: e6 8d       ..
 c2a17
-    dec l007c                                                         ; 2a17: c6 7c       .|
+    dec real_keys_pressed                                             ; 2a17: c6 7c       .|
 return6
     rts                                                               ; 2a19: 60          `
 
@@ -2163,7 +2165,7 @@ sub_c2a1e
     lda #>map_row_0                                                   ; 2a1e: a9 50       .P
     sta ptr_high                                                      ; 2a20: 85 8d       ..
     lda #$14                                                          ; 2a22: a9 14       ..
-    sta l007c                                                         ; 2a24: 85 7c       .|
+    sta real_keys_pressed                                             ; 2a24: 85 7c       .|
     ldy #0                                                            ; 2a26: a0 00       ..
     rts                                                               ; 2a28: 60          `
 
@@ -2252,7 +2254,7 @@ c2a9c
     lda #7                                                            ; 2aa9: a9 07       ..
     sta l0059                                                         ; 2aab: 85 59       .Y
     inc men_number_on_status_bar                                      ; 2aad: ee 1e 32    ..2
-    lda #$64                                                          ; 2ab0: a9 64       .d
+    lda #<bonus_life_text                                             ; 2ab0: a9 64       .d
     sta status_text_address_low                                       ; 2ab2: 85 69       .i
 return7
     rts                                                               ; 2ab4: 60          `
@@ -2311,7 +2313,7 @@ rle_bytes_table
 unused37
     !byte $27                                                         ; 2aff: 27          '
 
-sub_c2b00
+map_offset_to_discontiguous_map_offset
     lda ptr_high                                                      ; 2b00: a5 8d       ..
     and #7                                                            ; 2b02: 29 07       ).
     sta screen_addr1_high                                             ; 2b04: 85 8b       ..
@@ -2345,7 +2347,7 @@ sub_c2b2c
     sta ptr_low                                                       ; 2b2e: 85 8c       ..
     lda l0071                                                         ; 2b30: a5 71       .q
     sta ptr_high                                                      ; 2b32: 85 8d       ..
-    jsr sub_c2b00                                                     ; 2b34: 20 00 2b     .+
+    jsr map_offset_to_discontiguous_map_offset                        ; 2b34: 20 00 2b     .+
     sec                                                               ; 2b37: 38          8
     sbc l007e                                                         ; 2b38: e5 7e       .~
     ldx l007e                                                         ; 2b3a: a6 7e       .~
@@ -2398,25 +2400,25 @@ c2b71
 unused39
     !byte $86, $60, $a0, $1e, $a2, $fa, $a9,   1, $20, $f1, $ff       ; 2b85: 86 60 a0... .`.
 
-sub_c2b90
+wait_for_13_centiseconds
     lda #$0d                                                          ; 2b90: a9 0d       ..
-sub_c2b92
-    sta l0084                                                         ; 2b92: 85 84       ..
-sub_c2b94
+wait_for_a_centiseconds
+    sta wait_delay_centiseconds                                       ; 2b92: 85 84       ..
+wait_for_centiseconds
     lda #0                                                            ; 2b94: a9 00       ..
-    sta l0062                                                         ; 2b96: 85 62       .b
-loop_c2b98
+    sta keys_to_process                                               ; 2b96: 85 62       .b
+wait_loop
     jsr sub_c2860                                                     ; 2b98: 20 60 28     `(
     ldy #>(set_clock_value)                                           ; 2b9b: a0 1e       ..
     ldx #<(set_clock_value)                                           ; 2b9d: a2 70       .p
     lda #osword_read_clock                                            ; 2b9f: a9 01       ..
     jsr osword                                                        ; 2ba1: 20 f1 ff     ..            ; Read system clock
     lda set_clock_value                                               ; 2ba4: ad 70 1e    .p.
-    cmp l0084                                                         ; 2ba7: c5 84       ..
-    bmi loop_c2b98                                                    ; 2ba9: 30 ed       0.
-    lda l0062                                                         ; 2bab: a5 62       .b
+    cmp wait_delay_centiseconds                                       ; 2ba7: c5 84       ..
+    bmi wait_loop                                                     ; 2ba9: 30 ed       0.
+    lda keys_to_process                                               ; 2bab: a5 62       .b
     and #$f0                                                          ; 2bad: 29 f0       ).
-    sta l0062                                                         ; 2baf: 85 62       .b
+    sta keys_to_process                                               ; 2baf: 85 62       .b
     jsr sub_c2860                                                     ; 2bb1: 20 60 28     `(
     jsr sub_c2a56                                                     ; 2bb4: 20 56 2a     V*
     jsr reset_clock                                                   ; 2bb7: 20 4d 2a     M*
@@ -2581,9 +2583,9 @@ c2d12
     inx                                                               ; 2d18: e8          .
     pla                                                               ; 2d19: 68          h
     and #$0f                                                          ; 2d1a: 29 0f       ).
-    sta l007c                                                         ; 2d1c: 85 7c       .|
+    sta real_keys_pressed                                             ; 2d1c: 85 7c       .|
 c2d1e
-    lda l007c                                                         ; 2d1e: a5 7c       .|
+    lda real_keys_pressed                                             ; 2d1e: a5 7c       .|
     cmp #$0a                                                          ; 2d20: c9 0a       ..
     beq c2d32                                                         ; 2d22: f0 0e       ..
     cmp loop_counter                                                  ; 2d24: c5 77       .w
@@ -2694,7 +2696,7 @@ c2dbd
 unused45
     lda #$18                                                          ; 2dbf: a9 18       ..
     jsr add_a_to_ptr                                                  ; 2dc1: 20 40 22     @"
-    dec l007c                                                         ; 2dc4: c6 7c       .|
+    dec real_keys_pressed                                             ; 2dc4: c6 7c       .|
     bne unused46                                                      ; 2dc6: d0 02       ..
     pla                                                               ; 2dc8: 68          h
     rts                                                               ; 2dc9: 60          `
@@ -2720,16 +2722,16 @@ sub_c2e00
     lda #0                                                            ; 2e03: a9 00       ..
     sta l006f                                                         ; 2e05: 85 6f       .o
     sta l1f80                                                         ; 2e07: 8d 80 1f    ...
-    ldx #$14                                                          ; 2e0a: a2 14       ..
+    ldx #<players_and_men_status_bar                                  ; 2e0a: a2 14       ..
     lda cave_number                                                   ; 2e0c: a5 87       ..
     cmp #$10                                                          ; 2e0e: c9 10       ..
     bmi c2e14                                                         ; 2e10: 30 02       0.
-    ldx #$64                                                          ; 2e12: a2 64       .d
+    ldx #<bonus_life_text                                             ; 2e12: a2 64       .d
 c2e14
     stx status_text_address_low                                       ; 2e14: 86 69       .i
     lda l0065                                                         ; 2e16: a5 65       .e
     bmi c2e1e                                                         ; 2e18: 30 04       0.
-    lda #$a0                                                          ; 2e1a: a9 a0       ..
+    lda #<scrolling_pause_text                                        ; 2e1a: a9 a0       ..
     sta status_text_address_low                                       ; 2e1c: 85 69       .i
 c2e1e
     ldx #$0f                                                          ; 2e1e: a2 0f       ..
@@ -2773,9 +2775,9 @@ loop_c2e61
     sta l5540,x                                                       ; 2e64: 9d 40 55    .@U
     dex                                                               ; 2e67: ca          .
     bpl loop_c2e61                                                    ; 2e68: 10 f7       ..
-    jsr sub_c2f50                                                     ; 2e6a: 20 50 2f     P/
-    jsr sub_c2ebf                                                     ; 2e6d: 20 bf 2e     ..
-    jsr sub_c2700                                                     ; 2e70: 20 00 27     .'
+    jsr initialise_stage                                              ; 2e6a: 20 50 2f     P/
+    jsr play_screen_dissolve_effect                                   ; 2e6d: 20 bf 2e     ..
+    jsr start_demo_mode_playback                                      ; 2e70: 20 00 27     .'
     lda l0064                                                         ; 2e73: a5 64       .d
     cmp #8                                                            ; 2e75: c9 08       ..
     beq c2ebd                                                         ; 2e77: f0 44       .D
@@ -2785,7 +2787,7 @@ loop_c2e61
     bne c2ebd                                                         ; 2e81: d0 3a       .:
     lda player_number_on_status_bar                                   ; 2e83: ad 1b 32    ..2
     sta player_number_on_game_over_text                               ; 2e86: 8d 9e 32    ..2
-    lda #$8c                                                          ; 2e89: a9 8c       ..
+    lda #<game_over_text                                              ; 2e89: a9 8c       ..
     sta status_text_address_low                                       ; 2e8b: 85 69       .i
     ldx #$50                                                          ; 2e8d: a2 50       .P
     lda player_number_on_status_bar                                   ; 2e8f: ad 1b 32    ..2
@@ -2818,7 +2820,7 @@ l2eb8 = c2eb7+1
     bne loop_c2eb0                                                    ; 2ebb: d0 f3       ..
 c2ebd
     lda #$80                                                          ; 2ebd: a9 80       ..
-sub_c2ebf
+play_screen_dissolve_effect
     sta l0072                                                         ; 2ebf: 85 72       .r
     lda #$21                                                          ; 2ec1: a9 21       .!
     sta l005a                                                         ; 2ec3: 85 5a       .Z
@@ -2827,7 +2829,7 @@ sub_c2ebf
 loop_c2ec9
     jsr sub_c22b3                                                     ; 2ec9: 20 b3 22     ."
     jsr draw_grid_of_sprites                                          ; 2ecc: 20 00 23     .#
-    jsr sub_c2325                                                     ; 2ecf: 20 25 23     %#
+    jsr draw_grid_at_regular_screen_address                           ; 2ecf: 20 25 23     %#
     lda l005a                                                         ; 2ed2: a5 5a       .Z
     asl                                                               ; 2ed4: 0a          .
     and #$0f                                                          ; 2ed5: 29 0f       ).
@@ -2839,8 +2841,9 @@ loop_c2ec9
     rts                                                               ; 2ee3: 60          `
 
 unused48
-    !byte $60, $20, $c6, $5a, $10, $e6                                ; 2ee4: 60 20 c6... ` .
-    !text "`(%&%(%&'(%%%&  #$$$# "                                    ; 2eea: 60 28 25... `(%
+    !byte $60, $20, $c6, $5a, $10, $e6, $60, $28, $25, $26, $25, $28  ; 2ee4: 60 20 c6... ` .
+    !byte $25, $26, $27, $28, $25, $25, $25, $26, $20, $20, $23, $24  ; 2ef0: 25 26 27... %&'
+    !byte $24, $24, $23, $20                                          ; 2efc: 24 24 23... $$#
 
 sub_c2f00
     ldy #8                                                            ; 2f00: a0 08       ..
@@ -2855,7 +2858,7 @@ sub_c2f00
     sbc #sprite_0                                                     ; 2f14: e9 32       .2
     iny                                                               ; 2f16: c8          .
     jsr add_a_to_status_bar_number_at_y                               ; 2f17: 20 c0 28     .(
-    dec l006c                                                         ; 2f1a: c6 6c       .l
+    dec diamonds_required                                             ; 2f1a: c6 6c       .l
     bne return11                                                      ; 2f1c: d0 29       .)
     lda #7                                                            ; 2f1e: a9 07       ..
     ldx #0                                                            ; 2f20: a2 00       ..
@@ -2870,7 +2873,7 @@ sub_c2f00
     sta total_diamonds_on_status_bar_high_digit                       ; 2f35: 8d 03 32    ..2
     sta total_diamonds_on_status_bar_low_digit                        ; 2f38: 8d 04 32    ..2
     ldx cave_number                                                   ; 2f3b: a6 87       ..
-    lda l4b14,x                                                       ; 2f3d: bd 14 4b    ..K
+    lda diamond_score_after_enough_obtained_for_each_cave,x           ; 2f3d: bd 14 4b    ..K
     ldy #4                                                            ; 2f40: a0 04       ..
     jsr add_a_to_status_bar_number_at_y                               ; 2f42: 20 c0 28     .(
     inc l004c                                                         ; 2f45: e6 4c       .L
@@ -2880,19 +2883,19 @@ return11
 unused49
     !byte $91, $6a, $e6, $4c, $60,   0,   0,   0                      ; 2f48: 91 6a e6... .j.
 
-sub_c2f50
+initialise_stage
     lda #$14                                                          ; 2f50: a9 14       ..
     sta l007e                                                         ; 2f52: 85 7e       .~
     lsr                                                               ; 2f54: 4a          J
     sta l007f                                                         ; 2f55: 85 7f       ..
     ldy #$0d                                                          ; 2f57: a0 0d       ..
-loop_c2f59
+empty_status_bar_loop
     lda zeroed_status_bar,y                                           ; 2f59: b9 f0 32    ..2
     sta tile_map,y                                                    ; 2f5c: 99 00 32    ..2
     dey                                                               ; 2f5f: 88          .
-    bpl loop_c2f59                                                    ; 2f60: 10 f7       ..
+    bpl empty_status_bar_loop                                         ; 2f60: 10 f7       ..
     ldx cave_number                                                   ; 2f62: a6 87       ..
-    lda l4b00,x                                                       ; 2f64: bd 00 4b    ..K
+    lda diamond_score_before_enough_obtained_for_each_cave,x          ; 2f64: bd 00 4b    ..K
     ldy #4                                                            ; 2f67: a0 04       ..
     jsr add_a_to_status_bar_number_at_y                               ; 2f69: 20 c0 28     .(
     txa                                                               ; 2f6c: 8a          .
@@ -2942,7 +2945,7 @@ loop_c2fba
     bne loop_c2fba                                                    ; 2fc4: d0 f4       ..
 c2fc6
     lda required_diamonds_for_each_cave_difficulty_level_1,x          ; 2fc6: bd 28 4b    .(K
-    sta l006c                                                         ; 2fc9: 85 6c       .l
+    sta diamonds_required                                             ; 2fc9: 85 6c       .l
     ldy #1                                                            ; 2fcb: a0 01       ..
     jsr add_a_to_status_bar_number_at_y                               ; 2fcd: 20 c0 28     .(
     lda time_limit_for_each_cave_difficulty_level_1,x                 ; 2fd0: bd 3c 4b    .<K
@@ -2991,10 +2994,10 @@ unused51
     !byte $1f, $1f, $1f, $1f, $1f, $1f, $1f, $1f                      ; 3038: 1f 1f 1f... ...
 
 c3040
-    lda l0062                                                         ; 3040: a5 62       .b
+    lda keys_to_process                                               ; 3040: a5 62       .b
     and #2                                                            ; 3042: 29 02       ).
     beq c306c                                                         ; 3044: f0 26       .&
-    lda #$c8                                                          ; 3046: a9 c8       ..
+    lda #<pause_message                                               ; 3046: a9 c8       ..
     sta status_text_address_low                                       ; 3048: 85 69       .i
     lda #0                                                            ; 304a: a9 00       ..
     sta l004e                                                         ; 304c: 85 4e       .N
@@ -3003,11 +3006,11 @@ loop_c304e
     bne loop_c304e                                                    ; 3051: d0 fb       ..
 loop_c3053
     inc l004e                                                         ; 3053: e6 4e       .N
-    ldx #$c8                                                          ; 3055: a2 c8       ..
+    ldx #<pause_message                                               ; 3055: a2 c8       ..
     lda l004e                                                         ; 3057: a5 4e       .N
     and #$10                                                          ; 3059: 29 10       ).
     beq c305f                                                         ; 305b: f0 02       ..
-    ldx #$14                                                          ; 305d: a2 14       ..
+    ldx #<players_and_men_status_bar                                  ; 305d: a2 14       ..
 c305f
     stx status_text_address_low                                       ; 305f: 86 69       .i
     jsr sub_c30cf                                                     ; 3061: 20 cf 30     .0
@@ -3023,7 +3026,7 @@ c306c
     beq c3084                                                         ; 3070: f0 12       ..
     lda #$0e                                                          ; 3072: a9 0e       ..
     sta l0074                                                         ; 3074: 85 74       .t
-    lda #$b4                                                          ; 3076: a9 b4       ..
+    lda #<out_of_time_message                                         ; 3076: a9 b4       ..
     sta status_text_address_low                                       ; 3078: 85 69       .i
 loop_c307a
     jsr sub_c30cf                                                     ; 307a: 20 cf 30     .0
@@ -3062,50 +3065,46 @@ c3098
     jsr play_sound_x_pitch_y                                          ; 30b4: 20 2c 2c     ,,
     jsr sub_c2a56                                                     ; 30b7: 20 56 2a     V*
     jsr draw_grid_of_sprites                                          ; 30ba: 20 00 23     .#
-    jsr sub_c2325                                                     ; 30bd: 20 25 23     %#
+    jsr draw_grid_at_regular_screen_address                           ; 30bd: 20 25 23     %#
     lda #2                                                            ; 30c0: a9 02       ..
-    sta l0084                                                         ; 30c2: 85 84       ..
-    jsr sub_c2b94                                                     ; 30c4: 20 94 2b     .+
+    sta wait_delay_centiseconds                                       ; 30c2: 85 84       ..
+    jsr wait_for_centiseconds                                         ; 30c4: 20 94 2b     .+
     dec l006d                                                         ; 30c7: c6 6d       .m
     bne c3098                                                         ; 30c9: d0 cd       ..
 c30cb
-    lda #0                                                            ; 30cb: a9 00       ..
+    lda #<status_bar_sprite_numbers                                   ; 30cb: a9 00       ..
     sta status_text_address_low                                       ; 30cd: 85 69       .i
 sub_c30cf
     jsr draw_grid_of_sprites                                          ; 30cf: 20 00 23     .#
-    jsr sub_c2325                                                     ; 30d2: 20 25 23     %#
-    jsr sub_c2b90                                                     ; 30d5: 20 90 2b     .+
-    lda l0062                                                         ; 30d8: a5 62       .b
+    jsr draw_grid_at_regular_screen_address                           ; 30d2: 20 25 23     %#
+    jsr wait_for_13_centiseconds                                      ; 30d5: 20 90 2b     .+
+    lda keys_to_process                                               ; 30d8: a5 62       .b
     and #2                                                            ; 30da: 29 02       ).
 return13
     rts                                                               ; 30dc: 60          `
 
 sub_c30dd
-    jsr sub_c2325                                                     ; 30dd: 20 25 23     %#
+    jsr draw_grid_at_regular_screen_address                           ; 30dd: 20 25 23     %#
     lda #0                                                            ; 30e0: a9 00       ..
-    sta l0084                                                         ; 30e2: 85 84       ..
-    jsr sub_c2b94                                                     ; 30e4: 20 94 2b     .+
-    lda l0062                                                         ; 30e7: a5 62       .b
+    sta wait_delay_centiseconds                                       ; 30e2: 85 84       ..
+    jsr wait_for_centiseconds                                         ; 30e4: 20 94 2b     .+
+    lda keys_to_process                                               ; 30e7: a5 62       .b
     and #2                                                            ; 30e9: 29 02       ).
     rts                                                               ; 30eb: 60          `
 
 unused52
     !byte $62, $29,   2, $60,   0,   0,   0,   0,   0,   0,   0,   0  ; 30ec: 62 29 02... b).
     !byte   0,   0,   0,   0,   0,   0,   0,   0                      ; 30f8: 00 00 00... ...
-l3100
+demonstration_keys
     !byte   0,   0,   8,   0, $10, $80,   0, $20,   0, $10, $80, $20  ; 3100: 00 00 08... ...
     !byte $40,   0, $80, $10, $80,   0, $40,   0, $80, $20, $80,   0  ; 310c: 40 00 80... @..
     !byte $10,   0, $40,   0, $10, $80,   0, $10, $80,   0, $10,   0  ; 3118: 10 00 40... ..@
     !byte $40, $10, $40,   0, $10, $40,   0, $20, $80, $10,   0, $20  ; 3124: 40 10 40... @.@
-    !byte $40, $10                                                    ; 3130: 40 10       @.
-    !text "@ @"                                                       ; 3132: 40 20 40    @ @
-    !byte $10                                                         ; 3135: 10          .
-    !text "@ @ @"                                                     ; 3136: 40 20 40... @ @
-    !byte $10, $40, $10,   0,   8, $88,   8, $10,   0, $80,   0, $10  ; 313b: 10 40 10... .@.
-    !byte $40,   0, $80, $20, $80, $20,   0, $80, $10, $80, $20, $80  ; 3147: 40 00 80... @..
-    !byte   0, $10, $80,   0, $20, $80,   0, $10,   0, $80, $ff, $ff  ; 3153: 00 10 80... ...
-    !byte $ff                                                         ; 315f: ff          .
-l3160
+    !byte $40, $10, $40, $20, $40, $10, $40, $20, $40, $20, $40, $10  ; 3130: 40 10 40... @.@
+    !byte $40, $10,   0,   8, $88,   8, $10,   0, $80,   0, $10, $40  ; 313c: 40 10 00... @..
+    !byte   0, $80, $20, $80, $20,   0, $80, $10, $80, $20, $80,   0  ; 3148: 00 80 20... ..
+    !byte $10, $80,   0, $20, $80,   0, $10,   0, $80, $ff, $ff, $ff  ; 3154: 10 80 00... ...
+demonstration_key_durations
     !byte $14, $22,   2, $12,   1,   7,   2,   2,   6,   1, $0b,   1  ; 3160: 14 22 02... .".
     !byte   2,   2,   5,   4,   2,   6,   2,   1,   3,   3, $0b,   5  ; 316c: 02 02 05... ...
     !byte   2,   5,   2,   5,   3,   2,   7,   3,   3,   4,   1,   3  ; 3178: 02 05 02... ...
@@ -3127,13 +3126,13 @@ loop_c31cb
     sta l233c                                                         ; 31cd: 8d 3c 23    .<#
     jsr c3a00                                                         ; 31d0: 20 00 3a     .:
     inc l233c                                                         ; 31d3: ee 3c 23    .<#
-    lda #0                                                            ; 31d6: a9 00       ..
+    lda #<status_bar_sprite_numbers                                   ; 31d6: a9 00       ..
     sta status_text_address_low                                       ; 31d8: 85 69       .i
-loop_c31da
-    jsr sub_c2325                                                     ; 31da: 20 25 23     %#
-    jsr sub_c2b90                                                     ; 31dd: 20 90 2b     .+
+show_credits_loop
+    jsr draw_grid_at_regular_screen_address                           ; 31da: 20 25 23     %#
+    jsr wait_for_13_centiseconds                                      ; 31dd: 20 90 2b     .+
     inc status_text_address_low                                       ; 31e0: e6 69       .i
-    bne loop_c31da                                                    ; 31e2: d0 f6       ..
+    bne show_credits_loop                                             ; 31e2: d0 f6       ..
     jmp loop_c31cb                                                    ; 31e4: 4c cb 31    L.1
 
 unused53
@@ -3304,6 +3303,7 @@ scrolling_pause_text
     !byte sprite_space                                                ; 32ae: 00          .
     !text "MODE"                                                      ; 32af: 4d 4f 44... MOD
     !byte sprite_space                                                ; 32b3: 00          .
+out_of_time_message
     !text "O"                                                         ; 32b4: 4f          O
     !byte sprite_space                                                ; 32b5: 00          .
     !text "U"                                                         ; 32b6: 55          U
@@ -3324,6 +3324,7 @@ scrolling_pause_text
     !text "M"                                                         ; 32c5: 4d          M
     !byte sprite_space                                                ; 32c6: 00          .
     !text "E"                                                         ; 32c7: 45          E
+pause_message
     !text "HIT"                                                       ; 32c8: 48 49 54    HIT
     !byte sprite_space                                                ; 32cb: 00          .
     !text "SPACE"                                                     ; 32cc: 53 50 41... SPA
@@ -3560,18 +3561,21 @@ c3a00
     jsr draw_big_rockford                                             ; 3a00: 20 b5 2a     .*
     jsr reset_tune                                                    ; 3a03: 20 00 57     .W
     jsr reset_clock                                                   ; 3a06: 20 4d 2a     M*
+    ; show last score line
     jsr reset_grid_of_sprites                                         ; 3a09: 20 92 22     ."
     lda #<highscore_last_status_bar                                   ; 3a0c: a9 dc       ..
     sta status_text_address_low                                       ; 3a0e: 85 69       .i
-    lda #$7b                                                          ; 3a10: a9 7b       .{
-    ldy #0                                                            ; 3a12: a0 00       ..
-    jsr sub_c2329                                                     ; 3a14: 20 29 23     )#
+    lda #>screen_addr_row_28                                          ; 3a10: a9 7b       .{
+    ldy #<screen_addr_row_28                                          ; 3a12: a0 00       ..
+    jsr draw_grid                                                     ; 3a14: 20 29 23     )#
+    ; show highscore line
     jsr reset_grid_of_sprites                                         ; 3a17: 20 92 22     ."
     lda #<highscore_high_status_bar                                   ; 3a1a: a9 50       .P
     sta status_text_address_low                                       ; 3a1c: 85 69       .i
-    lda #$7d                                                          ; 3a1e: a9 7d       .}
-    ldy #$80                                                          ; 3a20: a0 80       ..
-    jsr sub_c2329                                                     ; 3a22: 20 29 23     )#
+    lda #>screen_addr_row_30                                          ; 3a1e: a9 7d       .}
+    ldy #<screen_addr_row_30                                          ; 3a20: a0 80       ..
+    jsr draw_grid                                                     ; 3a22: 20 29 23     )#
+; store cave letter and difficulty level number
     jsr reset_grid_of_sprites                                         ; 3a25: 20 92 22     ."
     ldx #0                                                            ; 3a28: a2 00       ..
     ldy #1                                                            ; 3a2a: a0 01       ..
@@ -3592,18 +3596,18 @@ c3a2c
 c3a45
     lda #<number_of_players_status_bar                                ; 3a45: a9 78       .x
     sta status_text_address_low                                       ; 3a47: 85 69       .i
-    jsr sub_c2325                                                     ; 3a49: 20 25 23     %#
+    jsr draw_grid_at_regular_screen_address                           ; 3a49: 20 25 23     %#
     jsr update_tune                                                   ; 3a4c: 20 13 57     .W
     lda #9                                                            ; 3a4f: a9 09       ..
-    jsr sub_c2b92                                                     ; 3a51: 20 92 2b     .+
+    jsr wait_for_a_centiseconds                                       ; 3a51: 20 92 2b     .+
     jsr update_tune                                                   ; 3a54: 20 13 57     .W
     lda #5                                                            ; 3a57: a9 05       ..
-    jsr sub_c2b92                                                     ; 3a59: 20 92 2b     .+
+    jsr wait_for_a_centiseconds                                       ; 3a59: 20 92 2b     .+
     ldx cave_number                                                   ; 3a5c: a6 87       ..
     ldy difficulty_level                                              ; 3a5e: a4 89       ..
     lda #$e8                                                          ; 3a60: a9 e8       ..
     sta c3a9e                                                         ; 3a62: 8d 9e 3a    ..:
-    lda l0062                                                         ; 3a65: a5 62       .b
+    lda keys_to_process                                               ; 3a65: a5 62       .b
     asl                                                               ; 3a67: 0a          .
     bcs c3a9e                                                         ; 3a68: b0 34       .4
     asl                                                               ; 3a6a: 0a          .
@@ -4414,11 +4418,12 @@ special_cave_0
     !byte $20, $0a, $a1, $20, $0a, $f3, $23, $0b, $9a, $90            ; 4ae8: 20 0a a1...  ..
     !byte $6a, $90, $0e, $0a, $f3, $23, $0b, $9a, $2a,   3            ; 4af2: 6a 90 0e... j..
     !byte $34,   3, $3e,   3                                          ; 4afc: 34 03 3e... 4.>
+
 ; *************************************************************************************
-l4b00
+diamond_score_before_enough_obtained_for_each_cave
     !byte 10, 20, 15,  5, 50, 40, 10, 10,  5, 25                      ; 4b00: 0a 14 0f... ...
     !byte 50, 20,  5, 10, 10, 10, 30, 10, 10, 30                      ; 4b0a: 32 14 05... 2..
-l4b14
+diamond_score_after_enough_obtained_for_each_cave
     !byte 15, 50,  0,  0, 90, 60, 20, 20, 10, 60                      ; 4b14: 0f 32 00... .2.
     !byte  0,  0,  8, 20, 20, 20,  0,  0,  0,  0                      ; 4b1e: 00 00 08... ...
 
@@ -5191,8 +5196,14 @@ pydis_end
 !if (<big_rockford_destination_screen_address) != $00 {
     !error "Assertion failed: <big_rockford_destination_screen_address == $00"
 }
+!if (<bonus_life_text) != $64 {
+    !error "Assertion failed: <bonus_life_text == $64"
+}
 !if (<data_sets) != $f4 {
     !error "Assertion failed: <data_sets == $f4"
+}
+!if (<game_over_text) != $8c {
+    !error "Assertion failed: <game_over_text == $8c"
 }
 !if (<grid_of_screen_sprites) != $00 {
     !error "Assertion failed: <grid_of_screen_sprites == $00"
@@ -5209,8 +5220,26 @@ pydis_end
 !if (<number_of_players_status_bar) != $78 {
     !error "Assertion failed: <number_of_players_status_bar == $78"
 }
+!if (<out_of_time_message) != $b4 {
+    !error "Assertion failed: <out_of_time_message == $b4"
+}
+!if (<pause_message) != $c8 {
+    !error "Assertion failed: <pause_message == $c8"
+}
 !if (<players_and_men_status_bar) != $14 {
     !error "Assertion failed: <players_and_men_status_bar == $14"
+}
+!if (<screen_addr_row_28) != $00 {
+    !error "Assertion failed: <screen_addr_row_28 == $00"
+}
+!if (<screen_addr_row_30) != $80 {
+    !error "Assertion failed: <screen_addr_row_30 == $80"
+}
+!if (<screen_addr_row_6) != $80 {
+    !error "Assertion failed: <screen_addr_row_6 == $80"
+}
+!if (<scrolling_pause_text) != $a0 {
+    !error "Assertion failed: <scrolling_pause_text == $a0"
 }
 !if (<sound1) != $b8 {
     !error "Assertion failed: <sound1 == $b8"
@@ -5509,6 +5538,12 @@ pydis_end
 !if (<start_of_grid_screen_address) != $c0 {
     !error "Assertion failed: <start_of_grid_screen_address == $c0"
 }
+!if (<status_bar_sprite_numbers) != $00 {
+    !error "Assertion failed: <status_bar_sprite_numbers == $00"
+}
+!if (<zeroed_status_bar) != $f0 {
+    !error "Assertion failed: <zeroed_status_bar == $f0"
+}
 !if (>(in_game_sound_block)) != $2c {
     !error "Assertion failed: >(in_game_sound_block) == $2c"
 }
@@ -5541,6 +5576,15 @@ pydis_end
 }
 !if (>map_row_0) != $50 {
     !error "Assertion failed: >map_row_0 == $50"
+}
+!if (>screen_addr_row_28) != $7b {
+    !error "Assertion failed: >screen_addr_row_28 == $7b"
+}
+!if (>screen_addr_row_30) != $7d {
+    !error "Assertion failed: >screen_addr_row_30 == $7d"
+}
+!if (>screen_addr_row_6) != $5f {
+    !error "Assertion failed: >screen_addr_row_6 == $5f"
 }
 !if (>sound1) != $56 {
     !error "Assertion failed: >sound1 == $56"
