@@ -155,7 +155,7 @@ screen_addr1_low            = $8a
 screen_addr1_high           = $8b
 ptr_low                     = $8c
 ptr_high                    = $8d
-l008e                       = $8e
+sound_channel               = $8e
 offset_to_sound             = $8f
 l0ba9                       = $0ba9
 grid_of_screen_sprites      = $0c00
@@ -975,9 +975,9 @@ reverse_nybbles_and_add_one
     rts                                                               ; 2255: 60          `
 
 sub_c2256
-    lda #<special_cave_2                                              ; 2256: a9 3f       .?
+    lda #<(map_row_0-1)                                               ; 2256: a9 3f       .?
     sta ptr_low                                                       ; 2258: 85 8c       ..
-    lda #>special_cave_2                                              ; 225a: a9 50       .P
+    lda #>(map_row_0-1)                                               ; 225a: a9 50       .P
     sta ptr_high                                                      ; 225c: 85 8d       ..
     ldy #0                                                            ; 225e: a0 00       ..
     ldx #$14                                                          ; 2260: a2 14       ..
@@ -1076,12 +1076,14 @@ c22dc
     tay                                                               ; 22f1: a8          .
     iny                                                               ; 22f2: c8          .
     ldx #$85                                                          ; 22f3: a2 85       ..
-    jsr c2c2c                                                         ; 22f5: 20 2c 2c     ,,
+    jsr play_sound_x_pitch_y                                          ; 22f5: 20 2c 2c     ,,
     rts                                                               ; 22f8: 60          `
 
 unused7
     lda #$eb                                                          ; 22f9: a9 eb       ..
-    sta l2c16                                                         ; 22fb: 8d 16 2c    ..,
+    ; sta $2c16
+    !byte $8d, $16, $2c                                               ; 22fb: 8d 16 2c    ..,
+
     rts                                                               ; 22fe: 60          `
 
 unused8
@@ -1809,10 +1811,10 @@ c278f
     bne c27a4                                                         ; 2791: d0 11       ..
     ldx #$85                                                          ; 2793: a2 85       ..
     ldy #$f0                                                          ; 2795: a0 f0       ..
-    jsr c2c2c                                                         ; 2797: 20 2c 2c     ,,
+    jsr play_sound_x_pitch_y                                          ; 2797: 20 2c 2c     ,,
     ldx #$85                                                          ; 279a: a2 85       ..
     ldy #$d2                                                          ; 279c: a0 d2       ..
-    jsr c2c2c                                                         ; 279e: 20 2c 2c     ,,
+    jsr play_sound_x_pitch_y                                          ; 279e: 20 2c 2c     ,,
     jsr sub_c2f00                                                     ; 27a1: 20 00 2f     ./
 c27a4
     jsr sub_c2c80                                                     ; 27a4: 20 80 2c     .,
@@ -1992,14 +1994,14 @@ prepare_level
     lda #0                                                            ; 2900: a9 00       ..
     sta l0078                                                         ; 2902: 85 78       .x
     ldy cave_number                                                   ; 2904: a4 87       ..
-    lda l4c90,y                                                       ; 2906: b9 90 4c    ..L
+    lda lower_nybble_is_initial_cell_for_each_cave,y                  ; 2906: b9 90 4c    ..L
     and #$0f                                                          ; 2909: 29 0f       ).
     sta initial_cell_fill_value                                       ; 290b: 85 79       .y
     jsr sub_c2256                                                     ; 290d: 20 56 22     V"
     ldy cave_number                                                   ; 2910: a4 87       ..
     ldx #1                                                            ; 2912: a2 01       ..
 loop_c2914
-    lda colour_one_for_each_cave,y                                    ; 2914: b9 a4 4c    ..L
+    lda lower_nybble_is_colour_one_for_each_cave,y                    ; 2914: b9 a4 4c    ..L
     lsr                                                               ; 2917: 4a          J
     lsr                                                               ; 2918: 4a          J
     lsr                                                               ; 2919: 4a          J
@@ -2070,7 +2072,7 @@ c2982
     lda #>special_cave_0                                              ; 2986: a9 47       .G
     sta ptr_high                                                      ; 2988: 85 8d       ..
     ldy cave_number                                                   ; 298a: a4 87       ..
-    lda l4c90,y                                                       ; 298c: b9 90 4c    ..L
+    lda lower_nybble_is_initial_cell_for_each_cave,y                  ; 298c: b9 90 4c    ..L
     lsr                                                               ; 298f: 4a          J
     lsr                                                               ; 2990: 4a          J
     lsr                                                               ; 2991: 4a          J
@@ -2093,7 +2095,7 @@ set_palette
     ldy cave_number                                                   ; 29ac: a4 87       ..
     ldx #1                                                            ; 29ae: a2 01       ..
 set_palette_loop
-    lda colour_one_for_each_cave,y                                    ; 29b0: b9 a4 4c    ..L
+    lda lower_nybble_is_colour_one_for_each_cave,y                    ; 29b0: b9 a4 4c    ..L
     and #$0f                                                          ; 29b3: 29 0f       ).
     jsr set_palette_colour_ax                                         ; 29b5: 20 35 2a     5*
     tya                                                               ; 29b8: 98          .
@@ -2113,7 +2115,7 @@ unused34
     and #$3f                                                          ; 29cc: 29 3f       )?
     cmp #$28                                                          ; 29ce: c9 28       .(
     bne c29a1                                                         ; 29d0: d0 cf       ..
-; beq l299c
+    ; beq $299c
     !byte $f0, $c8                                                    ; 29d2: f0 c8       ..
 
 return5
@@ -2125,7 +2127,7 @@ unused35
     inc screen_addr1_high                                             ; 29d9: e6 8b       ..
 c29db
     lda l007a                                                         ; 29db: a5 7a       .z
-    ; bne l299a
+    ; bne $299a
     !byte $d0, $bb                                                    ; 29dd: d0 bb       ..
 
     rts                                                               ; 29df: 60          `
@@ -2429,67 +2431,70 @@ unused40
     !byte $76, $85, $74, $a0, $83, $91, $8c, $4a, $88, $91, $8c, $85  ; 2be4: 76 85 74... v.t
     !byte $7a, $85, $78, $a2,   6, $a5, $87, $c9,   3, $d0,   2, $a2  ; 2bf0: 7a 85 78... z.x
     !byte $2e, $60, $cb, $60                                          ; 2bfc: 2e 60 cb... .`.
-l2c00
-    !byte $12                                                         ; 2c00: 12          .
-l2c01
-    !byte 5                                                           ; 2c01: 05          .
-l2c02
-    !byte 8                                                           ; 2c02: 08          .
-l2c03
-    !byte   5, $12, $f7, $c8,   1,   0, $fe,   4,   1,   0, $fb,   4  ; 2c03: 05 12 f7... ...
-    !byte   1, $10,   2,   5,   7, $13,   1                           ; 2c0f: 01 10 02... ...
-l2c16
-    !byte $dc,   1, $10,   4,   7, $1e, $11,   3, $ff, $28, $12,   1  ; 2c16: dc 01 10... ...
-    !byte $c8,   2                                                    ; 2c22: c8 02       ..
-l2c24
-    !byte $13,   0                                                    ; 2c24: 13 00       ..             ; Channel (2 bytes)
-l2c26
-    !byte 1                                                           ; 2c26: 01          .              ; Amplitude (2 bytes)
-l2c27
-    !byte 0                                                           ; 2c27: 00          .
-l2c28
-    !byte $8f,   0                                                    ; 2c28: 8f 00       ..             ; Pitch (2 bytes)
-l2c2a
-    !byte 1, 0                                                        ; 2c2a: 01 00       ..             ; Duration (2 bytes)
 
-c2c2c
+; Sound data packed into single bytes: channel, amplitude, pitch, duration
+in_game_sound_data
+    !byte $12,   5,   8,   5                                          ; 2c00: 12 05 08... ...
+    !byte $12, $f7, $c8,   1                                          ; 2c04: 12 f7 c8... ...
+    !byte   0, $fe,   4,   1                                          ; 2c08: 00 fe 04... ...
+    !byte   0, $fb,   4,   1                                          ; 2c0c: 00 fb 04... ...
+    !byte $10,   2,   5,   7                                          ; 2c10: 10 02 05... ...
+    !byte $13,   1, $dc,   1                                          ; 2c14: 13 01 dc... ...
+    !byte $10,   4,   7, $1e                                          ; 2c18: 10 04 07... ...
+    !byte $11,   3, $ff, $28                                          ; 2c1c: 11 03 ff... ...
+    !byte $12,   1, $c8,   2                                          ; 2c20: 12 01 c8... ...
+in_game_sound_block
+    !word $13                                                         ; 2c24: 13 00       ..             ; channel; Channel (2 bytes)
+in_game_sound_amplitude
+    !word 1                                                           ; 2c26: 01 00       ..             ; amplitude; Amplitude (2 bytes)
+in_game_sound_pitch
+    !word 143                                                         ; 2c28: 8f 00       ..             ; pitch; Pitch (2 bytes)
+in_game_sound_duration
+    !word 1                                                           ; 2c2a: 01 00       ..             ; duration; Duration (2 bytes)
+
+; If X is negative, then play sound (X AND 127) with pitch Y.
+; If X is non-negative, play sound X with default pitch.
+play_sound_x_pitch_y
     txa                                                               ; 2c2c: 8a          .
-    bmi c2c31                                                         ; 2c2d: 30 02       0.
+    bmi skip_using_default_pitch1                                     ; 2c2d: 30 02       0.
     ldy #0                                                            ; 2c2f: a0 00       ..
-c2c31
+skip_using_default_pitch1
     and #$7f                                                          ; 2c31: 29 7f       ).
     tax                                                               ; 2c33: aa          .
     cpx #6                                                            ; 2c34: e0 06       ..
-    bne c2c3d                                                         ; 2c36: d0 05       ..
-    jsr c2c3d                                                         ; 2c38: 20 3d 2c     =,
+    bne play_raw_sound_x_pitch_y                                      ; 2c36: d0 05       ..
+    ; sound 6 also plays sound 7
+    jsr play_raw_sound_x_pitch_y                                      ; 2c38: 20 3d 2c     =,
     ldx #7                                                            ; 2c3b: a2 07       ..
-c2c3d
+play_raw_sound_x_pitch_y
     txa                                                               ; 2c3d: 8a          .
     asl                                                               ; 2c3e: 0a          .
     asl                                                               ; 2c3f: 0a          .
     tax                                                               ; 2c40: aa          .
     lda #0                                                            ; 2c41: a9 00       ..
-    sta l2c27                                                         ; 2c43: 8d 27 2c    .',
-    lda l2c00,x                                                       ; 2c46: bd 00 2c    ..,
-    sta l2c24                                                         ; 2c49: 8d 24 2c    .$,
-    lda l2c01,x                                                       ; 2c4c: bd 01 2c    ..,
-    sta l2c26                                                         ; 2c4f: 8d 26 2c    .&,
-    bpl c2c59                                                         ; 2c52: 10 05       ..
+    sta in_game_sound_amplitude+1                                     ; 2c43: 8d 27 2c    .',
+    lda in_game_sound_data,x                                          ; 2c46: bd 00 2c    ..,
+    sta in_game_sound_block                                           ; 2c49: 8d 24 2c    .$,
+    lda in_game_sound_data+1,x                                        ; 2c4c: bd 01 2c    ..,
+    sta in_game_sound_amplitude                                       ; 2c4f: 8d 26 2c    .&,
+    bpl skip_negative_amplitude                                       ; 2c52: 10 05       ..
     lda #$ff                                                          ; 2c54: a9 ff       ..
-    sta l2c27                                                         ; 2c56: 8d 27 2c    .',
-c2c59
+    sta in_game_sound_amplitude+1                                     ; 2c56: 8d 27 2c    .',
+skip_negative_amplitude
     tya                                                               ; 2c59: 98          .
-    bne c2c5f                                                         ; 2c5a: d0 03       ..
-    lda l2c02,x                                                       ; 2c5c: bd 02 2c    ..,
-c2c5f
-    sta l2c28                                                         ; 2c5f: 8d 28 2c    .(,
-    lda l2c03,x                                                       ; 2c62: bd 03 2c    ..,
-    sta l2c2a                                                         ; 2c65: 8d 2a 2c    .*,
-    ldy #>(l2c24)                                                     ; 2c68: a0 2c       .,
-    ldx #<(l2c24)                                                     ; 2c6a: a2 24       .$
+    bne skip_using_default_pitch2                                     ; 2c5a: d0 03       ..
+    ; use default pitch
+    lda in_game_sound_data+2,x                                        ; 2c5c: bd 02 2c    ..,
+skip_using_default_pitch2
+    sta in_game_sound_pitch                                           ; 2c5f: 8d 28 2c    .(,
+    lda in_game_sound_data+3,x                                        ; 2c62: bd 03 2c    ..,
+    sta in_game_sound_duration                                        ; 2c65: 8d 2a 2c    .*,
+    ldy #>(in_game_sound_block)                                       ; 2c68: a0 2c       .,
+    ldx #<(in_game_sound_block)                                       ; 2c6a: a2 24       .$
     lda #osword_sound                                                 ; 2c6c: a9 07       ..
     jmp osword                                                        ; 2c6e: 4c f1 ff    L..            ; SOUND command
 
+unused41
     !byte 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0                 ; 2c71: 00 00 00... ...
 
 sub_c2c80
@@ -2508,11 +2513,11 @@ sub_c2c80
     sbc l006d                                                         ; 2c98: e5 6d       .m
     tay                                                               ; 2c9a: a8          .
     ldx #$88                                                          ; 2c9b: a2 88       ..
-    jsr c2c2c                                                         ; 2c9d: 20 2c 2c     ,,
+    jsr play_sound_x_pitch_y                                          ; 2c9d: 20 2c 2c     ,,
 c2ca0
     jsr reverse_nybbles_and_add_one                                   ; 2ca0: 20 4a 22     J"
     and #$0c                                                          ; 2ca3: 29 0c       ).
-    sta l2c02                                                         ; 2ca5: 8d 02 2c    ..,
+    sta in_game_sound_data+2                                          ; 2ca5: 8d 02 2c    ..,
     ldx #5                                                            ; 2ca8: a2 05       ..
     jsr sub_c2ce8                                                     ; 2caa: 20 e8 2c     .,
     lda l005a                                                         ; 2cad: a5 5a       .Z
@@ -2546,12 +2551,12 @@ c2cb7
 sub_c2ce8
     lda data_set_ptr_low,x                                            ; 2ce8: b5 46       .F
     beq return9                                                       ; 2cea: f0 03       ..
-    jmp c2c2c                                                         ; 2cec: 4c 2c 2c    L,,
+    jmp play_sound_x_pitch_y                                          ; 2cec: 4c 2c 2c    L,,
 
 return9
     rts                                                               ; 2cef: 60          `
 
-unused41
+unused42
     !byte $85, $a6, $a8, $91, $70, $60, $a2,   3, $bd, $e3, $20, $18  ; 2cf0: 85 a6 a8... ...
     !byte $69,   1, $c9, $0a                                          ; 2cfc: 69 01 c9... i..
 
@@ -2599,15 +2604,16 @@ c2d3c
     jsr sub_c2b15                                                     ; 2d3c: 20 15 2b     .+
     dex                                                               ; 2d3f: ca          .
     bne c2d1e                                                         ; 2d40: d0 dc       ..
-    beq c2d0a                                                         ; 2d42: f0 c6       ..
+    beq c2d0a                                                         ; 2d42: f0 c6       ..             ; ALWAYS branch
+
 return10
     rts                                                               ; 2d44: 60          `
 
-unused42
+unused43
     !byte $31, $15, $41, $15, $11, $25, $31, $12, $21, $15, $21       ; 2d45: 31 15 41... 1.A
 
 sub_c2d50
-    lda #<special_cave_2                                              ; 2d50: a9 3f       .?
+    lda #<(map_row_0-1)                                               ; 2d50: a9 3f       .?
     jsr sub_c2a1c                                                     ; 2d52: 20 1c 2a     .*
 c2d55
     lda (next_ptr_low),y                                              ; 2d55: b1 82       ..
@@ -2644,7 +2650,7 @@ c2d7f
     pla                                                               ; 2d7f: 68          h
     rts                                                               ; 2d80: 60          `
 
-unused43
+unused44
     !byte $8a, $69, $18, $aa, $90, $d3, $e6, $8d, $d0, $cf, $60, $15  ; 2d81: 8a 69 18... .i.
     !byte $11, $15, $51                                               ; 2d8d: 11 15 51    ..Q
 
@@ -2653,8 +2659,6 @@ sub_c2d90
 c2d93
     ldy #0                                                            ; 2d93: a0 00       ..
     lda (next_ptr_low),y                                              ; 2d95: b1 82       ..
-sub_c2d97
-l2d98 = sub_c2d97+1
     inc next_ptr_low                                                  ; 2d97: e6 82       ..
     bne c2d9d                                                         ; 2d99: d0 02       ..
     inc next_ptr_high                                                 ; 2d9b: e6 83       ..
@@ -2687,23 +2691,24 @@ c2dbd
     pla                                                               ; 2dbd: 68          h
     rts                                                               ; 2dbe: 60          `
 
-unused44
+unused45
     lda #$18                                                          ; 2dbf: a9 18       ..
     jsr add_a_to_ptr                                                  ; 2dc1: 20 40 22     @"
     dec l007c                                                         ; 2dc4: c6 7c       .|
-    bne c2dca                                                         ; 2dc6: d0 02       ..
+    bne unused46                                                      ; 2dc6: d0 02       ..
     pla                                                               ; 2dc8: 68          h
     rts                                                               ; 2dc9: 60          `
 
-c2dca
+unused46
     pla                                                               ; 2dca: 68          h
     asl                                                               ; 2dcb: 0a          .
     asl                                                               ; 2dcc: 0a          .
     dec loop_counter                                                  ; 2dcd: c6 77       .w
     bpl c2da6                                                         ; 2dcf: 10 d5       ..
-    bmi l2d98                                                         ; 2dd1: 30 c5       0.             ; ALWAYS branch
+    ; bmi $2d98
+    !byte $30, $c5                                                    ; 2dd1: 30 c5       0.             ; ALWAYS branch
 
-unused45
+unused47
     !byte $11, $25, $b1, $15, $11, $15, $12, $25, $11, $15, $21, $15  ; 2dd3: 11 25 b1... .%.
     !byte $11, $15, $21, $15, $11, $25, $41, $10, $51, $10            ; 2ddf: 11 15 21... ..!
     !byte $21, $45, $21                                               ; 2de9: 21 45 21    !E!
@@ -2833,7 +2838,7 @@ loop_c2ec9
     bpl loop_c2ec9                                                    ; 2ee1: 10 e6       ..
     rts                                                               ; 2ee3: 60          `
 
-unused46
+unused48
     !byte $60, $20, $c6, $5a, $10, $e6                                ; 2ee4: 60 20 c6... ` .
     !text "`(%&%(%&'(%%%&  #$$$# "                                    ; 2eea: 60 28 25... `(%
 
@@ -2872,7 +2877,7 @@ sub_c2f00
 return11
     rts                                                               ; 2f47: 60          `
 
-unused47
+unused49
     !byte $91, $6a, $e6, $4c, $60,   0,   0,   0                      ; 2f48: 91 6a e6... .j.
 
 sub_c2f50
@@ -2947,7 +2952,7 @@ c2fc6
     lda #0                                                            ; 2fda: a9 00       ..
     rts                                                               ; 2fdc: 60          `
 
-unused48
+unused50
     !byte   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0  ; 2fdd: 00 00 00... ...
     !byte   0,   0,   0,   0,   0, $81,   0,   0,   0,   0, $84,   0  ; 2fe9: 00 00 00... ...
     !byte   0, $86, $81,   0,   0,   1, $81, $d9, $19, $81, $ff       ; 2ff5: 00 86 81... ...
@@ -2981,7 +2986,7 @@ c3018
 return12
     rts                                                               ; 302b: 60          `
 
-unused49
+unused51
     !byte $85, $57, $60, $1c, $1f, $1f, $1f, $1f, $1f, $1f, $1f, $1f  ; 302c: 85 57 60... .W`
     !byte $1f, $1f, $1f, $1f, $1f, $1f, $1f, $1f                      ; 3038: 1f 1f 1f... ...
 
@@ -3054,7 +3059,7 @@ c3098
     tay                                                               ; 30b0: a8          .
     iny                                                               ; 30b1: c8          .
     ldx #$88                                                          ; 30b2: a2 88       ..
-    jsr c2c2c                                                         ; 30b4: 20 2c 2c     ,,
+    jsr play_sound_x_pitch_y                                          ; 30b4: 20 2c 2c     ,,
     jsr sub_c2a56                                                     ; 30b7: 20 56 2a     V*
     jsr draw_grid_of_sprites                                          ; 30ba: 20 00 23     .#
     jsr sub_c2325                                                     ; 30bd: 20 25 23     %#
@@ -3084,7 +3089,7 @@ sub_c30dd
     and #2                                                            ; 30e9: 29 02       ).
     rts                                                               ; 30eb: 60          `
 
-unused50
+unused52
     !byte $62, $29,   2, $60,   0,   0,   0,   0,   0,   0,   0,   0  ; 30ec: 62 29 02... b).
     !byte   0,   0,   0,   0,   0,   0,   0,   0                      ; 30f8: 00 00 00... ...
 l3100
@@ -3131,7 +3136,7 @@ loop_c31da
     bne loop_c31da                                                    ; 31e2: d0 f6       ..
     jmp loop_c31cb                                                    ; 31e4: 4c cb 31    L.1
 
-unused51
+unused53
     !byte $31, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff  ; 31e7: 31 ff ff... 1..
     !byte $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff  ; 31f3: ff ff ff... ...
     !byte $ff                                                         ; 31ff: ff          .
@@ -3407,7 +3412,7 @@ l3300
 ; 120 LDA #&7D:LDY #&80:JSR &2329
 ; 130 JSR &2292:LDX
 ; 
-unused52
+unused54
     !byte $50, $0e                                                    ; 336c: 50 0e       P.
     !text " JSR 10829"                                                ; 336e: 20 4a 53...  JS
     !byte $0d,   0, $5a, $1e                                          ; 3378: 0d 00 5a... ..Z
@@ -3553,7 +3558,7 @@ big_rockford_sprite
 
 c3a00
     jsr draw_big_rockford                                             ; 3a00: 20 b5 2a     .*
-    jsr c5700                                                         ; 3a03: 20 00 57     .W
+    jsr reset_tune                                                    ; 3a03: 20 00 57     .W
     jsr reset_clock                                                   ; 3a06: 20 4d 2a     M*
     jsr reset_grid_of_sprites                                         ; 3a09: 20 92 22     ."
     lda #<highscore_last_status_bar                                   ; 3a0c: a9 dc       ..
@@ -3588,10 +3593,10 @@ c3a45
     lda #<number_of_players_status_bar                                ; 3a45: a9 78       .x
     sta status_text_address_low                                       ; 3a47: 85 69       .i
     jsr sub_c2325                                                     ; 3a49: 20 25 23     %#
-    jsr sub_c5713                                                     ; 3a4c: 20 13 57     .W
+    jsr update_tune                                                   ; 3a4c: 20 13 57     .W
     lda #9                                                            ; 3a4f: a9 09       ..
     jsr sub_c2b92                                                     ; 3a51: 20 92 2b     .+
-    jsr sub_c5713                                                     ; 3a54: 20 13 57     .W
+    jsr update_tune                                                   ; 3a54: 20 13 57     .W
     lda #5                                                            ; 3a57: a9 05       ..
     jsr sub_c2b92                                                     ; 3a59: 20 92 2b     .+
     ldx cave_number                                                   ; 3a5c: a6 87       ..
@@ -3677,7 +3682,7 @@ c3ad1
 return14
     rts                                                               ; 3ae1: 60          `
 
-unused53
+unused55
     !byte $65, $20,   0, $3b, $4c,   0, $3a, $60, $ff, $ff, $ff, $ff  ; 3ae2: 65 20 00... e .
     !byte $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff  ; 3aee: ff ff ff... ...
     !byte $ff, $ff, $ff, $ff, $ff, $ff                                ; 3afa: ff ff ff... ...
@@ -3790,6 +3795,7 @@ sub_c3bc1
 return15
     rts                                                               ; 3bcc: 60          `
 
+unused56
     !byte $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff  ; 3bcd: ff ff ff... ...
     !byte $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff  ; 3bd9: ff ff ff... ...
     !byte $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff  ; 3be5: ff ff ff... ...
@@ -4278,102 +4284,137 @@ data_10_5
     !text ".AVEC"                                                     ; 46f2: 2e 41 56... .AV
     !byte $0d,   2, $8a, $16                                          ; 46f7: 0d 02 8a... ...
     !text "LDX #"                                                     ; 46fb: 4c 44 58... LDX
+
 special_cave_0
-    !byte $5a, $f2, $e2, $6a, $81, $f2, $d2, $6a, $71,   2, $61,   2  ; 4700: 5a f2 e2... Z..
-    !byte $21,   0, $21,   2, $61,   2, $e1, $0b, $61, $0b, $21, $0b  ; 470c: 21 00 21... !.!
-    !byte $21, $0b, $61, $0b, $61, $60, $0c, $f1, $d1, $0c, $2a, $62  ; 4718: 21 0b 61... !.a
-    !byte $0c, $a1, $0c, $22, $0c, $d1, $0c, $2a, $60, $0c, $f1, $d1  ; 4724: 0c a1 0c... ...
-    !byte $0c, $3a, $62, $0c, $a1, $0c, $22, $0c, $d1, $0c, $2a, $60  ; 4730: 0c 3a 62... .:b
-    !byte $0c, $f1, $d1, $0c, $3a, $71, $0b, $61, $0b, $21, $0b, $21  ; 473c: 0c f1 d1... ...
-    !byte $0b, $61, $0b, $61, $fa, $3a, $7a, $81,   9, $61,   9, $61  ; 4748: 0b 61 0b... .a.
-    !byte   9, $61,   9, $ba                                          ; 4754: 09 61 09... .a.
-    !text "jq A A A "                                                 ; 4758: 6a 71 20... jq
-    !byte $c1                                                         ; 4761: c1          .
-    !text " A A A "                                                   ; 4762: 20 41 20...  A
-    !byte $c1,   0,   4,   6, $41,   0,   4,   6, $41,   0,   4,   6  ; 4769: c1 00 04... ...
-    !byte $41,   0,   4,   6                                          ; 4775: 41 00 04... A..
-    !text ":q A A A "                                                 ; 4779: 3a 71 20... :q
-    !byte $c1                                                         ; 4782: c1          .
-    !text " A A A "                                                   ; 4783: 20 41 20...  A
-    !byte $c1,   0,   4,   6, $41,   0,   4,   6, $41,   0,   4,   6  ; 478a: c1 00 04... ...
-    !byte $41,   0,   4,   6, $4a, $92,   1, $f3, $13,   1, $92, $1b  ; 4796: 41 00 04... A..
-    !byte $70, $0b, $f3, $13, $0b, $70, $0b, $20,   6,   4, $60, $f3  ; 47a2: 70 0b f3... p..
-    !byte $13, $60,   4,   6, $10, $a2, $f3, $13, $a2, $a0, $f3, $13  ; 47ae: 13 60 04... .`.
-    !byte $c0,   6,   4, $60, $f3, $13, $60,   4,   6, $10, $a2, $f3  ; 47ba: c0 06 04... ...
-    !byte $13, $a2, $a0, $f3, $13, $c0,   6,   4, $60, $f3, $13, $60  ; 47c6: 13 a2 a0... ...
-    !byte   4,   6, $10, $a2, $f3, $13, $a2, $a0, $f3, $13, $c0,   6  ; 47d2: 04 06 10... ...
-    !byte   4, $60, $f3, $13, $60,   4,   6, $10, $1b, $72, $0b, $f3  ; 47de: 04 60 f3... .`.
-    !byte $13, $0b, $72, $1b, $6a, $0a, $f1, $f1, $11,   4, $f1, $f1  ; 47ea: 13 0b 72... ..r
-    !byte   1, $b2, $31,   4, $f1, $f1, $21, $c2, $6a, $f1, $f1, $11  ; 47f6: 01 b2 31... ..1
-    !byte   4, $81,   4, $5a, $f1, $31,   7, $0a, $31,   4, $f1, $c1  ; 4802: 04 81 04... ...
-    !byte   4, $41, $0a, $f0, $f0, $10,   4, $f0, $f0,   0, $b2, $30  ; 480e: 04 41 0a... .A.
-    !byte   4, $0a, $c2, $4a, $f0, $f0, $10,   4, $f0, $f0,   0, $a2  ; 481a: 04 0a c2... ...
-    !byte $1a, $c2, $81, $0a, $b0,   4, $0a, $d0, $7d, $0a, $f0, $20  ; 4826: 1a c2 81... ...
-    !byte   4                                                         ; 4832: 04          .
-    !text "JJjCb"                                                     ; 4833: 4a 4a 6a... JJj
-    !byte 1                                                           ; 4838: 01          .
-    !text "BcR"                                                       ; 4839: 42 63 52    BcR
-    !byte   1, $52, $63, $0b, $a0, $0b, $63, $0b, $a0, $0b, $73, $ab  ; 483c: 01 52 63... .Rc
-    !byte $83, $ab, $5a, $f3,   3, $0b, $62, $0b, $f3, $e3, $f0, $30  ; 4848: 83 ab 5a... ..Z
-    !byte $f3, $33,   2, $63,   2, $f3, $23, $bb,   2, $63,   2, $bb  ; 4854: f3 33 02... .3.
-    !byte $63, $c2, $63, $c2, $0a, $73, $0b, $b2, $63, $b2, $0b, $13  ; 4860: 63 c2 63... c.c
-    !byte $0a,   1, $b2,   0, $72, $0a,   1,   2, $31,   4, $c1,   4  ; 486c: 0a 01 b2... ...
-    !byte $0b, $0a,   1,   2,   1,   2,   6,   2,   1, $52,   0, $52  ; 4878: 0b 0a 01... ...
-    !byte $0a, $5b,   1, $0b,   4, $81,   4, $0b, $0a, $81, $32,   0  ; 4884: 0a 5b 01... .[.
-    !byte $32, $0a, $81, $0b,   4, $41,   4, $0b, $0a, $a1, $12,   0  ; 4890: 32 0a 81... 2..
-    !byte $12, $0a, $51, $40, $0b, $20, $0b, $40, $0a, $51, $e0, $0a  ; 489c: 12 0a 51... ..Q
-    !byte $51, $e6, $0a, $31, $0b, $51, $0b, $22, $0b, $0a, $31,   0  ; 48a8: 51 e6 0a... Q..
-    !byte $41,   4, $41,   4, $0a, $31,   4, $31, $0b, $62, $0b, $0a  ; 48b4: 41 04 41... A.A
-    !byte $31, $0b, $21,   4, $81,   4, $0a, $61, $0b, $a2, $0b, $0a  ; 48c0: 31 0b 21... 1.!
-    !byte $5b,   4, $c1,   4, $0a, $f2, $42, $0b, $2a, $31,   4, $41  ; 48cc: 5b 04 c1... [..
-    !byte   2, $21,   4, $41,   2, $21,   4, $41,   2, $21,   4, $31  ; 48d8: 02 21 04... .!.
-    !byte   3, $91, $0b, $81, $0b, $81, $0b, $4a, $f1, $f1, $51,   2  ; 48e4: 03 91 0b... ...
-    !byte   3, $91, $0b, $81, $0b, $81, $0b, $51,   2,   1,   3, $41  ; 48f0: 03 91 0b... ...
-    !byte $82,   1, $82,   1, $82, $11,   2, $11,   3, $f1, $f1, $21  ; 48fc: 82 01 82... ...
-    !byte   2, $21,   3, $f1, $f1, $11,   2, $31,   3, $81,   2, $f1  ; 4908: 02 21 03... .!.
-    !byte $61,   2, $41,   3, $81, $0b, $11, $f2,   2, $21,   2, $51  ; 4914: 61 02 41... a.A
-    !byte   3, $f1, $e1,   2, $61,   3, $f1, $d1,   2, $71,   3, $f1  ; 4920: 03 f1 e1... ...
-    !byte $c1,   2, $81,   3, $f1, $b1,   2, $2a, $31,   4, $31, $0b  ; 492c: c1 02 81... ...
-    !byte $0a, $1a, $91,   2, $21,   2, $21,   2, $21,   2, $71,   9  ; 4938: 0a 1a 91... ...
-    !byte $91, $72, $0b, $12,   1, $0b, $21, $0b, $21, $0b, $3a, $11  ; 4944: 91 72 0b... .r.
-    !byte $a2, $f1, $11,   9, $3a, $11, $e2, $0a, $f1, $e1,   9, $2a  ; 4950: a2 f1 11... ...
-    !byte $11, $a2, $3a, $91, $0b, $21, $0b, $21, $0b, $21, $0b, $0a  ; 495c: 11 a2 3a... ..:
-    !byte $0b, $21, $0b, $0a, $f0, $30,   7, $ea, $40, $f2, $d2, $90  ; 4968: 0b 21 0b... .!.
-    !byte $fe, $de, $90, $f5, $d5, $90, $f1, $d1, $90, $f1, $d1, $40  ; 4974: fe de 90... ...
-    !byte $3a, $f1, $51,   6,   1,   6,   1,   6,   1,   6,   1,   6  ; 4980: 3a f1 51... :.Q
-    !byte   1,   6, $f1, $c1,   5,   1,   5,   1,   5,   1,   5,   1  ; 498c: 01 06 f1... ...
-    !byte   5,   1,   5, $2a, $a1,   0, $0b,   0, $0b,   0, $0b,   0  ; 4998: 05 01 05... ...
-    !byte $0b,   0, $0b, $0e, $0a, $a1, $a0, $0a, $a1, $70, $0e, $10  ; 49a4: 0b 00 0b... ...
-    !byte $0a, $a1, $a0, $0a, $a1, $50, $0e, $30, $0a, $a1, $a0, $0a  ; 49b0: 0a a1 a0... ...
-    !byte $a1, $30, $0e, $50, $0a, $a1, $a0, $0a, $a1, $10, $0e, $70  ; 49bc: a1 30 0e... .0.
-    !byte $0a, $a1, $a0, $0a, $a1, $0e, $0b,   0, $0b,   0, $0b,   0  ; 49c8: 0a a1 a0... ...
-    !byte $0b,   0, $0b,   0, $1a, $0a, $10,   2, $f0, $40,   2, $0a  ; 49d4: 0b 00 0b... ...
-    !byte $20,   2, $f0, $20,   2, $0a, $30,   2, $f0,   0,   2, $0a  ; 49e0: 20 02 f0...  ..
-    !byte $40,   2, $e0,   2, $0a, $50,   2, $c0,   2, $0a, $60,   2  ; 49ec: 40 02 e0... @..
-    !byte $a0,   2, $0a, $70,   2, $80,   2, $0a, $80,   2, $60,   2  ; 49f8: a0 02 0a... ...
-    !byte $0a, $90,   2, $40,   2, $0a, $a0,   2, $20,   2, $0a, $b0  ; 4a04: 0a 90 02... ...
-    !byte $21, $0a, $b0                                               ; 4a10: 21 0a b0    !..
-    !text "-zja]"                                                     ; 4a13: 2d 7a 6a... -zj
-    !byte $11, $5d, $0a, $61,   2, $31,   2, $11,   2, $31,   2, $0a  ; 4a18: 11 5d 0a... .].
-    !byte $61, $0b, $31, $0b, $11, $0b, $31, $0b, $4a, $61, $0b, $32  ; 4a24: 61 0b 31... a.1
-    !byte $0b, $11, $0b, $32, $0b, $2a, $81,   9, $61,   9, $61,   9  ; 4a30: 0b 11 0b... ...
-    !byte $61,   9, $2a, $f0, $20, $0b, $0a, $90,   5, $0a, $90,   1  ; 4a3c: 61 09 2a... a.*
-    !byte $6a, $90, $0e, $0a, $f3, $23, $0b, $9a,   1,   5,   6, $e1  ; 4a48: 6a 90 0e... j..
-    !byte   5, $0b, $0a, $11,   5,   6, $c1,   5, $0a,   1,   4,   1  ; 4a54: 05 0b 0a... ...
-    !byte   5,   6, $a1,   5,   1,   4, $0a,   1,   5,   4,   1,   5  ; 4a60: 05 06 a1... ...
-    !byte   6, $81,   5,   1,   4,   5, $0a, $11,   5,   4,   1,   5  ; 4a6c: 06 81 05... ...
-    !byte   6, $61,   5,   1,   4,   5, $0a, $21,   5,   4,   1,   5  ; 4a78: 06 61 05... .a.
-    !byte   6, $41,   5,   1,   4,   5, $0a, $31,   5,   4,   1,   5  ; 4a84: 06 41 05... .A.
-    !byte   6, $21,   5,   1,   4,   5, $0a, $41,   5,   4,   1,   5  ; 4a90: 06 21 05... .!.
-    !byte   6,   1,   5,   1,   4,   5, $0a, $51,   5,   4,   1, $15  ; 4a9c: 06 01 05... ...
-    !byte   1,   4,   5, $0a, $61,   5,   4, $11,   4,   5, $0a, $f3  ; 4aa8: 01 04 05... ...
-    !byte $23, $0b, $9a, $f0, $20, $0b, $5a, $e0, $36, $0a, $e0, $36  ; 4ab4: 23 0b 9a... #..
-    !byte $0a, $e0, $36, $0a, $e4, $36, $0b, $0a, $f3, $33, $9a, $a1  ; 4ac0: 0a e0 36... ..6
-    !byte $25, $41, $0b, $0a, $a1, $25, $1a, $a1, $2d, $0a, $71,   5  ; 4acc: 25 41 0b... %A.
-    !byte $11, $20, $0a, $81,   5,   1, $20, $0a, $91,   5, $20, $0a  ; 4ad8: 11 20 0a... . .
-    !byte $a1, $2d, $0a, $a1, $20, $0a, $a1, $20, $0a, $f3, $23, $0b  ; 4ae4: a1 2d 0a... .-.
-    !byte $9a, $90, $6a, $90, $0e, $0a, $f3, $23, $0b, $9a, $2a,   3  ; 4af0: 9a 90 6a... ..j
+    !byte $5a, $f2, $e2, $6a, $81, $f2, $d2, $6a, $71,   2            ; 4700: 5a f2 e2... Z..
+    !byte $61,   2, $21,   0, $21,   2, $61,   2, $e1, $0b            ; 470a: 61 02 21... a.!
+    !byte $61, $0b, $21, $0b, $21, $0b, $61, $0b, $61, $60            ; 4714: 61 0b 21... a.!
+    !byte $0c, $f1, $d1, $0c, $2a, $62, $0c, $a1, $0c, $22            ; 471e: 0c f1 d1... ...
+
+    !byte $0c, $d1, $0c, $2a, $60, $0c, $f1, $d1, $0c, $3a            ; 4728: 0c d1 0c... ...
+    !byte $62, $0c, $a1, $0c, $22, $0c, $d1, $0c, $2a, $60            ; 4732: 62 0c a1... b..
+    !byte $0c, $f1, $d1, $0c, $3a, $71, $0b, $61, $0b, $21            ; 473c: 0c f1 d1... ...
+    !byte $0b, $21, $0b, $61, $0b, $61, $fa, $3a, $7a, $81            ; 4746: 0b 21 0b... .!.
+
+    !byte   9, $61,   9, $61,   9, $61,   9, $ba, $6a, $71            ; 4750: 09 61 09... .a.
+    !byte $20, $41, $20, $41, $20, $41, $20, $c1, $20, $41            ; 475a: 20 41 20...  A
+    !byte $20, $41, $20, $41, $20, $c1,   0,   4,   6, $41            ; 4764: 20 41 20...  A
+    !byte   0,   4,   6, $41,   0,   4,   6, $41,   0,   4            ; 476e: 00 04 06... ...
+
+    !byte   6, $3a, $71, $20, $41, $20, $41, $20, $41, $20            ; 4778: 06 3a 71... .:q
+    !byte $c1, $20, $41, $20, $41, $20, $41, $20, $c1,   0            ; 4782: c1 20 41... . A
+    !byte   4,   6, $41,   0,   4,   6, $41,   0,   4,   6            ; 478c: 04 06 41... ..A
+    !byte $41,   0,   4,   6, $4a, $92,   1, $f3, $13,   1            ; 4796: 41 00 04... A..
+
+    !byte $92, $1b, $70, $0b, $f3, $13, $0b, $70, $0b, $20            ; 47a0: 92 1b 70... ..p
+    !byte   6,   4, $60, $f3, $13, $60,   4,   6, $10, $a2            ; 47aa: 06 04 60... ..`
+    !byte $f3, $13, $a2, $a0, $f3, $13, $c0,   6,   4, $60            ; 47b4: f3 13 a2... ...
+    !byte $f3, $13, $60,   4,   6, $10, $a2, $f3, $13, $a2            ; 47be: f3 13 60... ..`
+
+    !byte $a0, $f3, $13, $c0,   6,   4, $60, $f3, $13, $60            ; 47c8: a0 f3 13... ...
+    !byte   4,   6, $10, $a2, $f3, $13, $a2, $a0, $f3, $13            ; 47d2: 04 06 10... ...
+    !byte $c0,   6,   4, $60, $f3, $13, $60,   4,   6, $10            ; 47dc: c0 06 04... ...
+    !byte $1b, $72, $0b, $f3, $13, $0b, $72, $1b, $6a, $0a            ; 47e6: 1b 72 0b... .r.
+
+    !byte $f1, $f1, $11,   4, $f1, $f1,   1, $b2, $31,   4            ; 47f0: f1 f1 11... ...
+    !byte $f1, $f1, $21, $c2, $6a, $f1, $f1, $11,   4, $81            ; 47fa: f1 f1 21... ..!
+    !byte   4, $5a, $f1, $31,   7, $0a, $31,   4, $f1, $c1            ; 4804: 04 5a f1... .Z.
+    !byte   4, $41, $0a, $f0, $f0, $10,   4, $f0, $f0,   0            ; 480e: 04 41 0a... .A.
+
+    !byte $b2, $30,   4, $0a, $c2, $4a, $f0, $f0, $10,   4            ; 4818: b2 30 04... .0.
+    !byte $f0, $f0,   0, $a2, $1a, $c2, $81, $0a, $b0,   4            ; 4822: f0 f0 00... ...
+    !byte $0a, $d0, $7d, $0a, $f0, $20,   4, $4a, $4a, $6a            ; 482c: 0a d0 7d... ..}
+    !byte $43, $62,   1, $42, $63, $52,   1, $52, $63, $0b            ; 4836: 43 62 01... Cb.
+
+    !byte $a0, $0b, $63, $0b, $a0, $0b, $73, $ab, $83, $ab            ; 4840: a0 0b 63... ..c
+    !byte $5a, $f3,   3, $0b, $62, $0b, $f3, $e3, $f0, $30            ; 484a: 5a f3 03... Z..
+    !byte $f3, $33,   2, $63,   2, $f3, $23, $bb,   2, $63            ; 4854: f3 33 02... .3.
+    !byte   2, $bb, $63, $c2, $63, $c2, $0a, $73, $0b, $b2            ; 485e: 02 bb 63... ..c
+
+    !byte $63, $b2, $0b, $13, $0a,   1, $b2,   0, $72, $0a            ; 4868: 63 b2 0b... c..
+    !byte   1,   2, $31,   4, $c1,   4, $0b, $0a,   1,   2            ; 4872: 01 02 31... ..1
+    !byte   1,   2,   6,   2,   1, $52,   0, $52, $0a, $5b            ; 487c: 01 02 06... ...
+    !byte   1, $0b,   4, $81,   4, $0b, $0a, $81, $32,   0            ; 4886: 01 0b 04... ...
+
+    !byte $32, $0a, $81, $0b,   4, $41,   4, $0b, $0a, $a1            ; 4890: 32 0a 81... 2..
+    !byte $12,   0, $12, $0a, $51, $40, $0b, $20, $0b, $40            ; 489a: 12 00 12... ...
+    !byte $0a, $51, $e0, $0a, $51, $e6, $0a, $31, $0b, $51            ; 48a4: 0a 51 e0... .Q.
+    !byte $0b, $22, $0b, $0a, $31,   0, $41,   4, $41,   4            ; 48ae: 0b 22 0b... .".
+
+    !byte $0a, $31,   4, $31, $0b, $62, $0b, $0a, $31, $0b            ; 48b8: 0a 31 04... .1.
+    !byte $21,   4, $81,   4, $0a, $61, $0b, $a2, $0b, $0a            ; 48c2: 21 04 81... !..
+    !byte $5b,   4, $c1,   4, $0a, $f2, $42, $0b, $2a, $31            ; 48cc: 5b 04 c1... [..
+    !byte   4, $41,   2, $21,   4, $41,   2, $21,   4, $41            ; 48d6: 04 41 02... .A.
+
+    !byte   2, $21,   4, $31,   3, $91, $0b, $81, $0b, $81            ; 48e0: 02 21 04... .!.
+    !byte $0b, $4a, $f1, $f1, $51,   2,   3, $91, $0b, $81            ; 48ea: 0b 4a f1... .J.
+    !byte $0b, $81, $0b, $51,   2,   1,   3, $41, $82,   1            ; 48f4: 0b 81 0b... ...
+    !byte $82,   1, $82, $11,   2, $11,   3, $f1, $f1, $21            ; 48fe: 82 01 82... ...
+
+    !byte   2, $21,   3, $f1, $f1, $11,   2, $31,   3, $81            ; 4908: 02 21 03... .!.
+    !byte   2, $f1, $61,   2, $41,   3, $81, $0b, $11, $f2            ; 4912: 02 f1 61... ..a
+    !byte   2, $21,   2, $51,   3, $f1, $e1,   2, $61,   3            ; 491c: 02 21 02... .!.
+    !byte $f1, $d1,   2, $71,   3, $f1, $c1,   2, $81,   3            ; 4926: f1 d1 02... ...
+
+    !byte $f1, $b1,   2, $2a, $31,   4, $31, $0b, $0a, $1a            ; 4930: f1 b1 02... ...
+    !byte $91,   2, $21,   2, $21,   2, $21,   2, $71,   9            ; 493a: 91 02 21... ..!
+    !byte $91, $72, $0b, $12,   1, $0b, $21, $0b, $21, $0b            ; 4944: 91 72 0b... .r.
+    !byte $3a, $11, $a2, $f1, $11,   9, $3a, $11, $e2, $0a            ; 494e: 3a 11 a2... :..
+
+    !byte $f1, $e1,   9, $2a, $11, $a2, $3a, $91, $0b, $21            ; 4958: f1 e1 09... ...
+    !byte $0b, $21, $0b, $21, $0b, $0a, $0b, $21, $0b, $0a            ; 4962: 0b 21 0b... .!.
+    !byte $f0, $30,   7, $ea, $40, $f2, $d2, $90, $fe, $de            ; 496c: f0 30 07... .0.
+    !byte $90, $f5, $d5, $90, $f1, $d1, $90, $f1, $d1, $40            ; 4976: 90 f5 d5... ...
+
+    !byte $3a, $f1, $51,   6,   1,   6,   1,   6,   1,   6            ; 4980: 3a f1 51... :.Q
+    !byte   1,   6,   1,   6, $f1, $c1,   5,   1,   5,   1            ; 498a: 01 06 01... ...
+    !byte   5,   1,   5,   1,   5,   1,   5, $2a, $a1,   0            ; 4994: 05 01 05... ...
+    !byte $0b,   0, $0b,   0, $0b,   0, $0b,   0, $0b, $0e            ; 499e: 0b 00 0b... ...
+
+    !byte $0a, $a1, $a0, $0a, $a1, $70, $0e, $10, $0a, $a1            ; 49a8: 0a a1 a0... ...
+    !byte $a0, $0a, $a1, $50, $0e, $30, $0a, $a1, $a0, $0a            ; 49b2: a0 0a a1... ...
+    !byte $a1, $30, $0e, $50, $0a, $a1, $a0, $0a, $a1, $10            ; 49bc: a1 30 0e... .0.
+    !byte $0e, $70, $0a, $a1, $a0, $0a, $a1, $0e, $0b,   0            ; 49c6: 0e 70 0a... .p.
+
+    !byte $0b,   0, $0b,   0, $0b,   0, $0b,   0, $1a, $0a            ; 49d0: 0b 00 0b... ...
+    !byte $10,   2, $f0, $40,   2, $0a, $20,   2, $f0, $20            ; 49da: 10 02 f0... ...
+    !byte   2, $0a, $30,   2, $f0,   0,   2, $0a, $40,   2            ; 49e4: 02 0a 30... ..0
+    !byte $e0,   2, $0a, $50,   2, $c0,   2, $0a, $60,   2            ; 49ee: e0 02 0a... ...
+
+    !byte $a0,   2, $0a, $70,   2, $80,   2, $0a, $80,   2            ; 49f8: a0 02 0a... ...
+    !byte $60,   2, $0a, $90,   2, $40,   2, $0a, $a0,   2            ; 4a02: 60 02 0a... `..
+    !byte $20,   2, $0a, $b0, $21, $0a, $b0, $2d, $7a, $6a            ; 4a0c: 20 02 0a...  ..
+    !byte $61, $5d, $11, $5d, $0a, $61,   2, $31,   2, $11            ; 4a16: 61 5d 11... a].
+
+    !byte   2, $31,   2, $0a, $61, $0b, $31, $0b, $11, $0b            ; 4a20: 02 31 02... .1.
+    !byte $31, $0b, $4a, $61, $0b, $32, $0b, $11, $0b, $32            ; 4a2a: 31 0b 4a... 1.J
+    !byte $0b, $2a, $81,   9, $61,   9, $61,   9, $61,   9            ; 4a34: 0b 2a 81... .*.
+    !byte $2a, $f0, $20, $0b, $0a, $90,   5, $0a, $90,   1            ; 4a3e: 2a f0 20... *.
+
+    !byte $6a, $90, $0e, $0a, $f3, $23, $0b, $9a,   1,   5            ; 4a48: 6a 90 0e... j..
+    !byte   6, $e1,   5, $0b, $0a, $11,   5,   6, $c1,   5            ; 4a52: 06 e1 05... ...
+    !byte $0a,   1,   4,   1,   5,   6, $a1,   5,   1,   4            ; 4a5c: 0a 01 04... ...
+    !byte $0a,   1,   5,   4,   1,   5,   6, $81,   5,   1            ; 4a66: 0a 01 05... ...
+
+    !byte   4,   5, $0a, $11,   5,   4,   1,   5,   6, $61            ; 4a70: 04 05 0a... ...
+    !byte   5,   1,   4,   5, $0a, $21,   5,   4,   1,   5            ; 4a7a: 05 01 04... ...
+    !byte   6, $41,   5,   1,   4,   5, $0a, $31,   5,   4            ; 4a84: 06 41 05... .A.
+    !byte   1,   5,   6, $21,   5,   1,   4,   5, $0a, $41            ; 4a8e: 01 05 06... ...
+
+    !byte 5, 4, 1, 5, 6, 1, 5, 1, 4, 5                                ; 4a98: 05 04 01... ...
+    !byte $0a, $51,   5,   4,   1, $15,   1,   4,   5, $0a            ; 4aa2: 0a 51 05... .Q.
+    !byte $61,   5,   4, $11,   4,   5, $0a, $f3, $23, $0b            ; 4aac: 61 05 04... a..
+    !byte $9a, $f0, $20, $0b, $5a, $e0, $36, $0a, $e0, $36            ; 4ab6: 9a f0 20... ..
+
+    !byte $0a, $e0, $36, $0a, $e4, $36, $0b, $0a, $f3, $33            ; 4ac0: 0a e0 36... ..6
+    !byte $9a, $a1, $25, $41, $0b, $0a, $a1, $25, $1a, $a1            ; 4aca: 9a a1 25... ..%
+    !byte $2d, $0a, $71,   5, $11, $20, $0a, $81,   5,   1            ; 4ad4: 2d 0a 71... -.q
+    !byte $20, $0a, $91,   5, $20, $0a, $a1, $2d, $0a, $a1            ; 4ade: 20 0a 91...  ..
+
+    !byte $20, $0a, $a1, $20, $0a, $f3, $23, $0b, $9a, $90            ; 4ae8: 20 0a a1...  ..
+    !byte $6a, $90, $0e, $0a, $f3, $23, $0b, $9a, $2a,   3            ; 4af2: 6a 90 0e... j..
     !byte $34,   3, $3e,   3                                          ; 4afc: 34 03 3e... 4.>
+; *************************************************************************************
 l4b00
     !byte 10, 20, 15,  5, 50, 40, 10, 10,  5, 25                      ; 4b00: 0a 14 0f... ...
     !byte 50, 20,  5, 10, 10, 10, 30, 10, 10, 30                      ; 4b0a: 32 14 05... 2..
@@ -4381,7 +4422,6 @@ l4b14
     !byte 15, 50,  0,  0, 90, 60, 20, 20, 10, 60                      ; 4b14: 0f 32 00... .2.
     !byte  0,  0,  8, 20, 20, 20,  0,  0,  0,  0                      ; 4b1e: 00 00 08... ...
 
-; *************************************************************************************
 required_diamonds_for_each_cave_difficulty_level_1
     !byte 12, 10, 24, 36,  4,  4, 15, 10, 75, 12                      ; 4b28: 0c 0a 18... ...
     !byte  6, 19, 50, 30, 20, 12,  6, 16, 14,  6                      ; 4b32: 06 13 32... ..2
@@ -4417,52 +4457,46 @@ time_limit_for_each_cave_difficulty_level_5
     !byte  30,  70,  70,  50,  30,  80, 120,  80, 120, 100            ; 4bdc: 1e 46 46... .FF
     !byte 240, 160, 140, 130, 140, 150,  10,  15,  20,  20            ; 4be6: f0 a0 8c... ...
 
-; *************************************************************************************
 l4bf0
-    !byte   2, $13,   2,   1,   1, $12,   1,   1, $0a,   1, $12, $12  ; 4bf0: 02 13 02... ...
-    !byte   1,   1,   1,   1,   3,   2,   1,   1                      ; 4bfc: 01 01 01... ...
+    !byte   2, $13,   2,   1,   1, $12,   1,   1, $0a,   1            ; 4bf0: 02 13 02... ...
+    !byte $12, $12,   1,   1,   1,   1,   3,   2,   1,   1            ; 4bfa: 12 12 01... ...
 l4c04
-    !byte   3, $12,   3,   1,   1,   3, $14, $14,   8, $0d, $14,   3  ; 4c04: 03 12 03... ...
-    !byte $12,   3, $14,   1,   3,   1,   8,   3                      ; 4c10: 12 03 14... ...
+    !byte   3, $12,   3,   1,   1,   3, $14, $14,   8, $0d            ; 4c04: 03 12 03... ...
+    !byte $14,   3, $12,   3, $14,   1,   3,   1,   8,   3            ; 4c0e: 14 03 12... ...
 l4c18
-    !byte $10, $14, $12, $14, $14, $12,   5,   3, $0a, $14, $0f, $14  ; 4c18: 10 14 12... ...
-    !byte   1, $14, $14,   2, $0a,   2,   5,   8                      ; 4c24: 01 14 14... ...
+    !byte $10, $14, $12, $14, $14, $12,   5,   3, $0a, $14            ; 4c18: 10 14 12... ...
+    !byte $0f, $14,   1, $14, $14,   2, $0a,   2,   5,   8            ; 4c22: 0f 14 01... ...
 l4c2c
-    !byte $26, $12                                                    ; 4c2c: 26 12       &.
-    !text "'&'&'"                                                     ; 4c2e: 27 26 27... '&'
-    !byte 0, 9                                                        ; 4c33: 00 09       ..
-    !text "'&'"                                                       ; 4c35: 27 26 27    '&'
-    !byte $0a, $27, $14, $27, $12, $12, $12,   9                      ; 4c38: 0a 27 14... .'.
+    !byte $26, $12, $27, $26, $27, $26, $27,   0,   9, $27            ; 4c2c: 26 12 27... &.'
+    !byte $26, $27, $0a, $27, $14, $27, $12, $12, $12,   9            ; 4c36: 26 27 0a... &'.
 l4c40
-    !byte   1,   2,   3, $10,   5,   6,   7, $11,   9, $0a, $0b, $12  ; 4c40: 01 02 03... ...
-    !byte $0d, $0e, $0f, $13,   4,   8, $0c,   0                      ; 4c4c: 0d 0e 0f... ...
+    !byte   1,   2,   3, $10,   5,   6,   7, $11,   9, $0a            ; 4c40: 01 02 03... ...
+    !byte $0b, $12, $0d, $0e, $0f, $13,   4,   8, $0c,   0            ; 4c4a: 0b 12 0d... ...
 l4c54
-    !byte   0,   0,   0,   0,   0,   0, $28, $19,   0,   0,   0,   0  ; 4c54: 00 00 00... ...
-    !byte $20,   0, $0a, $14,   0,   0,   0,   4                      ; 4c60: 20 00 0a...  ..
+    !byte   0,   0,   0,   0,   0,   0, $28, $19,   0,   0            ; 4c54: 00 00 00... ...
+    !byte   0,   0, $20,   0, $0a, $14,   0,   0,   0,   4            ; 4c5e: 00 00 20... ..
 l4c68
-    !byte   5,   0,   0,   0,   3,   0,   0,   0,   3,   0,   0,   0  ; 4c68: 05 00 00... ...
-    !byte   3,   0,   0,   0, $80, $80, $80, $80                      ; 4c74: 03 00 00... ...
+    !byte 5, 0, 0, 0, 3, 0, 0, 0, 3, 0                                ; 4c68: 05 00 00... ...
+    !byte   0,   0,   3,   0,   0,   0, $80, $80, $80, $80            ; 4c72: 00 00 03... ...
 l4c7c
-    !byte   8, $44,   2, $0a                                          ; 4c7c: 08 44 02... .D.
-    !text "CT!%7id3"                                                  ; 4c80: 43 54 21... CT!
-    !byte $14                                                         ; 4c88: 14          .
-    !text "Y<*"                                                       ; 4c89: 59 3c 2a    Y<*
-    !byte $11, $67, $14, $26                                          ; 4c8c: 11 67 14... .g.
-l4c90
-    !byte $11, $11, $11, $11, $11, $31, $11,   1, $35, $11, $11, $11  ; 4c90: 11 11 11... ...
-    !byte   1, $11,   1, $11,   0, $11,   0, $11                      ; 4c9c: 01 11 01... ...
-colour_one_for_each_cave
-    !byte $15, $15, $23, $15,   6, $15,   2,   3, $41,   3, $56, $15  ; 4ca4: 15 15 23... ..#
-    !byte $12,   6, $51, $16,   2,   5,   4,   5                      ; 4cb0: 12 06 51... ..Q
-colour_two_for_each_cave
-    !byte $41, $44, $42, $14,   4, $51, $54, $51, $45,   2, $52, $42  ; 4cb8: 41 44 42... ADB
-    !byte $14,   4, $54, $55,   4,   2,   1,   4                      ; 4cc4: 14 04 54... ..T
-colour_three_for_each_cave
-    !byte $57, $57, $57, $13,   7, $57, $57, $57, $47,   7, $57, $57  ; 4ccc: 57 57 57... WWW
-    !byte $57,   7, $57, $57,   6,   7,   7,   7                      ; 4cd8: 57 07 57... W.W
+    !byte   8, $44,   2, $0a, $43, $54, $21, $25, $37, $69            ; 4c7c: 08 44 02... .D.
+    !byte $64, $33, $14, $59, $3c, $2a, $11, $67, $14, $26            ; 4c86: 64 33 14... d3.
+lower_nybble_is_initial_cell_for_each_cave
+    !byte $11, $11, $11, $11, $11, $31, $11,   1, $35, $11            ; 4c90: 11 11 11... ...
+    !byte $11, $11,   1, $11,   1, $11,   0, $11,   0, $11            ; 4c9a: 11 11 01... ...
+lower_nybble_is_colour_one_for_each_cave
+    !byte $15, $15, $23, $15,   6, $15,   2,   3, $41,   3            ; 4ca4: 15 15 23... ..#
+    !byte $56, $15, $12,   6, $51, $16,   2,   5,   4,   5            ; 4cae: 56 15 12... V..
+lower_nybble_is_colour_two_for_each_cave
+    !byte $41, $44, $42, $14,   4, $51, $54, $51, $45,   2            ; 4cb8: 41 44 42... ADB
+    !byte $52, $42, $14,   4, $54, $55,   4,   2,   1,   4            ; 4cc2: 52 42 14... RB.
+lower_nybble_is_colour_three_for_each_cave
+    !byte $57, $57, $57, $13,   7, $57, $57, $57, $47,   7            ; 4ccc: 57 57 57... WWW
+    !byte $57, $57, $57,   7, $57, $57,   6,   7,   7,   7            ; 4cd6: 57 57 57... WWW
 cave_to_data_set
-    !byte   0,   1,   2,   3, $ff,   4,   5,   6,   7, $ff,   8,   9  ; 4ce0: 00 01 02... ...
-    !byte $0a, $ff, $0b, $0c, $ff, $ff, $ff, $ff                      ; 4cec: 0a ff 0b... ...
+    !byte   0,   1,   2,   3, $ff,   4,   5,   6,   7, $ff            ; 4ce0: 00 01 02... ...
+    !byte   8,   9, $0a, $ff, $0b, $0c, $ff, $ff, $ff, $ff            ; 4cea: 08 09 0a... ...
+; *************************************************************************************
 data_set_0
 data_sets
     !word data_1_0                                                    ; 4cf4: 9d 43       .C
@@ -4669,9 +4703,8 @@ backwards_status_bar
     !text "REYALP"                                                    ; 5034: 52 45 59... REY
     !byte sprite_space                                                ; 503a: 00          .
     !byte sprite_1                                                    ; 503b: 33          3
-    !byte $83, $83, $83                                               ; 503c: 83 83 83    ...
-special_cave_2
-    !byte 1                                                           ; 503f: 01          .
+unused57
+    !byte $83, $83, $83,   1                                          ; 503c: 83 83 83... ...
 
 map_row_0
     !byte $83, $81, $81, $80, $80, $80, $80, $80, $80, $80            ; 5040: 83 81 81... ...
@@ -4693,7 +4726,7 @@ default_status_bar
     !byte sprite_slash                                                ; 507a: 3e          >
     !byte sprite_2                                                    ; 507b: 34          4
 
-unused54
+unused58
     !byte $83, $83, $83, $83                                          ; 507c: 83 83 83... ...
 
 map_row_1
@@ -4702,7 +4735,7 @@ map_row_1
     !byte $81, $81, $81, $81, $81, $81, $81, $81, $81, $81            ; 5094: 81 81 81... ...
     !byte $81, $81, $81, $81, $81, $81, $81, $81, $81, $83            ; 509e: 81 81 81... ...
 
-unused55
+unused59
     !byte   1, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83  ; 50a8: 01 83 83... ...
     !byte $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83  ; 50b4: 83 83 83... ...
 
@@ -4712,7 +4745,7 @@ map_row_2
     !byte $81, $81, $81, $81, $81, $81, $81, $81, $81, $81            ; 50d4: 81 81 81... ...
     !byte $81, $81, $81, $81, $81, $81, $81, $81, $81, $83            ; 50de: 81 81 81... ...
 
-unused56
+unused60
     !byte   1, $83, $83, $83, $83, $83, $83,   8, $83, $83,   2, $83  ; 50e8: 01 83 83... ...
     !byte $83, $83, $83, $83,   5, $83,   5,   4, $83, $83, $83, $83  ; 50f4: 83 83 83... ...
 
@@ -4745,7 +4778,7 @@ map_row_6
     !byte $80, $81, $85, $81, $85, $81, $85, $81, $85, $81            ; 5194: 80 81 85... ...
     !byte $85, $81, $85, $81, $81, $81, $81, $81, $81, $83            ; 519e: 85 81 85... ...
 
-unused57
+unused61
     !byte $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83  ; 51a8: 83 83 83... ...
     !byte $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83  ; 51b4: 83 83 83... ...
 
@@ -4755,7 +4788,7 @@ map_row_7
     !byte $80, $81, $81, $81, $81, $81, $81, $81, $81, $81            ; 51d4: 80 81 81... ...
     !byte $81, $81, $81, $81, $81, $81, $81, $81, $81, $83            ; 51de: 81 81 81... ...
 
-unused58
+unused62
     !byte $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83  ; 51e8: 83 83 83... ...
     !byte $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83  ; 51f4: 83 83 83... ...
 
@@ -4765,7 +4798,7 @@ map_row_8
     !byte $80, $81, $81, $81, $81, $81, $81, $81, $81, $81            ; 5214: 80 81 81... ...
     !byte $81, $81, $81, $81, $81, $81, $81, $81, $81, $83            ; 521e: 81 81 81... ...
 
-unused59
+unused63
     !byte $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83  ; 5228: 83 83 83... ...
     !byte $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83  ; 5234: 83 83 83... ...
 
@@ -4775,7 +4808,7 @@ map_row_9
     !byte $84, $80, $81, $81, $81, $81, $81, $81, $81, $81            ; 5254: 84 80 81... ...
     !byte $81, $81, $81, $81, $81, $81, $81, $81, $81, $83            ; 525e: 81 81 81... ...
 
-unused60
+unused64
     !byte $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83  ; 5268: 83 83 83... ...
     !byte $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83  ; 5274: 83 83 83... ...
 
@@ -4785,7 +4818,7 @@ map_row_10
     !byte $81, $80, $81, $81, $81, $81, $81, $81, $81, $81            ; 5294: 81 80 81... ...
     !byte $81, $81, $81, $81, $81, $81, $81, $81, $81, $83            ; 529e: 81 81 81... ...
 
-unused61
+unused65
     !byte $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83  ; 52a8: 83 83 83... ...
     !byte $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83  ; 52b4: 83 83 83... ...
 
@@ -4795,7 +4828,7 @@ map_row_11
     !byte $81, $80, $81, $81, $81, $81, $81, $81, $81, $81            ; 52d4: 81 80 81... ...
     !byte $81, $81, $81, $81, $81, $81, $81, $81, $81, $83            ; 52de: 81 81 81... ...
 
-unused62
+unused66
     !byte $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83  ; 52e8: 83 83 83... ...
     !byte $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83  ; 52f4: 83 83 83... ...
 
@@ -4805,7 +4838,7 @@ map_row_12
     !byte $81, $80, $81, $81, $81, $81, $81, $81, $81, $81            ; 5314: 81 80 81... ...
     !byte $81, $81, $81, $81, $81, $81, $81, $81, $81, $83            ; 531e: 81 81 81... ...
 
-unused63
+unused67
     !byte $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83  ; 5328: 83 83 83... ...
     !byte $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83  ; 5334: 83 83 83... ...
 
@@ -4815,7 +4848,7 @@ map_row_13
     !byte $81, $80, $81, $81, $81, $81, $81, $81, $81, $81            ; 5354: 81 80 81... ...
     !byte $81, $81, $81, $81, $81, $81, $81, $81, $81, $83            ; 535e: 81 81 81... ...
 
-unused64
+unused68
     !byte $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83  ; 5368: 83 83 83... ...
     !byte $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83  ; 5374: 83 83 83... ...
 
@@ -4825,7 +4858,7 @@ map_row_14
     !byte $81, $80, $81, $81, $81, $81, $81, $81, $81, $81            ; 5394: 81 80 81... ...
     !byte $81, $81, $81, $81, $81, $81, $81, $81, $81, $83            ; 539e: 81 81 81... ...
 
-unused65
+unused69
     !byte $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83  ; 53a8: 83 83 83... ...
     !byte $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83  ; 53b4: 83 83 83... ...
 
@@ -4835,7 +4868,7 @@ map_row_15
     !byte $81, $80, $81, $81, $81, $81, $81, $81, $81, $81            ; 53d4: 81 80 81... ...
     !byte $81, $81, $81, $81, $81, $81, $81, $81, $81, $83            ; 53de: 81 81 81... ...
 
-unused66
+unused70
     !byte $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83  ; 53e8: 83 83 83... ...
     !byte $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83  ; 53f4: 83 83 83... ...
 
@@ -4949,19 +4982,19 @@ l5540
     !byte $83, $83, $83, $83                                          ; 5564: 83 83 83... ...
 
 ; unused copy of routine at $5700
-unused67
+unused71
     lda #osbyte_flush_buffer_class                                    ; 5568: a9 0f       ..
     ldx #0                                                            ; 556a: a2 00       ..
     jsr osbyte                                                        ; 556c: 20 f4 ff     ..            ; Flush all buffers (X=0)
     ldx #5                                                            ; 556f: a2 05       ..
 loop_c5571
-    lda l56e8,x                                                       ; 5571: bd e8 56    ..V
-    sta l56d0,x                                                       ; 5574: 9d d0 56    ..V
+    lda tune_start_position_per_channel,x                             ; 5571: bd e8 56    ..V
+    sta tune_position_per_channel,x                                   ; 5574: 9d d0 56    ..V
     dex                                                               ; 5577: ca          .
     bpl loop_c5571                                                    ; 5578: 10 f7       ..
     rts                                                               ; 557a: 60          `
 
-unused68
+unused72
     !byte $a9,   0, $85, $8e, $a9, $83, $b8, $e5, $8e, $aa, $a0, $ff  ; 557b: a9 00 85... ...
     !byte $a9, $80, $a0, $f4, $ff, $8a, $f0, $e6, $a6, $8e, $8a, $8a  ; 5587: a9 80 a0... ...
     !byte $8a, $8a, $85, $8f, $bd, $d0, $d6, $a8, $e0, $80, $d0, $84  ; 5593: 8a 8a 85... ...
@@ -4974,33 +5007,23 @@ unused68
     !byte $be, $56, $8a, $18, $69, $b8, $aa, $a0, $56, $a9,   7, $20  ; 55e7: be 56 8a... .V.
     !byte $f1, $ff, $e6, $8e, $26, $8e, $e0,   3, $d0, $82, $60, $83  ; 55f3: f1 ff e6... ...
     !byte $83                                                         ; 55ff: 83          .
-l5600
+tune_pitches_and_commands
     !byte $48, $58, $5c, $64, $58, $5c, $64, $70, $5c, $64, $70, $78  ; 5600: 48 58 5c... HX\
-    !byte $49, $45                                                    ; 560c: 49 45       IE
-l560e
-    !byte $19,   5, $11, $24, $20, $19                                ; 560e: 19 05 11... ...
-l5614
-    !byte   5, $13,   9, $25,   3,   5                                ; 5614: 05 13 09... ...
-l561a
-    !byte $c8, $a8, $a8, $a8, $a8, $18, $c9, $10, $c9, $18, $c9, $10  ; 561a: c8 a8 a8... ...
-    !byte $c9, $18, $c9, $10, $c9, $18, $c9, $10, $a8, $a8, $a8, $88  ; 5626: c9 18 c9... ...
-    !byte $a8, $94, $8c                                               ; 5632: a8 94 8c    ...
-    !text "@X", $5c, "dp"                                             ; 5635: 40 58 5c... @X\
-    !byte $a8, $a0, $94, $8c, $88                                     ; 563a: a8 a0 94... ...
-    !text "xpHX", $5c, "dX", $5c, "dp", $5c, "dpxH"                   ; 563f: 78 70 48... xpH
-    !byte $b5, $b0, $18, $78,   5, $11, $80, $20, $18, $78,   5, $11  ; 564e: b5 b0 18... ...
-    !byte $a9,   8, $78, $25,   1, $a9,   5, $c8, $ca                 ; 565a: a9 08 78... ..x
-    !text "Xxd", $5c                                                  ; 5663: 58 78 64... Xxd
-    !byte $10                                                         ; 5667: 10          .
-    !text "(,4@xpd", $5c, "XH@HX", $5c, "dX", $5c, "dp", $5c, "dpx"   ; 5668: 28 2c 34... (,4
-    !text "H"                                                         ; 567f: 48          H
-    !byte $a9, $a4, $19,   5, $11, $24, $20, $19,   5, $13,   9, $25  ; 5680: a9 a4 19... ...
-    !byte   3,   5, $c8, $cb, $cd, $89, $8d, $89, $8d, $89, $8d, $81  ; 568c: 03 05 c8... ...
-    !byte $85, $a9, $a1, $9d, $95, $a1, $a1, $8d, $a1, $89, $8d, $89  ; 5698: 85 a9 a1... ...
-    !byte $8d, $89, $8d, $cc, $70, $94, $80                           ; 56a4: 8d 89 8d... ...
-    !text "x,@HP", $5c                                                ; 56ab: 78 2c 40... x,@
-    !byte $94, $8c, $80                                               ; 56b1: 94 8c 80    ...
-    !text "xpd", $5c                                                  ; 56b4: 78 70 64... xpd
+    !byte $49, $45, $19,   5, $11, $24, $20, $19,   5, $13,   9, $25  ; 560c: 49 45 19... IE.
+    !byte   3,   5, $c8, $a8, $a8, $a8, $a8, $18, $c9, $10, $c9, $18  ; 5618: 03 05 c8... ...
+    !byte $c9, $10, $c9, $18, $c9, $10, $c9, $18, $c9, $10, $a8, $a8  ; 5624: c9 10 c9... ...
+    !byte $a8, $88, $a8, $94, $8c, $40, $58, $5c, $64, $70, $a8, $a0  ; 5630: a8 88 a8... ...
+    !byte $94, $8c, $88, $78, $70, $48, $58, $5c, $64, $58, $5c, $64  ; 563c: 94 8c 88... ...
+    !byte $70, $5c, $64, $70, $78, $48, $b5, $b0, $18, $78,   5, $11  ; 5648: 70 5c 64... p\d
+    !byte $80, $20, $18, $78,   5, $11, $a9,   8, $78, $25,   1, $a9  ; 5654: 80 20 18... . .
+    !byte   5, $c8, $ca, $58, $78, $64, $5c, $10, $28, $2c, $34, $40  ; 5660: 05 c8 ca... ...
+    !byte $78, $70, $64, $5c, $58, $48, $40, $48, $58, $5c, $64, $58  ; 566c: 78 70 64... xpd
+    !byte $5c, $64, $70, $5c, $64, $70, $78, $48, $a9, $a4, $19,   5  ; 5678: 5c 64 70... \dp
+    !byte $11, $24, $20, $19,   5, $13,   9, $25,   3,   5, $c8, $cb  ; 5684: 11 24 20... .$
+    !byte $cd, $89, $8d, $89, $8d, $89, $8d, $81, $85, $a9, $a1, $9d  ; 5690: cd 89 8d... ...
+    !byte $95, $a1, $a1, $8d, $a1, $89, $8d, $89, $8d, $89, $8d, $cc  ; 569c: 95 a1 a1... ...
+    !byte $70, $94, $80, $78, $2c, $40, $48, $50, $5c, $94, $8c, $80  ; 56a8: 70 94 80... p..
+    !byte $78, $70, $64, $5c                                          ; 56b4: 78 70 64... xpd
 sound1
     !word 1                                                           ; 56b8: 01 00       ..             ; channel
     !word 10                                                          ; 56ba: 0a 00       ..             ; amplitude
@@ -5018,88 +5041,95 @@ sound3
     !word 12                                                          ; 56ca: 0c 00       ..             ; amplitude
     !word 169                                                         ; 56cc: a9 00       ..             ; pitch
     !word 6                                                           ; 56ce: 06 00       ..             ; duration
-l56d0
+tune_position_per_channel
     !byte $0e, $4f, $81                                               ; 56d0: 0e 4f 81    .O.
-l56d3
-    !byte   0,   0,   0, $19, $a9, $79, $79, $81, $79, $12,   3,   3  ; 56d3: 00 00 00... ...
-    !byte   3,   8,   7,   1,   7, $40, $0f,   1,   1                 ; 56df: 03 08 07... ...
-l56e8
-    !byte   0, $41, $73,   0,   0,   0                                ; 56e8: 00 41 73... .As
-l56ee
-    !byte   3,   6,   9, $0c,   0,   0,   0,   0,   0,   0,   0,   0  ; 56ee: 03 06 09... ...
-    !byte   0,   0,   0,   0,   0,   0                                ; 56fa: 00 00 00... ...
+tune_note_repeat_per_channel
+    !byte 0, 0, 0                                                     ; 56d3: 00 00 00    ...
+command_pitch
+    !byte $19, $a9, $79, $79, $81, $79                                ; 56d6: 19 a9 79... ..y
+command_note_durations
+    !byte $12,   3,   3,   3,   8,   7                                ; 56dc: 12 03 03... ...
+command_note_repeat_counts
+    !byte   1,   7, $40, $0f,   1,   1                                ; 56e2: 01 07 40... ..@
+tune_start_position_per_channel
+    !byte   0, $41, $73                                               ; 56e8: 00 41 73    .As
+    !byte 0, 0, 0                                                     ; 56eb: 00 00 00    ...
+tune_note_durations_table
+    !byte  3,  6,  9, 12                                              ; 56ee: 03 06 09... ...
+unused73
+    !byte 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0                    ; 56f2: 00 00 00... ...
 
-c5700
+reset_tune
     lda #osbyte_flush_buffer_class                                    ; 5700: a9 0f       ..
     ldx #0                                                            ; 5702: a2 00       ..
     jsr osbyte                                                        ; 5704: 20 f4 ff     ..            ; Flush all buffers (X=0)
     ldx #5                                                            ; 5707: a2 05       ..
-loop_c5709
-    lda l56e8,x                                                       ; 5709: bd e8 56    ..V
-    sta l56d0,x                                                       ; 570c: 9d d0 56    ..V
+reset_tune_loop
+    lda tune_start_position_per_channel,x                             ; 5709: bd e8 56    ..V
+    sta tune_position_per_channel,x                                   ; 570c: 9d d0 56    ..V
     dex                                                               ; 570f: ca          .
-    bpl loop_c5709                                                    ; 5710: 10 f7       ..
+    bpl reset_tune_loop                                               ; 5710: 10 f7       ..
     rts                                                               ; 5712: 60          `
 
-sub_c5713
+update_tune
     lda #0                                                            ; 5713: a9 00       ..
-    sta l008e                                                         ; 5715: 85 8e       ..
-c5717
+    sta sound_channel                                                 ; 5715: 85 8e       ..
+update_channels_loop
     lda #$fa                                                          ; 5717: a9 fa       ..
     sec                                                               ; 5719: 38          8
-    sbc l008e                                                         ; 571a: e5 8e       ..
+    sbc sound_channel                                                 ; 571a: e5 8e       ..
     tax                                                               ; 571c: aa          .
     ldy #$ff                                                          ; 571d: a0 ff       ..
     lda #osbyte_read_adc_or_get_buffer_status                         ; 571f: a9 80       ..
     jsr osbyte                                                        ; 5721: 20 f4 ff     ..            ; Read buffer status or ADC channel
     txa                                                               ; 5724: 8a          .
-    beq c578d                                                         ; 5725: f0 66       .f
-    ldx l008e                                                         ; 5727: a6 8e       ..
+    beq move_to_next_tune_channel                                     ; 5725: f0 66       .f
+    ldx sound_channel                                                 ; 5727: a6 8e       ..
     txa                                                               ; 5729: 8a          .
     asl                                                               ; 572a: 0a          .
     asl                                                               ; 572b: 0a          .
     asl                                                               ; 572c: 0a          .
     sta offset_to_sound                                               ; 572d: 85 8f       ..
-    lda l56d0,x                                                       ; 572f: bd d0 56    ..V
+    lda tune_position_per_channel,x                                   ; 572f: bd d0 56    ..V
     tay                                                               ; 5732: a8          .
     cpx #0                                                            ; 5733: e0 00       ..
-    bne c573b                                                         ; 5735: d0 04       ..
+    bne skip_end_of_tune_check                                        ; 5735: d0 04       ..
     cpy #$41                                                          ; 5737: c0 41       .A
-    beq c5700                                                         ; 5739: f0 c5       ..
-c573b
-    lda l5600,y                                                       ; 573b: b9 00 56    ..V
-    cmp #$c8                                                          ; 573e: c9 c8       ..
-    bcc c575c                                                         ; 5740: 90 1a       ..
+    beq reset_tune                                                    ; 5739: f0 c5       ..
+skip_end_of_tune_check
+    lda tune_pitches_and_commands,y                                   ; 573b: b9 00 56    ..V
+    cmp #200                                                          ; 573e: c9 c8       ..
+    bcc note_found                                                    ; 5740: 90 1a       ..
     tay                                                               ; 5742: a8          .
-    lda l56d3,x                                                       ; 5743: bd d3 56    ..V
-    bne c574e                                                         ; 5746: d0 06       ..
-    lda l561a,y                                                       ; 5748: b9 1a 56    ..V
-    sta l56d3,x                                                       ; 574b: 9d d3 56    ..V
-c574e
-    lda l560e,y                                                       ; 574e: b9 0e 56    ..V
+    lda tune_note_repeat_per_channel,x                                ; 5743: bd d3 56    ..V
+    bne skip_reset_note_repeat                                        ; 5746: d0 06       ..
+    lda command_note_repeat_counts-200,y                              ; 5748: b9 1a 56    ..V
+    sta tune_note_repeat_per_channel,x                                ; 574b: 9d d3 56    ..V
+skip_reset_note_repeat
+    lda command_pitch-200,y                                           ; 574e: b9 0e 56    ..V
     pha                                                               ; 5751: 48          H
-    lda l5614,y                                                       ; 5752: b9 14 56    ..V
+    lda command_note_durations - 200,y                                ; 5752: b9 14 56    ..V
     tay                                                               ; 5755: a8          .
     pla                                                               ; 5756: 68          h
-    dec l56d3,x                                                       ; 5757: de d3 56    ..V
+    dec tune_note_repeat_per_channel,x                                ; 5757: de d3 56    ..V
     bpl c576e                                                         ; 575a: 10 12       ..
-c575c
+note_found
     pha                                                               ; 575c: 48          H
     and #3                                                            ; 575d: 29 03       ).
     tay                                                               ; 575f: a8          .
     lda #0                                                            ; 5760: a9 00       ..
-    sta l56d3,x                                                       ; 5762: 9d d3 56    ..V
-    lda l56ee,y                                                       ; 5765: b9 ee 56    ..V
+    sta tune_note_repeat_per_channel,x                                ; 5762: 9d d3 56    ..V
+    lda tune_note_durations_table,y                                   ; 5765: b9 ee 56    ..V
     tay                                                               ; 5768: a8          .
     pla                                                               ; 5769: 68          h
     and #$fc                                                          ; 576a: 29 fc       ).
     ora #1                                                            ; 576c: 09 01       ..
 c576e
     pha                                                               ; 576e: 48          H
-    lda l56d3,x                                                       ; 576f: bd d3 56    ..V
-    bne c5777                                                         ; 5772: d0 03       ..
-    inc l56d0,x                                                       ; 5774: fe d0 56    ..V
-c5777
+    lda tune_note_repeat_per_channel,x                                ; 576f: bd d3 56    ..V
+    bne skip_increment_tune_position                                  ; 5772: d0 03       ..
+    inc tune_position_per_channel,x                                   ; 5774: fe d0 56    ..V
+skip_increment_tune_position
     pla                                                               ; 5777: 68          h
     ldx offset_to_sound                                               ; 5778: a6 8f       ..
     sta sound1_pitch,x                                                ; 577a: 9d bc 56    ..V
@@ -5112,13 +5142,14 @@ c5777
     ldy #>sound1                                                      ; 5786: a0 56       .V
     lda #osword_sound                                                 ; 5788: a9 07       ..
     jsr osword                                                        ; 578a: 20 f1 ff     ..            ; SOUND command
-c578d
-    inc l008e                                                         ; 578d: e6 8e       ..
-    ldx l008e                                                         ; 578f: a6 8e       ..
+move_to_next_tune_channel
+    inc sound_channel                                                 ; 578d: e6 8e       ..
+    ldx sound_channel                                                 ; 578f: a6 8e       ..
     cpx #3                                                            ; 5791: e0 03       ..
-    bne c5717                                                         ; 5793: d0 82       ..
+    bne update_channels_loop                                          ; 5793: d0 82       ..
     rts                                                               ; 5795: 60          `
 
+unused74
     !byte $d0,   7, $c8, $c0,   6, $d0,   2, $a0,   1, $84, $89, $85  ; 5796: d0 07 c8... ...
     !byte $87, $c9, $10, $30, $9d, $ee, $1e, $32, $d0, $98, $60,   0  ; 57a2: 87 c9 10... ...
     !byte   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0  ; 57ae: 00 00 00... ...
@@ -5139,8 +5170,11 @@ pydis_end
 !if ('S') != $53 {
     !error "Assertion failed: 'S' == $53"
 }
-!if (<(l2c24)) != $24 {
-    !error "Assertion failed: <(l2c24) == $24"
+!if (<(in_game_sound_block)) != $24 {
+    !error "Assertion failed: <(in_game_sound_block) == $24"
+}
+!if (<(map_row_0-1)) != $3f {
+    !error "Assertion failed: <(map_row_0-1) == $3f"
 }
 !if (<(palette_block)) != $29 {
     !error "Assertion failed: <(palette_block) == $29"
@@ -5186,9 +5220,6 @@ pydis_end
 }
 !if (<special_cave_1) != $00 {
     !error "Assertion failed: <special_cave_1 == $00"
-}
-!if (<special_cave_2) != $3f {
-    !error "Assertion failed: <special_cave_2 == $3f"
 }
 !if (<sprite_addr_0) != $00 {
     !error "Assertion failed: <sprite_addr_0 == $00"
@@ -5478,8 +5509,11 @@ pydis_end
 !if (<start_of_grid_screen_address) != $c0 {
     !error "Assertion failed: <start_of_grid_screen_address == $c0"
 }
-!if (>(l2c24)) != $2c {
-    !error "Assertion failed: >(l2c24) == $2c"
+!if (>(in_game_sound_block)) != $2c {
+    !error "Assertion failed: >(in_game_sound_block) == $2c"
+}
+!if (>(map_row_0-1)) != $50 {
+    !error "Assertion failed: >(map_row_0-1) == $50"
 }
 !if (>(palette_block)) != $2a {
     !error "Assertion failed: >(palette_block) == $2a"
@@ -5516,9 +5550,6 @@ pydis_end
 }
 !if (>special_cave_1) != $50 {
     !error "Assertion failed: >special_cave_1 == $50"
-}
-!if (>special_cave_2) != $50 {
-    !error "Assertion failed: >special_cave_2 == $50"
 }
 !if (>sprite_addr_0) != $13 {
     !error "Assertion failed: >sprite_addr_0 == $13"
@@ -5810,6 +5841,15 @@ pydis_end
 }
 !if (>tile_map) != $32 {
     !error "Assertion failed: >tile_map == $32"
+}
+!if (command_note_durations - 200) != $5614 {
+    !error "Assertion failed: command_note_durations - 200 == $5614"
+}
+!if (command_note_repeat_counts-200) != $561a {
+    !error "Assertion failed: command_note_repeat_counts-200 == $561a"
+}
+!if (command_pitch-200) != $560e {
+    !error "Assertion failed: command_pitch-200 == $560e"
 }
 !if (data_10_0) != $4028 {
     !error "Assertion failed: data_10_0 == $4028"
@@ -6173,6 +6213,15 @@ pydis_end
 }
 !if (data_9_9) != $40b4 {
     !error "Assertion failed: data_9_9 == $40b4"
+}
+!if (in_game_sound_data+1) != $2c01 {
+    !error "Assertion failed: in_game_sound_data+1 == $2c01"
+}
+!if (in_game_sound_data+2) != $2c02 {
+    !error "Assertion failed: in_game_sound_data+2 == $2c02"
+}
+!if (in_game_sound_data+3) != $2c03 {
+    !error "Assertion failed: in_game_sound_data+3 == $2c03"
 }
 !if (inkey_key_b) != $9b {
     !error "Assertion failed: inkey_key_b == $9b"
