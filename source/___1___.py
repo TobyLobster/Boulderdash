@@ -18,6 +18,40 @@ config.set_show_char_literals(False)
 config.set_show_all_labels(False)
 
 # Common helper routines
+class SubstituteLabels():
+    def __init__(self, substitute_labels):
+        self.substitute_labels = substitute_labels
+
+        # Create the substitute labels but with inverted dictionaries
+        self.inverse_labels = {}
+        for pair in self.substitute_labels:
+            dict = self.substitute_labels[pair]
+            inv_dict = {v: k for k, v in dict.items()}
+            self.inverse_labels[pair] = inv_dict
+
+            # HACK: also make labels lXXXX, which seems redundant, but changes the way the label_maker suggestions works
+            for key in dict:
+                m = re.match("l([0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F])", key)
+                if m:
+                    addr = int(m.group(1), 16)
+                    label(addr, key)
+
+    def substitute_label_maker(self, addr, context, suggestion):
+        for pair in self.substitute_labels:
+            if context in range(pair[0], pair[1]):
+                dict = self.substitute_labels[pair]
+                if suggestion[0] in dict:
+                    return dict[suggestion[0]]
+
+        # stop using the substitution if not in range
+        for pair in self.inverse_labels:
+            if context not in range(pair[0], pair[1]):
+                dict = self.inverse_labels[pair]
+                if suggestion[0] in dict:
+                    return dict[suggestion[0]]
+
+        return suggestion
+
 def ab(addr, message=""):
     if message != "":
         message = ". "+message
@@ -79,6 +113,70 @@ def message(start_addr, end_addr):
 
 load(0x1300, "original/___1___", "6502")
 
+# NOTE:
+#
+#   Ranges here are *binary* NOT the *runtime* addresses as used everywhere else.
+#   This is to make the addresses unique.
+#
+substitute_labels = {
+    (0x2a00, 0x2a28): {
+        "real_keys_pressed": "x_loop_counter",
+    },
+    (0x2b00, 0x2b85): {
+        "ptr_low":  "map_address_low",
+        "ptr_high": "map_address_high",
+        "screen_addr1_low":  "map_x",
+        "screen_addr1_high": "map_y",
+    },
+    (0x3a00, 0x3b00): {
+        "l006a": "timeout_until_demo_mode",
+    },
+}
+
+label(0x0046, "data_set_ptr_low")
+label(0x0047, "data_set_ptr_high")
+label(0x0059, "countdown_while_switching_palette")
+label(0x005c, "sub_second_ticks")
+label(0x005d, "previous_direction_keys")
+label(0x005e, "just_pressed_direction_keys")
+label(0x0062, "keys_to_process")
+label(0x0065, "demo_mode_tick_count")
+label(0x0067, "demo_key_duration")
+label(0x0069, "status_text_address_low")
+label(0x006c, "diamonds_required")
+label(0x006f, "bonus_life_available")
+label(0x0073, "sprite_for_block_type_1")
+label(0x0074, "sprite_for_block_type_2")
+label(0x0075, "sprite_for_block_type_3")
+label(0x007c, "real_keys_pressed")
+label(0x0073, "grid_x")
+label(0x0077, "loop_counter")
+label(0x0079, "initial_cell_fill_value")
+label(0x007e, "visible_top_left_map_x")
+label(0x007f, "visible_top_left_map_y")
+label(0x0080, "screen_addr2_low")
+label(0x0081, "screen_addr2_high")
+label(0x0082, "next_ptr_low")
+label(0x0083, "next_ptr_high")
+label(0x0084, "wait_delay_centiseconds")
+
+label(0x0085, "tile_map_ptr_low")
+label(0x0086, "tile_map_ptr_high")
+
+label(0x0087, "cave_number")
+label(0x0088, "row_counter")
+label(0x0089, "difficulty_level")
+label(0x008a, "screen_addr1_low")
+label(0x008b, "screen_addr1_high")
+label(0x008c, "ptr_low")
+label(0x008d, "ptr_high")
+label(0x008e, "sound_channel")
+label(0x008f, "offset_to_sound")
+
+# (Class SubstituteLabels is defined in common.py to implement the substitute labels)
+s = SubstituteLabels(substitute_labels)
+set_label_maker_hook(s.substitute_label_maker)
+
 comment(0x1300, """
 Caves: A-P + Four bonus caves
 
@@ -103,78 +201,184 @@ $0f = player
 """)
 
 sprites = {
-    0x0: "sprite_space",
-    0x1: "sprite_boulder1",
-    0x2: "sprite_boulder2",
-    0x3: "sprite_diamond1",
-    0x4: "sprite_diamond2",
-    0x5: "sprite_diamond3",
-    0x6: "sprite_diamond4",
-    0x7: "sprite_titanium_wall1",
-    0x8: "sprite_titanium_wall2",
-    0x9: "sprite_box",
+    0: "sprite_space",
+    1: "sprite_boulder1",
+    2: "sprite_boulder2",
+    3: "sprite_diamond1",
+    4: "sprite_diamond2",
+    5: "sprite_diamond3",
+    6: "sprite_diamond4",
+    7: "sprite_titanium_wall1",
+    8: "sprite_titanium_wall2",
+    9: "sprite_box",
 
-    0x0a: "sprite_wall1",
-    0x0b: "sprite_wall2",
-    0x0c: "sprite_explosion1",
-    0x0d: "sprite_explosion2",
-    0x0e: "sprite_explosion3",
-    0x0f: "sprite_explosion4",
-    0x10: "sprite_magic_wall1",
-    0x11: "sprite_magic_wall2",
-    0x12: "sprite_magic_wall3",
-    0x13: "sprite_magic_wall4",
+    10: "sprite_wall1",
+    11: "sprite_wall2",
+    12: "sprite_explosion1",
+    13: "sprite_explosion2",
+    14: "sprite_explosion3",
+    15: "sprite_explosion4",
+    16: "sprite_magic_wall1",
+    17: "sprite_magic_wall2",
+    18: "sprite_magic_wall3",
+    19: "sprite_magic_wall4",
 
-    0x14: "sprite_fungus1",
-    0x15: "sprite_fungus2",
-    0x16: "sprite_butterfly1",
-    0x17: "sprite_butterfly2",
-    0x18: "sprite_butterfly3",
-    0x19: "sprite_boxy1",
-    0x1a: "sprite_boxy2",
-    0x1b: "sprite_boxy3",
-    0x1c: "sprite_boxy4",
-    0x1d: "sprite_earth1",
+    20: "sprite_fungus1",
+    21: "sprite_fungus2",
+    22: "sprite_butterfly1",
+    23: "sprite_butterfly2",
+    24: "sprite_butterfly3",
+    25: "sprite_firefly1",
+    26: "sprite_firefly2",
+    27: "sprite_firefly3",
+    28: "sprite_firefly4",
+    29: "sprite_earth1",
 
-    0x1e: "sprite_earth2",
-    0x1f: "sprite_pathway",
-    0x20: "sprite_rockford_blinking1",
-    0x21: "sprite_rockford_blinking2",
-    0x22: "sprite_rockford_blinking3",
-    0x23: "sprite_rockford_winking1",
-    0x24: "sprite_rockford_winking2",
-    0x25: "sprite_rockford_moving_down1",
-    0x26: "sprite_rockford_moving_down2",
-    0x27: "sprite_rockford_moving_down3",
+    30: "sprite_earth2",
+    31: "sprite_pathway",
+    32: "sprite_rockford_blinking1",
+    33: "sprite_rockford_blinking2",
+    34: "sprite_rockford_blinking3",
+    35: "sprite_rockford_winking1",
+    36: "sprite_rockford_winking2",
+    37: "sprite_rockford_moving_down1",
+    38: "sprite_rockford_moving_down2",
+    39: "sprite_rockford_moving_down3",
 
-    0x28: "sprite_rockford_moving_up1",
-    0x29: "sprite_rockford_moving_up2",
-    0x2a: "sprite_rockford_moving_left1",
-    0x2b: "sprite_rockford_moving_left2",
-    0x2c: "sprite_rockford_moving_left3",
-    0x2d: "sprite_rockford_moving_left4",
-    0x2e: "sprite_rockford_moving_right1",
-    0x2f: "sprite_rockford_moving_right2",
-    0x30: "sprite_rockford_moving_right3",
-    0x31: "sprite_rockford_moving_right4",
+    40: "sprite_rockford_moving_up1",
+    41: "sprite_rockford_moving_up2",
+    42: "sprite_rockford_moving_left1",
+    43: "sprite_rockford_moving_left2",
+    44: "sprite_rockford_moving_left3",
+    45: "sprite_rockford_moving_left4",
+    46: "sprite_rockford_moving_right1",
+    47: "sprite_rockford_moving_right2",
+    48: "sprite_rockford_moving_right3",
+    49: "sprite_rockford_moving_right4",
 
-    0x32: "sprite_0",
-    0x33: "sprite_1",
-    0x34: "sprite_2",
-    0x35: "sprite_3",
-    0x36: "sprite_4",
-    0x37: "sprite_5",
-    0x38: "sprite_6",
-    0x39: "sprite_7",
-    0x3a: "sprite_8",
-    0x3b: "sprite_9",
+    50: "sprite_0",
+    51: "sprite_1",
+    52: "sprite_2",
+    53: "sprite_3",
+    54: "sprite_4",
+    55: "sprite_5",
+    56: "sprite_6",
+    57: "sprite_7",
+    58: "sprite_8",
+    59: "sprite_9",
 
-    0x3c: "sprite_white",
-    0x3d: "sprite_dash",
-    0x3e: "sprite_slash",
-    0x3f: "sprite_comma",
-    0x40: "sprite_full_stop",
+    60: "sprite_white",
+    61: "sprite_dash",
+    62: "sprite_slash",
+    63: "sprite_comma",
+    64: "sprite_full_stop",
 }
+
+sprite_addr = {
+    0: "sprite_addr_space",
+    1: "sprite_addr_boulder1",
+    2: "sprite_addr_boulder2",
+    3: "sprite_addr_diamond1",
+    4: "sprite_addr_diamond2",
+    5: "sprite_addr_diamond3",
+    6: "sprite_addr_diamond4",
+    7: "sprite_addr_titanium_wall1",
+    8: "sprite_addr_titanium_wall2",
+    9: "sprite_addr_box",
+
+    10: "sprite_addr_wall1",
+    11: "sprite_addr_wall2",
+    12: "sprite_addr_explosion1",
+    13: "sprite_addr_explosion2",
+    14: "sprite_addr_explosion3",
+    15: "sprite_addr_explosion4",
+    16: "sprite_addr_magic_wall1",
+    17: "sprite_addr_magic_wall2",
+    18: "sprite_addr_magic_wall3",
+    19: "sprite_addr_magic_wall4",
+
+    20: "sprite_addr_fungus1",
+    21: "sprite_addr_fungus2",
+    22: "sprite_addr_butterfly1",
+    23: "sprite_addr_butterfly2",
+    24: "sprite_addr_butterfly3",
+    25: "sprite_addr_firefly1",
+    26: "sprite_addr_firefly2",
+    27: "sprite_addr_firefly3",
+    28: "sprite_addr_firefly4",
+    29: "sprite_addr_earth1",
+
+    30: "sprite_addr_earth2",
+    31: "sprite_addr_pathway",
+    32: "sprite_addr_rockford_blinking1",
+    33: "sprite_addr_rockford_blinking2",
+    34: "sprite_addr_rockford_blinking3",
+    35: "sprite_addr_rockford_winking1",
+    36: "sprite_addr_rockford_winking2",
+    37: "sprite_addr_rockford_moving_down1",
+    38: "sprite_addr_rockford_moving_down2",
+    39: "sprite_addr_rockford_moving_down3",
+
+    40: "sprite_addr_rockford_moving_up1",
+    41: "sprite_addr_rockford_moving_up2",
+    42: "sprite_addr_rockford_moving_left1",
+    43: "sprite_addr_rockford_moving_left2",
+    44: "sprite_addr_rockford_moving_left3",
+    45: "sprite_addr_rockford_moving_left4",
+    46: "sprite_addr_rockford_moving_right1",
+    47: "sprite_addr_rockford_moving_right2",
+    48: "sprite_addr_rockford_moving_right3",
+    49: "sprite_addr_rockford_moving_right4",
+
+    50: "sprite_addr_0",
+    51: "sprite_addr_1",
+    52: "sprite_addr_2",
+    53: "sprite_addr_3",
+    54: "sprite_addr_4",
+    55: "sprite_addr_5",
+    56: "sprite_addr_6",
+    57: "sprite_addr_7",
+    58: "sprite_addr_8",
+    59: "sprite_addr_9",
+
+    60: "sprite_addr_white",
+    61: "sprite_addr_dash",
+    62: "sprite_addr_slash",
+    63: "sprite_addr_comma",
+    64: "sprite_addr_full_stop",
+    65: "sprite_addr_A",
+    66: "sprite_addr_B",
+    67: "sprite_addr_C",
+    68: "sprite_addr_D",
+    69: "sprite_addr_E",
+
+    70: "sprite_addr_F",
+    71: "sprite_addr_G",
+    72: "sprite_addr_H",
+    73: "sprite_addr_I",
+    74: "sprite_addr_J",
+    75: "sprite_addr_K",
+    76: "sprite_addr_L",
+    77: "sprite_addr_M",
+    78: "sprite_addr_N",
+    79: "sprite_addr_O",
+
+    80: "sprite_addr_P",
+    81: "sprite_addr_Q",
+    82: "sprite_addr_R",
+    83: "sprite_addr_S",
+    84: "sprite_addr_T",
+    85: "sprite_addr_U",
+    86: "sprite_addr_V",
+    87: "sprite_addr_W",
+    88: "sprite_addr_X",
+    89: "sprite_addr_Y",
+
+    90: "sprite_addr_Z",
+
+    96: "sprite_addr_titanium_wall1",
+}
+
 for i in sprites:
     constant(i, sprites[i])
 
@@ -236,24 +440,29 @@ for r in ranges:
         byte(i)
         expr(i, sprites)
 
-addrs = [0] * 95
-for i in range(0, 95):
-    name  = "sprite_addr_" + str(i)
+addrs = [0] * 106
+for i in range(0, 105):
+    if i in sprite_addr:
+        name  = sprite_addr[i]
+    else:
+        name  = "sprite_addr_" + str(i)
     addr = get_u8_binary(0x2000+i) + 256*get_u8_binary(0x2080+i)
-    addrs[i] = addr
+    if addr not in addrs:
+        addrs[i] = addr
     label(addr, name)
     byte(0x2000+i)
     byte(0x2080+i)
     expr(0x2000+i, make_lo(name))
     expr(0x2080+i, make_hi(name))
 
-byte(0x2061, 0x2080-0x2061)
-byte(0x20df, 0x2100-0x20df)
+#byte(0x2061, 0x2080-0x2061)
+#byte(0x20df, 0x2100-0x20df)
 
 unused(0x24f7)
 i = 1
 while i < len(addrs):
     length = addrs[i] - addrs[i-1]
+    utils.warn(i)
     if length > 0:
         byte(addrs[i-1], length)
     i=i+1
@@ -269,50 +478,23 @@ for i in range(0, 130):
     addr = 0x4cf4 + 2*i
     level_addr = get_u8_binary(addr) + 256*get_u8_binary(addr + 1)
 
-    word(0x4cf4 + 2*i)
+    byte(0x4cf4 + i)
     if (i % 10) == 0:
         label(0x4cf4 + 2*i, "data_set_"+ str(j))
         j += 1
         k = 0
 
     if level_addr != 0:
-        name = "data_" + str(j) + "_"+str(k)
-        label(level_addr, name)
-        expr(addr, name)
+        #name = "data_" + str(j) + "_"+str(k)
+        #label(level_addr, name)
+        #expr(addr, name)
         k += 1
 
 constant(20, "total_caves")
 constant(0xac, "opcode_ldy_abs")
 constant(0xb9, "opcode_lda_abs_y")
-
-label(0x0046, "data_set_ptr_low")
-label(0x0047, "data_set_ptr_high")
-label(0x005c, "sub_second_ticks")
-label(0x0062, "keys_to_process")
-label(0x0067, "demo_key_duration")
-label(0x0069, "status_text_address_low")
-label(0x006c, "diamonds_required")
-label(0x007c, "real_keys_pressed")
-label(0x0073, "grid_x")
-label(0x0077, "loop_counter")
-label(0x0079, "initial_cell_fill_value")
-label(0x0080, "screen_addr2_low")
-label(0x0081, "screen_addr2_high")
-label(0x0082, "next_ptr_low")
-label(0x0083, "next_ptr_high")
-label(0x0084, "wait_delay_centiseconds")
-
-label(0x0085, "tile_map_ptr_low")
-label(0x0086, "tile_map_ptr_high")
-
-label(0x0087, "cave_number")
-label(0x0089, "difficulty_level")
-label(0x008a, "screen_addr1_low")
-label(0x008b, "screen_addr1_high")
-label(0x008c, "ptr_low")
-label(0x008d, "ptr_high")
-label(0x008e, "sound_channel")
-label(0x008f, "offset_to_sound")
+constant(0xca, "opcode_dex")
+constant(0xe8, "opcode_inx")
 
 label(0x0c00, "grid_of_screen_sprites")
 
@@ -322,25 +504,50 @@ label(0x1e70, "set_clock_value")
 unused(0x1ee0)
 blank(0x1ee0)
 
+byte(0x1f00, 15)
+unused(0x1f0f)
+byte(0x1f0f, 35)
 blank(0x1f32)
 string(0x1f56, 1)
 blank(0x1f5a)
+byte(0x1f5a, 38)
+label(0x1f80, "cell_type_to_sprite")
+byte(0x1f87, 8)
+byte(0x1f87+8, 8)
+byte(0x1f87+2*8, 8)
+byte(0x1f87+3*8, 8)
+byte(0x1f87+4*8, 8)
+byte(0x1f87+5*8, 8)
+byte(0x1f87+6*8, 8)
+byte(0x1f87+7*8, 8)
+byte(0x1f87+8*8, 8)
+byte(0x1f87+9*8, 8)
+byte(0x1f87+10*8, 8)
+byte(0x1f87+11*8, 8)
+byte(0x1f87+12*8, 8)
+byte(0x1f87+13*8, 8)
+
 
 label(0x2000, "sprite_addresses_low")
+label(0x2007, "sprite_titanium_addressA")
+label(0x2060, "sprite_titanium_addressB")
 label(0x2080, "sprite_addresses_high")
 unused(0x20df)
 
-label(0x2150, "offset")
+label(0x2150, "index_to_cell_type")
 byte(0x2156, 9)
 
 label(0x2228, "inkey_keys_table")
 blank(0x2230)
 unused(0x2230)
+entry(0x2230)
 label(0x2238, "increment_ptr_and_clear_carry")
 label(0x223e, "skip_increment")
 label(0x2240, "add_a_to_ptr")
 label(0x2249, "return1")
 label(0x224a, "reverse_nybbles_and_add_one")
+comment(0x2256, "Clears the entire map to initial_cell_fill_value.\nClears the visible grid to $ff", indent=1)
+label(0x2256, "clear_map_and_grid")
 expr(0x2257, make_lo("map_row_0-1"))
 expr(0x225b, make_hi("map_row_0-1"))
 label(0x2276, "increment_ptr_using_40_bytes_out_of_every_64")
@@ -372,6 +579,8 @@ expr(0x2328, make_hi("start_of_grid_screen_address"))
 label(0x2329, "draw_grid")
 expr(0x232c, make_hi("backwards_status_bar"))
 expr(0x232e, make_lo("backwards_status_bar"))
+label(0x233b, "instruction_for_self_modification")
+label(0x233c, "status_text_address_high")
 expr(0x233c, make_hi("tile_map"))
 expr(0x2340, "opcode_ldy_abs")
 expr(0x2345, make_lo("players_and_men_status_bar"))
@@ -416,6 +625,7 @@ unused(0x2667)
 unused(0x2674)
 unused(0x2678)
 blank(0x2689)
+label(0x2689, "read_keys")
 label(0x2691, "read_keys_loop")
 unused_entry(0x26ad)
 unused(0x26c3)
@@ -426,13 +636,27 @@ entry(0x26df)
 expr(0x26fa, make_lo("status_bar_sprite_numbers"))
 unused(0x26fd)
 
-label(0x2700, "start_demo_mode_playback")
+label(0x2700, "start_gameplay")
 label(0x2735, "update_demo_mode")
 expr(0x273e, make_lo("scrolling_pause_text"))
 comment(0x2777, "decrement time remaining", indent=1)
 expr(0x2781, make_lo("out_of_time_message"))
 label(0x27ef, "return4")
+unused(0x27f0)
+byte(0x27f0,16)
 
+#label(0x2800, "update_rockford_animation")
+unused(0x2852)
+byte(0x2852, 14)
+label(0x2860, "read_keys_and_resolve_direction_keys")
+comment(0x2863, "just get the direction keys (top nybble)", indent=1)
+comment(0x2869, "look for any changes of direction. If so use the just pressed directions as input", indent=1)
+comment(0x286d, "no new directions were pressed, so use the previous directions from last time.", indent=1)
+label(0x2872, "direction_keys_changed")
+comment(0x2876, "nothing was just pressed, so just use the currently pressed keys", indent=1)
+label(0x2877, "store_active_direction_keys")
+comment(0x287a, "remember the special (non-direction keys) only", indent=1)
+comment(0x2880, "recall the active direction keys, and combine with the special keys", indent=1)
 unused(0x288a)
 label(0x2898, "increment_status_bar_number")
 expr(0x28a3, "sprite_0")
@@ -441,10 +665,21 @@ label(0x28c0, "add_a_to_status_bar_number_at_y")
 label(0x28aa, "decrement_status_bar_number")
 
 label(0x2900, "prepare_level")
+comment(0x2910, "high nybbles in the cave colour arrays store the sprite to use for three basic block types. copy them into sprite_for_block_type_1/2/3", indent=1)
+label(0x2914, "loop_three_times")
 expr(0x2920, "total_caves")
+comment(0x2927, "look up the data set needed for the cave number", indent=1)
+comment(0x292f, "start the pointer at data_sets", indent=1)
+comment(0x2937, "Loop counter X is data set number.\nAdd X * twenty bytes to pointer to get to 'data_set_X' address", indent=1)
 expr(0x2930, make_lo("data_sets"))
 expr(0x2934, make_hi("data_sets"))
+label(0x293a, "add_twenty_times_x_loop")
+label(0x2942, "got_data_set_X_address")
+comment(0x2946, "set offset in Y = 4*(difficulty level-1)", indent=1)
 expr(0x293b, "total_caves")
+comment(0x2951, "set next_ptr = $4e00+?ptr, and if top bit of (ptr?1) is set, increment high byte", indent=1)
+comment(0x2964, "set ptr_low = (ptr?1) AND &7F", indent=1)
+comment(0x2969, "reset ptr to the start of the data_set_X", indent=1)
 expr(0x2983, make_lo("special_cave_0"))
 expr(0x2987, make_hi("special_cave_0"))
 nonentry(0x299a)
@@ -462,15 +697,59 @@ nonentry(0x29d2)
 comment(0x29d2, "beq $299c", indent=1)
 entry(0x29df)
 
-label(0x2a00, "increment_ptr")
+label(0x2a00, "increment_map_ptr")
+label(0x2a17, "skip_increment_high_byte2")
 label(0x2a19, "return6")
+label(0x2a1a, "set_ptr_to_start_of_map")
+label(0x2a1c, "set_ptr_high_to_start_of_map_with_offset_a")
+label(0x2a1e, "set_ptr_high_to_start_of_map")
 expr(0x2a1b, make_lo("map_row_0"))
 expr(0x2a1f, make_hi("map_row_0"))
 label(0x2a29, "palette_block")
+label(0x2a2a, "palette_block+1")
+byte(0x2a29)
+byte(0x2a2a)
+byte(0x2a2b)
+byte(0x2a2c)
+byte(0x2a2d)
 label(0x2a35, "set_palette_colour_ax")
 label(0x2a4d, "reset_clock")
+label(0x2a56, "animate_flashing_spaces_and_check_for_bonus_life")
+stars(0x2a56)
+comment(0x2a56, "")
+comment(0x2a56, """Animate the flashing spaces on the grid.\nCalculate and set palette colour 3 over a number of frames
+Also checks for awarding a bonus life.
+
+Sequence of colours to show.
+countdown_while_changing_palette    physical colour to set
+    7                                       7 (white)
+    6                                       6 (cyan)
+    5                                       5 (magenta)
+    4                                       3 (yellow)
+    3                                       7 (white)
+    2                                       6 (cyan)
+    1                                       5 (magenta)
+    0                                       -
+""")
+
+label(0x2a6a, "skip_setting_physical_colour_to_three")
+comment(0x2a68, "set logical colour three", indent=1)
+comment(0x2a71, "restore to spaces", indent=1)
+blank(0x2a79)
+comment(0x2a79, "a bonus life is awarded every 500 points", indent=1)
+label(0x2a79, "check_for_bonus_life")
 expr(0x2a7d, "sprite_0")
+expr(0x2a81, "sprite_5")
+label(0x2a89, "zero_or_five_in_hundreds_column")
+label(0x2a8b, "check_for_non_zero_in_top_digits")
 expr(0x2a8f, "sprite_0")
+label(0x2a9c, "non_zero_digit_found_in_hundreds_column_or_above")
+comment(0x2aa0, "award bonus life", indent=1)
+comment(0x2aa4, "set sprite for space to pathway", indent=1)
+comment(0x2aa9, "start animating colour three", indent=1)
+comment(0x2aad, "add one to the MEN count", indent=1)
+comment(0x2ab0, "show bonus life text (very briefly)", indent=1)
+expr(0x2aa5, "sprite_pathway")
 label(0x2ab5, "draw_big_rockford")
 label(0x2ac3, "draw_big_rockford_loop")
 stars(0x2ab5)
@@ -495,11 +774,23 @@ blank(0x2ad4)
 ab(0x2ae9)
 blank(0x2aea)
 
-label(0x2b00, "map_offset_to_discontiguous_map_offset")
+stars(0x2b00)
+label(0x2b00, "map_address_to_map_xy_position")
+label(0x2b15, "map_xy_position_to_map_address")
+comment(0x2b2c, "Scrolls the map by setting the tile_map_ptr and visible_top_left_map_x and y")
+label(0x2b2c, "update_map_scroll_position")
+decimal(0x2b3d)
+decimal(0x2b41)
+label(0x2b45, "check_for_need_to_scroll_left")
+label(0x2b4e, "check_for_need_to_scroll_down")
+label(0x2b5e, "check_for_need_to_scroll_up")
+label(0x2b67, "check_for_bonus_levels")
+comment(0x2b6d, "bonus level is always situated in top left corner", indent=1)
+label(0x2b71, "skip_bonus_level")
 unused(0x2b85)
-label(0x2b90, "wait_for_13_centiseconds")
-label(0x2b92, "wait_for_a_centiseconds")
-label(0x2b94, "wait_for_centiseconds")
+label(0x2b90, "wait_for_13_centiseconds_and_read_keys")
+label(0x2b92, "wait_for_a_centiseconds_and_read_keys")
+label(0x2b94, "wait_for_centiseconds_and_read_keys")
 label(0x2b98, "wait_loop")
 unused(0x2bc0)
 
@@ -541,6 +832,22 @@ label(0x2d44, "return10")
 unused(0x2d45)
 expr(0x2d51, make_lo("map_row_0-1"))
 unused(0x2d81)
+label(0x2d90, "fill_with_basics")
+comment(0x2d93, "read byte from stage and increment to next byte", indent=1)
+label(0x2d9d, "skip_increment_high_byte1")
+comment(0x2da1, "The top two bits of the stage byte hold the type to write into the cell. So we shift down six times to get the index, and put the result in X.", indent=1)
+comment(0x2da9, "if the index is zero, don't write to the map.", indent=1)
+comment(0x2dab, "X=1,2 or 3. Look up the sprite to store in the cell (in the map).", indent=1)
+expr(0x2dac, "sprite_for_block_type_1-1")
+
+
+expr(0x2507, "sprite_for_block_type_1-1")
+expr(0x256d, "sprite_for_block_type_1-1")
+expr(0x2577, "sprite_for_block_type_1-1")
+expr(0x291c, "sprite_for_block_type_1-1")
+
+ab(0x2dbb)
+blank(0x2dbd)
 unused_entry(0x2dbf)
 unused(0x2dca)
 comment(0x2dd1, "bmi $2d98", indent=1)
@@ -558,6 +865,7 @@ expr(0x2e80, "sprite_0")
 expr(0x2e8a, make_lo("game_over_text"))
 expr(0x2e93, "sprite_1")
 label(0x2ebf, "play_screen_dissolve_effect")
+label(0x2ec9, "screen_dissolve_loop")
 unused(0x2ee4)
 byte(0x2ee4, 28)
 
@@ -586,7 +894,8 @@ label(0x3100, "demonstration_keys")
 label(0x3160, "demonstration_key_durations")
 byte(0x3100, 0x60)
 entry(0x31c0, "entry_point")
-expr(0x31cc, "sprite_0")
+expr(0x31cc, make_hi("status_bar_sprite_numbers"))
+comment(0x31d3, "increment to point to credits text at $3300", indent=1)
 expr(0x31d7, make_lo("status_bar_sprite_numbers"))
 label(0x31da, "show_credits_loop")
 unused(0x31e7)
@@ -650,8 +959,10 @@ label(0x32dc, "highscore_last_status_bar")
 label(0x32f0, "zeroed_status_bar")
 
 blank(0x3300)
+label(0x3300, "copy_of_credits")
 comment(0x3300, """
 Basic program for debugging purposes. Starts the game.
+On startup, this is immediately overwritten by the credits text.
 
 10*KEY 1 MO.4|M PAGE=13056 |M|N
 20 MODE 5
@@ -672,7 +983,7 @@ A fragment of the original source code (unused).
 120 LDA #125:LDY #128:JSR 9001
 130 JSR 8850:LDX
 
-Note the unusual lack of hex literals, everything's decimal.
+Note there are no hex literals, everything's decimal. Which is unusual.
 
 Translating this to hex form, we see this is the code at &3a06
 80 JSR &2A4D
@@ -690,6 +1001,7 @@ blank(0x3400)
 label(0x3400, "big_rockford_sprite")
 byte(0x3400, 6*256)
 
+label(0x3a00, "show_menu")
 comment(0x3a09, "show last score line", indent=1)
 expr(0x3a0d, make_lo("highscore_last_status_bar"))
 expr(0x3a11, make_hi("screen_addr_row_28"))
@@ -699,18 +1011,36 @@ expr(0x3a1b, make_lo("highscore_high_status_bar"))
 expr(0x3a1f, make_hi("screen_addr_row_30"))
 expr(0x3a21, make_lo("screen_addr_row_30"))
 comment(0x3a25, "store cave letter and difficulty level number")
+label(0x3a2c, "handle_menu_loop")
 expr(0x3a37, "'A'")
 expr(0x3a3d, "sprite_0")
 expr(0x3a3e, "sprite_0")
+label(0x3a45, "waiting_for_demo_loop")
 expr(0x3a46, make_lo("number_of_players_status_bar"))
+expr(0x3a61, "opcode_inx")
+expr(0x3a9a, "opcode_dex")
+label(0x3a99, "move_left_to_change_cave")
+label(0x3a9e, "self_modify_move_left_or_right")
+label(0x3aa3, "store_new_difficulty_level_selected")
+label(0x3aaf, "increase_difficulty_level")
+label(0x3ab7, "decrease_difficulty_level")
+label(0x3abb, "dont_go_below_one")
+label(0x3abe, "toggle_one_or_two_players")
+blank(0x3a80)
+comment(0x3a80, "demo mode", indent=1)
 expr(0x3a83, "sprite_0")
+label(0x3a84, "zero_score_on_status_bar_loop")
 expr(0x3aca, "'S'")
+label(0x3ad1, "show_rockford_again_and_play_game")
 label(0x3ae1, "return14")
 unused(0x3ae2)
 
+label(0x3b00, "play_game")
 expr(0x3b0f, "sprite_2")
 expr(0x3b19, "sprite_0")
 expr(0x3b33, "sprite_0")
+label(0x3b4b, "skip_adding_new_difficulty_level_to_menu")
+comment(0x3b48, "add new difficulty level to menu", indent=1)
 expr(0x3b71, "sprite_0")
 expr(0x3b91, "sprite_0")
 expr(0x3b92, "sprite_0")
@@ -755,12 +1085,21 @@ for i in range(240):
     if (i % 10) == 0:
         byte(0x4b00+i, 10)
 
+label(0x4bf0, "start_y")
 ten_by_two(0x4bf0)
+label(0x4c04, "start_x")
 ten_by_two(0x4c04)
+label(0x4c18, "end_y")
 ten_by_two(0x4c18)
+label(0x4c2c, "end_x")
 ten_by_two(0x4c2c)
+label(0x4c40, "cave_play_order")
+for i in range(20):
+    decimal(0x4c40 + i)
+    decimal(0x4c54 + i)
 ten_by_two(0x4c40)
 ten_by_two(0x4c54)
+label(0x4c68, "number_of_difficuly_levels_available_for_each_cave")
 ten_by_two(0x4c68)
 ten_by_two(0x4c7c)
 ten_by_two(0x4c90, "lower_nybble_is_initial_cell_for_each_cave")
@@ -893,6 +1232,9 @@ label(0x5800 + 30*0x140, "screen_addr_row_30")
 acorn.bbc()
 
 print(""";
+; Disassembly of Boulderdash, by TobyLobster 2024
+; This is a disassembly of the version from http://bbcmicro.co.uk/game.php?id=669
+;
 ; File: ___1___
 ;
 """)
