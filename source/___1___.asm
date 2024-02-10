@@ -93,91 +93,94 @@ sprite_white                           = 60
 total_caves                            = 20
 
 ; Memory locations
-l0000                               = $00
-data_set_ptr_low                    = $46
-data_set_ptr_high                   = $47
-l0048                               = $48
-l0049                               = $49
-l004a                               = $4a
-l004b                               = $4b
-l004c                               = $4c
-l004d                               = $4d
-l004e                               = $4e
-l0050                               = $50
-l0051                               = $51
-l0052                               = $52
-l0053                               = $53
-l0054                               = $54
-l0055                               = $55
-l0056                               = $56
-l0057                               = $57
-l0058                               = $58
-countdown_while_switching_palette   = $59
-l005a                               = $5a
-l005b                               = $5b
-sub_second_ticks                    = $5c
-previous_direction_keys             = $5d
-just_pressed_direction_keys         = $5e
-l005f                               = $5f
-l0060                               = $60
-keys_to_process                     = $62
-l0064                               = $64
-demo_mode_tick_count                = $65
-l0066                               = $66
-demo_key_duration                   = $67
-status_text_address_low             = $69
-l006a                               = $6a
-timeout_until_demo_mode             = $6a
-l006b                               = $6b
-diamonds_required                   = $6c
-l006d                               = $6d
-bonus_life_available                = $6f
-l0070                               = $70
-l0071                               = $71
-l0072                               = $72
-grid_x                              = $73
-sprite_for_block_type_1             = $73
-sprite_for_block_type_2             = $74
-sprite_for_block_type_3             = $75
-l0076                               = $76
-loop_counter                        = $77
-l0078                               = $78
-initial_cell_fill_value             = $79
-l007a                               = $7a
-l007b                               = $7b
-real_keys_pressed                   = $7c
-x_loop_counter                      = $7c
-visible_top_left_map_x              = $7e
-visible_top_left_map_y              = $7f
-screen_addr2_low                    = $80
-screen_addr2_high                   = $81
-next_ptr_low                        = $82
-next_ptr_high                       = $83
-wait_delay_centiseconds             = $84
-tile_map_ptr_low                    = $85
-tile_map_ptr_high                   = $86
-cave_number                         = $87
-row_counter                         = $88
-difficulty_level                    = $89
-map_x                               = $8a
-screen_addr1_low                    = $8a
-map_y                               = $8b
-screen_addr1_high                   = $8b
-map_address_low                     = $8c
-ptr_low                             = $8c
-map_address_high                    = $8d
-ptr_high                            = $8d
-sound_channel                       = $8e
-offset_to_sound                     = $8f
-l0ba9                               = $0ba9
-grid_of_screen_sprites              = $0c00
-start_of_grid_screen_address        = $5bc0
-screen_addr_row_6                   = $5f80
-screen_addr_row_28                  = $7b00
-screen_addr_row_30                  = $7d80
-osword                              = $fff1
-osbyte                              = $fff4
-lfff6                               = $fff6
+l0000                                   = $00
+data_set_ptr_low                        = $46
+data_set_ptr_high                       = $47
+l0048                                   = $48
+remember_y                              = $48
+l0049                                   = $49
+l004a                                   = $4a
+l004b                                   = $4b
+l004c                                   = $4c
+l004d                                   = $4d
+l004e                                   = $4e
+l0050                                   = $50
+l0051                                   = $51
+l0052                                   = $52
+l0053                                   = $53
+l0054                                   = $54
+l0055                                   = $55
+l0056                                   = $56
+l0057                                   = $57
+l0058                                   = $58
+countdown_while_switching_palette       = $59
+l005a                                   = $5a
+l005b                                   = $5b
+sub_second_ticks                        = $5c
+previous_direction_keys                 = $5d
+just_pressed_direction_keys             = $5e
+l005f                                   = $5f
+l0060                                   = $60
+keys_to_process                         = $62
+l0064                                   = $64
+demo_mode_tick_count                    = $65
+l0066                                   = $66
+demo_key_duration                       = $67
+status_text_address_low                 = $69
+l006a                                   = $6a
+map_rockford_end_position_addr_low      = $6a
+map_rockford_end_position_addr_high     = $6b
+diamonds_required                       = $6c
+time_remaining                          = $6d
+bonus_life_available                    = $6f
+map_rockford_start_position_addr_low    = $70
+map_rockford_start_position_addr_high   = $71
+l0072                                   = $72
+grid_x                                  = $73
+sprite_for_block_type_1                 = $73
+sprite_for_block_type_2                 = $74
+sprite_for_block_type_3                 = $75
+l0076                                   = $76
+loop_counter                            = $77
+value_to_not_write_as_a_strip           = $77
+l0078                                   = $78
+initial_cell_fill_value                 = $79
+l007a                                   = $7a
+l007b                                   = $7b
+lower_nybble_value                      = $7c
+real_keys_pressed                       = $7c
+x_loop_counter                          = $7c
+visible_top_left_map_x                  = $7e
+visible_top_left_map_y                  = $7f
+screen_addr2_low                        = $80
+screen_addr2_high                       = $81
+next_ptr_low                            = $82
+next_ptr_high                           = $83
+wait_delay_centiseconds                 = $84
+tile_map_ptr_low                        = $85
+tile_map_ptr_high                       = $86
+cave_number                             = $87
+row_counter                             = $88
+difficulty_level                        = $89
+map_x                                   = $8a
+screen_addr1_low                        = $8a
+map_y                                   = $8b
+screen_addr1_high                       = $8b
+map_address_low                         = $8c
+ptr_low                                 = $8c
+map_address_high                        = $8d
+ptr_high                                = $8d
+sound_channel                           = $8e
+offset_to_sound                         = $8f
+l0ba9                                   = $0ba9
+grid_of_screen_sprites                  = $0c00
+start_of_grid_screen_address            = $5bc0
+screen_addr_row_6                       = $5f80
+screen_addr_row_28                      = $7b00
+screen_addr_row_30                      = $7d80
+osword                                  = $fff1
+osbyte                                  = $fff4
+lfff6                                   = $fff6
 
     * = $1300
 
@@ -189,12 +192,12 @@ lfff6                               = $fff6
 ; $00 = empty
 ; $01 = earth
 ; $02 = wall
-; $03 = titanium wall
+; $03 = end position
 ; $04 = diamond
 ; $05 = rock
 ; $06 = exit
 ; $07 = fungus
-; $08 = player
+; $08 = rockford
 ; $09 = 4x4 earth square with monster pacing inside
 ; $0a = animate explosion the player
 ; $0b = Letter D/ Vertical column of earth?
@@ -941,15 +944,13 @@ l2180
     !byte $83, $92, $85, $8a,   0,   0, $8b, $8a, $8a,   0,   0,   0  ; 21a4: 83 92 85... ...
     !byte   1,   1,   1, $ff,   1,   1,   1, $ff, $ff, $ff,   0,   0  ; 21b0: 01 01 01... ...
     !byte $ff, $ff, $ff,   0                                          ; 21bc: ff ff ff... ...
-l21c0
+handler_table_low
     !byte $a5, $a5, $a5, $a5,   0,   0,   0, $9e, $e3, $ca, $e3, $e0  ; 21c0: a5 a5 a5... ...
     !byte $f0, $ae,   0,   0                                          ; 21cc: f0 ae 00... ...
-l21d0
-    !text '"', '"', '"', '"'                                          ; 21d0: 22 22 22... """
-    !byte 0, 0                                                        ; 21d4: 00 00       ..
-    !text "%%&+&#"                                                    ; 21d6: 25 25 26... %%&
+handler_table_high
+    !byte $22, $22, $22, $22,   0,   0, $25, $25, $26, $2b, $26, $23  ; 21d0: 22 22 22... """
 l21dc
-    !text "#&%&"                                                      ; 21dc: 23 26 25... #&%
+    !byte $23, $26, $25, $26                                          ; 21dc: 23 26 25... #&%
 l21e0
     !byte $8f, $8f, $84,   0, $f1, $d1, $b6, $b1, $8f, $8f, $d1, $f1  ; 21e0: 8f 8f 84... ...
     !byte $b1, $71,   0, $71                                          ; 21ec: b1 71 00... .q.
@@ -1068,22 +1069,25 @@ clear_backwards_status_bar_loop
     bne clear_backwards_status_bar_loop                               ; 22a2: d0 fa       ..
     rts                                                               ; 22a4: 60          `
 
-unused6
+handler_0
+handler_1
+handler_2
+handler_3
     txa                                                               ; 22a5: 8a          .
     sec                                                               ; 22a6: 38          8
     sbc #$90                                                          ; 22a7: e9 90       ..
     cmp #$10                                                          ; 22a9: c9 10       ..
-    bpl unused7                                                       ; 22ab: 10 04       ..
+    bpl c22b1                                                         ; 22ab: 10 04       ..
     tax                                                               ; 22ad: aa          .
     lda l21e0,x                                                       ; 22ae: bd e0 21    ..!
-unused7
+c22b1
     tax                                                               ; 22b1: aa          .
     rts                                                               ; 22b2: 60          `
 
 sub_c22b3
-    ldy #<special_cave_1                                              ; 22b3: a0 00       ..
+    ldy #<special_data_1                                              ; 22b3: a0 00       ..
     sty ptr_low                                                       ; 22b5: 84 8c       ..
-    lda #>special_cave_1                                              ; 22b7: a9 50       .P
+    lda #>special_data_1                                              ; 22b7: a9 50       .P
     sta ptr_high                                                      ; 22b9: 85 8d       ..
     ldx #$16                                                          ; 22bb: a2 16       ..
 c22bd
@@ -1123,14 +1127,14 @@ c22dc
     jsr play_sound_x_pitch_y                                          ; 22f5: 20 2c 2c     ,,
     rts                                                               ; 22f8: 60          `
 
-unused8
+unused6
     lda #$eb                                                          ; 22f9: a9 eb       ..
     ; sta $2c16
     !byte $8d, $16, $2c                                               ; 22fb: 8d 16 2c    ..,
 
     rts                                                               ; 22fe: 60          `
 
-unused9
+unused7
     rts                                                               ; 22ff: 60          `
 
 draw_grid_of_sprites
@@ -1266,18 +1270,22 @@ c23b4
 return2
     rts                                                               ; 23db: 60          `
 
-unused10
-    !byte $a0,   7, $9a, $a9, $a9, $0b, $c5, $7a, $d0,   2, $a5, $74  ; 23dc: a0 07 9a... ...
+unused8
+    !byte $a0,   7, $9a, $a9                                          ; 23dc: a0 07 9a... ...
 
-unused11
+handler_11
+    lda #$0b                                                          ; 23e0: a9 0b       ..
+    cmp l007a                                                         ; 23e2: c5 7a       .z
+    bne c23e8                                                         ; 23e4: d0 02       ..
+    lda sprite_for_block_type_2                                       ; 23e6: a5 74       .t
+c23e8
     sta l007a                                                         ; 23e8: 85 7a       .z
     lda sprite_for_block_type_2                                       ; 23ea: a5 74       .t
     and #$7f                                                          ; 23ec: 29 7f       ).
     tax                                                               ; 23ee: aa          .
     rts                                                               ; 23ef: 60          `
 
-unused12
-unused13
+handler_12
     txa                                                               ; 23f0: 8a          .
     and #$7f                                                          ; 23f1: 29 7f       ).
     cmp l0078                                                         ; 23f3: c5 78       .x
@@ -1288,21 +1296,24 @@ c23f9
     ldx l0076                                                         ; 23fb: a6 76       .v
     rts                                                               ; 23fd: 60          `
 
-unused14
+unused9
     !byte $76, $60                                                    ; 23fe: 76 60       v`
 
+    ; write to branch offset (self-modifying code)
 sub_c2400
-    ldy #$5f                                                          ; 2400: a0 5f       ._
-    bne c2406                                                         ; 2402: d0 02       ..
+    ldy #c249a - after_branch                                         ; 2400: a0 5f       ._
+    bne c2406                                                         ; 2402: d0 02       ..             ; ALWAYS branch
+
 sub_c2404
-    ldy #$26                                                          ; 2404: a0 26       .&
+    ldy #c2461 - after_branch                                         ; 2404: a0 26       .&
+    ; write to branch offset (self-modifying code)
 c2406
     sty l243a                                                         ; 2406: 8c 3a 24    .:$
     lda #$14                                                          ; 2409: a9 14       ..
     sta tile_map_ptr_low                                              ; 240b: 85 85       ..
-    lda #>special_cave_1                                              ; 240d: a9 50       .P
+    lda #>special_data_1                                              ; 240d: a9 50       .P
     sta ptr_high                                                      ; 240f: 85 8d       ..
-    lda #<special_cave_1                                              ; 2411: a9 00       ..
+    lda #<special_data_1                                              ; 2411: a9 00       ..
     sta ptr_low                                                       ; 2413: 85 8c       ..
     ldy #$40                                                          ; 2415: a0 40       .@
 c2417
@@ -1325,12 +1336,13 @@ c2423
     tax                                                               ; 2432: aa          .
     and #$0f                                                          ; 2433: 29 0f       ).
     tay                                                               ; 2435: a8          .
-    lda l21d0,y                                                       ; 2436: b9 d0 21    ..!
+    lda handler_table_high,y                                          ; 2436: b9 d0 21    ..!
 sub_c2439
 l243a = sub_c2439+1
     beq c249a                                                         ; 2439: f0 5f       ._
+after_branch
     sta l2452                                                         ; 243b: 8d 52 24    .R$
-    lda l21c0,y                                                       ; 243e: b9 c0 21    ..!
+    lda handler_table_low,y                                           ; 243e: b9 c0 21    ..!
     sta l2451                                                         ; 2441: 8d 51 24    .Q$
     ldy #1                                                            ; 2444: a0 01       ..
     lda (ptr_low),y                                                   ; 2446: b1 8c       ..
@@ -1341,7 +1353,7 @@ l243a = sub_c2439+1
 sub_c2450
 l2451 = sub_c2450+1
 l2452 = sub_c2450+2
-    jsr sub_c2500                                                     ; 2450: 20 00 25     .%
+    jsr handler_6                                                     ; 2450: 20 00 25     .%
     lda l007a                                                         ; 2453: a5 7a       .z
     ldy #$81                                                          ; 2455: a0 81       ..
     sta (ptr_low),y                                                   ; 2457: 91 8c       ..
@@ -1371,14 +1383,14 @@ c2467
     bne c2417                                                         ; 2484: d0 91       ..
     ldy #$26                                                          ; 2486: a0 26       .&
 loop_c2488
-    lda l5500,y                                                       ; 2488: b9 00 55    ..U
+    lda map_row_19,y                                                  ; 2488: b9 00 55    ..U
     and #$7f                                                          ; 248b: 29 7f       ).
-    sta l5500,y                                                       ; 248d: 99 00 55    ..U
+    sta map_row_19,y                                                  ; 248d: 99 00 55    ..U
     dey                                                               ; 2490: 88          .
     bne loop_c2488                                                    ; 2491: d0 f5       ..
-    lda (l006a),y                                                     ; 2493: b1 6a       .j
+    lda (map_rockford_end_position_addr_low),y                        ; 2493: b1 6a       .j
     and #$7f                                                          ; 2495: 29 7f       ).
-    sta (l006a),y                                                     ; 2497: 91 6a       .j
+    sta (map_rockford_end_position_addr_low),y                        ; 2497: 91 6a       .j
     rts                                                               ; 2499: 60          `
 
 c249a
@@ -1443,7 +1455,8 @@ c24e8
 unused1
     !byte $60,   3, $d0,   2, $e6, $4a, $60,   1, $60                 ; 24f7: 60 03 d0... `..
 
-sub_c2500
+handler_6
+handler_14
     cpx #$c0                                                          ; 2500: e0 c0       ..
     bpl c2542                                                         ; 2502: 10 3e       .>
     ldy #8                                                            ; 2504: a0 08       ..
@@ -1540,6 +1553,7 @@ c2578
     ldy #$82                                                          ; 2598: a0 82       ..
     lda l007b                                                         ; 259a: a5 7b       .{
     sta (ptr_low),y                                                   ; 259c: 91 8c       ..
+handler_7
     lda l0054                                                         ; 259e: a5 54       .T
     beq c25a6                                                         ; 25a0: f0 04       ..
     tax                                                               ; 25a2: aa          .
@@ -1599,56 +1613,56 @@ c25f1
 return3
     rts                                                               ; 25f5: 60          `
 
-unused15
+unused10
     sbc l0ba9,y                                                       ; 25f6: f9 a9 0b    ...
     sta l007a                                                         ; 25f9: 85 7a       .z
     rts                                                               ; 25fb: 60          `
 
-unused16
+unused11
     rts                                                               ; 25fc: 60          `
 
     !byte   0, $60, $4a                                               ; 25fd: 00 60 4a    .`J
 
-unused17
+handler_15
     stx l005b                                                         ; 2600: 86 5b       .[
     lda l005f                                                         ; 2602: a5 5f       ._
-    bne unused18                                                      ; 2604: d0 03       ..
+    bne c2609                                                         ; 2604: d0 03       ..
     inx                                                               ; 2606: e8          .
-    bne unused19                                                      ; 2607: d0 05       ..
-unused18
+    bne c260e                                                         ; 2607: d0 05       ..
+c2609
     ldx #$46                                                          ; 2609: a2 46       .F
     stx l005f                                                         ; 260b: 86 5f       ._
     rts                                                               ; 260d: 60          `
 
-unused19
+c260e
     lda keys_to_process                                               ; 260e: a5 62       .b
     and #$f0                                                          ; 2610: 29 f0       ).
-    bne unused22                                                      ; 2612: d0 12       ..
+    bne c2626                                                         ; 2612: d0 12       ..
     ldx #$0f                                                          ; 2614: a2 0f       ..
-unused20
+c2616
     lda #$41                                                          ; 2616: a9 41       .A
-unused21
+c2618
     sta l0048                                                         ; 2618: 85 48       .H
     clc                                                               ; 261a: 18          .
     adc ptr_low                                                       ; 261b: 65 8c       e.
-    sta l0070                                                         ; 261d: 85 70       .p
+    sta map_rockford_start_position_addr_low                          ; 261d: 85 70       .p
     lda ptr_high                                                      ; 261f: a5 8d       ..
     adc #0                                                            ; 2621: 69 00       i.
-    sta l0071                                                         ; 2623: 85 71       .q
+    sta map_rockford_start_position_addr_high                         ; 2623: 85 71       .q
     rts                                                               ; 2625: 60          `
 
-unused22
+c2626
     ldx #0                                                            ; 2626: a2 00       ..
     stx l0058                                                         ; 2628: 86 58       .X
     dex                                                               ; 262a: ca          .
-unused23
+loop_c262b
     inx                                                               ; 262b: e8          .
     asl                                                               ; 262c: 0a          .
-    bcc unused23                                                      ; 262d: 90 fc       ..
+    bcc loop_c262b                                                    ; 262d: 90 fc       ..
     lda l2224,x                                                       ; 262f: bd 24 22    .$"
-    beq unused24                                                      ; 2632: f0 02       ..
+    beq c2636                                                         ; 2632: f0 02       ..
     sta l0052                                                         ; 2634: 85 52       .R
-unused24
+c2636
     ldy l2200,x                                                       ; 2636: bc 00 22    .."
     sty sprite_for_block_type_1                                       ; 2639: 84 73       .s
     lda l0000,y                                                       ; 263b: b9 00 00    ...
@@ -1656,41 +1670,41 @@ unused24
     and #$0f                                                          ; 2640: 29 0f       ).
     tay                                                               ; 2642: a8          .
     lda l21f0,y                                                       ; 2643: b9 f0 21    ..!
-    beq unused26                                                      ; 2646: f0 2c       .,
-    bmi unused25                                                      ; 2648: 30 1d       0.
+    beq c2674                                                         ; 2646: f0 2c       .,
+    bmi c2667                                                         ; 2648: 30 1d       0.
     ldy l2204,x                                                       ; 264a: bc 04 22    .."
-    beq unused26                                                      ; 264d: f0 25       .%
+    beq c2674                                                         ; 264d: f0 25       .%
     lda (ptr_low),y                                                   ; 264f: b1 8c       ..
-    bne unused26                                                      ; 2651: d0 21       .!
+    bne c2674                                                         ; 2651: d0 21       .!
     lda l0064                                                         ; 2653: a5 64       .d
     cmp #$45                                                          ; 2655: c9 45       .E
-    beq unused26                                                      ; 2657: f0 1b       ..
+    beq c2674                                                         ; 2657: f0 1b       ..
     dec l0053                                                         ; 2659: c6 53       .S
-    bne unused26                                                      ; 265b: d0 17       ..
+    bne c2674                                                         ; 265b: d0 17       ..
     ora #$80                                                          ; 265d: 09 80       ..
     sta (ptr_low),y                                                   ; 265f: 91 8c       ..
     lda #4                                                            ; 2661: a9 04       ..
     sta l0053                                                         ; 2663: 85 53       .S
     inc l004a                                                         ; 2665: e6 4a       .J
-unused25
+c2667
     lda keys_to_process                                               ; 2667: a5 62       .b
     and #8                                                            ; 2669: 29 08       ).
-    beq unused27                                                      ; 266b: f0 0b       ..
+    beq c2678                                                         ; 266b: f0 0b       ..
     ldy sprite_for_block_type_1                                       ; 266d: a4 73       .s
     lda #0                                                            ; 266f: a9 00       ..
     sta l0000,y                                                       ; 2671: 99 00 00    ...
-unused26
+c2674
     ldx l0052                                                         ; 2674: a6 52       .R
-    bne unused20                                                      ; 2676: d0 9e       ..
-unused27
+    bne c2616                                                         ; 2676: d0 9e       ..
+c2678
     ldy sprite_for_block_type_1                                       ; 2678: a4 73       .s
     lda l0052                                                         ; 267a: a5 52       .R
     sta l0000,y                                                       ; 267c: 99 00 00    ...
     lda l2208,x                                                       ; 267f: bd 08 22    .."
     dex                                                               ; 2682: ca          .
-    beq unused21                                                      ; 2683: f0 93       ..
+    beq c2618                                                         ; 2683: f0 93       ..
     ldx #$80                                                          ; 2685: a2 80       ..
-    bne unused21                                                      ; 2687: d0 8f       ..
+    bne c2618                                                         ; 2687: d0 8f       ..
 
 read_keys
     ldx #7                                                            ; 2689: a2 07       ..
@@ -1713,60 +1727,64 @@ read_keys_loop
     sta keys_to_process                                               ; 26a8: 85 62       .b
     rts                                                               ; 26aa: 60          `
 
-    !byte $62, $60                                                    ; 26ab: 62 60       b`
+    !byte $62, $60, $a6                                               ; 26ab: 62 60 a6    b`.
 
-unused28
-    ldx screen_addr1_low                                              ; 26ad: a6 8a       ..
+handler_13
+    txa                                                               ; 26ae: 8a          .
     ldx l0050                                                         ; 26af: a6 50       .P
     cmp #$bd                                                          ; 26b1: c9 bd       ..
-    bne unused32                                                      ; 26b3: d0 25       .%
+    bne c26da                                                         ; 26b3: d0 25       .%
     lda sprite_for_block_type_2                                       ; 26b5: a5 74       .t
     and #$0f                                                          ; 26b7: 29 0f       ).
     tay                                                               ; 26b9: a8          .
     lda l2120,y                                                       ; 26ba: b9 20 21    . !
-    beq unused29                                                      ; 26bd: f0 04       ..
+    beq c26c3                                                         ; 26bd: f0 04       ..
     ldy #$80                                                          ; 26bf: a0 80       ..
     sty sprite_for_block_type_2                                       ; 26c1: 84 74       .t
-unused29
+c26c3
     cpx #$2d                                                          ; 26c3: e0 2d       .-
-    beq unused31                                                      ; 26c5: f0 10       ..
+    beq c26d7                                                         ; 26c5: f0 10       ..
     ldy l007a                                                         ; 26c7: a4 7a       .z
-    bne unused30                                                      ; 26c9: d0 02       ..
+    bne c26cd                                                         ; 26c9: d0 02       ..
     sta l007a                                                         ; 26cb: 85 7a       .z
-unused30
+c26cd
     ldx #$1d                                                          ; 26cd: a2 1d       ..
     inc data_set_ptr_high                                             ; 26cf: e6 47       .G
     ldy l0051                                                         ; 26d1: a4 51       .Q
-    bne unused31                                                      ; 26d3: d0 02       ..
+    bne c26d7                                                         ; 26d3: d0 02       ..
     ldx #$2d                                                          ; 26d5: a2 2d       .-
-unused31
+c26d7
     stx l0050                                                         ; 26d7: 86 50       .P
     rts                                                               ; 26d9: 60          `
 
-unused32
+c26da
     cpx #$1d                                                          ; 26da: e0 1d       ..
-    beq unused30                                                      ; 26dc: f0 ef       ..
+    beq c26cd                                                         ; 26dc: f0 ef       ..
     rts                                                               ; 26de: 60          `
 
-    and #$7f                                                          ; 26df: 29 7f       ).
-    tax                                                               ; 26e1: aa          .
-    cpx #$8a                                                          ; 26e2: e0 8a       ..
+unused12
+    !byte $29, $7f, $aa, $e0                                          ; 26df: 29 7f aa... )..
+
+handler_8
+handler_10
+    txa                                                               ; 26e3: 8a          .
     and #$7f                                                          ; 26e4: 29 7f       ).
     tax                                                               ; 26e6: aa          .
     cpx #$18                                                          ; 26e7: e0 18       ..
-    beq unused33                                                      ; 26e9: f0 12       ..
+    beq c26fd                                                         ; 26e9: f0 12       ..
     lda #0                                                            ; 26eb: a9 00       ..
     sta keys_to_process                                               ; 26ed: 85 62       .b
     lda l005a                                                         ; 26ef: a5 5a       .Z
     cmp #$f0                                                          ; 26f1: c9 f0       ..
-    bpl unused33                                                      ; 26f3: 10 08       ..
+    bpl c26fd                                                         ; 26f3: 10 08       ..
     ldx #$21                                                          ; 26f5: a2 21       .!
     inc l004a                                                         ; 26f7: e6 4a       .J
     lda #<status_bar_sprite_numbers                                   ; 26f9: a9 00       ..
     sta status_text_address_low                                       ; 26fb: 85 69       .i
-unused33
+c26fd
     rts                                                               ; 26fd: 60          `
 
+unused13
     !byte   0, $24                                                    ; 26fe: 00 24       .$
 
 start_gameplay
@@ -1839,7 +1857,7 @@ c2762
     ; decrement time remaining
     ldy #$0c                                                          ; 2777: a0 0c       ..
     jsr decrement_status_bar_number                                   ; 2779: 20 aa 28     .(
-    dec l006d                                                         ; 277c: c6 6d       .m
+    dec time_remaining                                                ; 277c: c6 6d       .m
     bne c2787                                                         ; 277e: d0 07       ..
     lda #<out_of_time_message                                         ; 2780: a9 b4       ..
     sta status_text_address_low                                       ; 2782: 85 69       .i
@@ -1906,7 +1924,7 @@ c27ec
 return4
     rts                                                               ; 27ef: 60          `
 
-unused34
+unused14
     !byte $27, $60, $f0,   6, $d0, $e9, $29, $23,   2, $40, $60, $29  ; 27f0: 27 60 f0... '`.
     !byte   8, $f0, $e5, $60                                          ; 27fc: 08 f0 e5... ...
 
@@ -1955,7 +1973,7 @@ c2848
     inc l0058                                                         ; 284f: e6 58       .X
     rts                                                               ; 2851: 60          `
 
-unused35
+unused15
     !byte $8d, $8f, $1f, $e6, $58, $60, $d0,   5, $a5, $5e, $4c, $64  ; 2852: 8d 8f 1f... ...
     !byte $28, $25                                                    ; 285e: 28 25       (%
 
@@ -1993,7 +2011,7 @@ store_active_direction_keys
     sty previous_direction_keys                                       ; 2887: 84 5d       .]
     rts                                                               ; 2889: 60          `
 
-unused36
+unused16
     !byte $bd,   0, $1f, $99, $80, $1f, $c6, $77, $a6, $77, $10, $ee  ; 288a: bd 00 1f... ...
     !byte $a5, $5a                                                    ; 2896: a5 5a       .Z
 
@@ -2035,17 +2053,17 @@ c28d1
     ldy real_keys_pressed                                             ; 28d1: a4 7c       .|
     rts                                                               ; 28d3: 60          `
 
-    !byte $81, $22, $20,   1                                          ; 28d4: 81 22 20... ."
-    !text "AxvtzC?"                                                   ; 28d8: 41 78 76... Axv
-    !byte   1, $81, $22, $20,   1, $41, $41, $98, $38, $e9, $10, $c9  ; 28df: 01 81 22... .."
-    !byte   4, $10,   4, $aa, $bd, $f7, $28,   9, $80, $85, $77, $60  ; 28eb: 04 10 04... ...
-    !byte   0,   0, $84,   1, $55, $28, $a5, $98, $0a                 ; 28f7: 00 00 84... ...
+unused17
+    !byte $81, $22, $20,   1, $41, $78, $76, $74, $7a, $43, $3f,   1  ; 28d4: 81 22 20... ."
+    !byte $81, $22, $20,   1, $41, $41, $98, $38, $e9, $10, $c9,   4  ; 28e0: 81 22 20... ."
+    !byte $10,   4, $aa, $bd, $f7, $28,   9, $80, $85, $77, $60,   0  ; 28ec: 10 04 aa... ...
+    !byte   0, $84,   1, $55, $28, $a5, $98, $0a                      ; 28f8: 00 84 01... ...
 
 prepare_level
     lda #0                                                            ; 2900: a9 00       ..
     sta l0078                                                         ; 2902: 85 78       .x
     ldy cave_number                                                   ; 2904: a4 87       ..
-    lda lower_nybble_is_initial_cell_for_each_cave,y                  ; 2906: b9 90 4c    ..L
+    lda fill_cell_in_lower_nybble_strip_value_to_skip_in_upper_for_each_cave,y; 2906: b9 90 4c    ..L
     and #$0f                                                          ; 2909: 29 0f       ).
     sta initial_cell_fill_value                                       ; 290b: 85 79       .y
     jsr clear_map_and_grid                                            ; 290d: 20 56 22     V"
@@ -2054,25 +2072,27 @@ prepare_level
     ldy cave_number                                                   ; 2910: a4 87       ..
     ldx #1                                                            ; 2912: a2 01       ..
 loop_three_times
-    lda lower_nybble_is_colour_one_for_each_cave,y                    ; 2914: b9 a4 4c    ..L
+    lda colour_1_lower_nybble_block_type_1_upper_for_each_cave,y      ; 2914: b9 a4 4c    ..L
     lsr                                                               ; 2917: 4a          J
     lsr                                                               ; 2918: 4a          J
     lsr                                                               ; 2919: 4a          J
     lsr                                                               ; 291a: 4a          J
     sta sprite_for_block_type_1-1,x                                   ; 291b: 95 72       .r
+    ; add number of caves to Y, in order to get next block type
     tya                                                               ; 291d: 98          .
     clc                                                               ; 291e: 18          .
     adc #total_caves                                                  ; 291f: 69 14       i.
     tay                                                               ; 2921: a8          .
+    ; increment loop counter X
     inx                                                               ; 2922: e8          .
     cpx #4                                                            ; 2923: e0 04       ..
     bne loop_three_times                                              ; 2925: d0 ed       ..
-    ; look up the data set needed for the cave number
+    ; look up which data set needed from the cave number
     ldy cave_number                                                   ; 2927: a4 87       ..
     lda cave_to_data_set,y                                            ; 2929: b9 e0 4c    ..L
-    bmi c2982                                                         ; 292c: 30 54       0T
+    bmi add_strips                                                    ; 292c: 30 54       0T
     tax                                                               ; 292e: aa          .
-    ; start the pointer at data_sets
+    ; start with ptr = data_sets
     lda #<data_sets                                                   ; 292f: a9 f4       ..
     sta ptr_low                                                       ; 2931: 85 8c       ..
     lda #>data_sets                                                   ; 2933: a9 4c       .L
@@ -2103,14 +2123,15 @@ got_data_set_X_address
     sta next_ptr_low                                                  ; 2953: 85 82       ..
     lda #$4e                                                          ; 2955: a9 4e       .N
     sta next_ptr_high                                                 ; 2957: 85 83       ..
+    ; use the lower seven bits of (ptr?1) as ptr_low
     iny                                                               ; 2959: c8          .
     lda (ptr_low),y                                                   ; 295a: b1 8c       ..
-    sty l0048                                                         ; 295c: 84 48       .H
-    bpl c2964                                                         ; 295e: 10 04       ..
+    sty remember_y                                                    ; 295c: 84 48       .H
+    bpl store_ptr_low_and_fill_with_basics                            ; 295e: 10 04       ..
     inc next_ptr_high                                                 ; 2960: e6 83       ..
     and #$7f                                                          ; 2962: 29 7f       ).
     ; set ptr_low = (ptr?1) AND &7F
-c2964
+store_ptr_low_and_fill_with_basics
     sta ptr_low                                                       ; 2964: 85 8c       ..
     jsr fill_with_basics                                              ; 2966: 20 90 2d     .-
     ; reset ptr to the start of the data_set_X
@@ -2118,45 +2139,47 @@ c2964
     sta ptr_low                                                       ; 296b: 85 8c       ..
     lda data_set_ptr_high                                             ; 296d: a5 47       .G
     sta ptr_high                                                      ; 296f: 85 8d       ..
-    ldy l0048                                                         ; 2971: a4 48       .H
+    ; recall Y and read the next two bytes as an address. Can be zero. For details?
+    ldy remember_y                                                    ; 2971: a4 48       .H
     iny                                                               ; 2973: c8          .
     lda (ptr_low),y                                                   ; 2974: b1 8c       ..
     sta next_ptr_low                                                  ; 2976: 85 82       ..
     iny                                                               ; 2978: c8          .
     lda (ptr_low),y                                                   ; 2979: b1 8c       ..
-    beq c2982                                                         ; 297b: f0 05       ..
+    beq add_strips                                                    ; 297b: f0 05       ..
     sta next_ptr_high                                                 ; 297d: 85 83       ..
-    jsr sub_c2d50                                                     ; 297f: 20 50 2d     P-
-c2982
-    lda #<special_cave_0                                              ; 2982: a9 00       ..
+    jsr add_patches                                                   ; 297f: 20 50 2d     P-
+add_strips
+    lda #<strip_data                                                  ; 2982: a9 00       ..
     sta ptr_low                                                       ; 2984: 85 8c       ..
-    lda #>special_cave_0                                              ; 2986: a9 47       .G
+    lda #>strip_data                                                  ; 2986: a9 47       .G
     sta ptr_high                                                      ; 2988: 85 8d       ..
+    ; get value to skip when writing strips to the map
     ldy cave_number                                                   ; 298a: a4 87       ..
-    lda lower_nybble_is_initial_cell_for_each_cave,y                  ; 298c: b9 90 4c    ..L
+    lda fill_cell_in_lower_nybble_strip_value_to_skip_in_upper_for_each_cave,y; 298c: b9 90 4c    ..L
     lsr                                                               ; 298f: 4a          J
     lsr                                                               ; 2990: 4a          J
     lsr                                                               ; 2991: 4a          J
     lsr                                                               ; 2992: 4a          J
-    sta loop_counter                                                  ; 2993: 85 77       .w
-loop_c2995
+    sta value_to_not_write_as_a_strip                                 ; 2993: 85 77       .w
+find_strip_data_for_cave_loop
     dey                                                               ; 2995: 88          .
-    bmi c29a1                                                         ; 2996: 30 09       0.
-    lda l4c7c,y                                                       ; 2998: b9 7c 4c    .|L
+    bmi found_strip_data_for_cave                                     ; 2996: 30 09       0.
+    lda length_of_strip_data_for_each_cave,y                          ; 2998: b9 7c 4c    .|L
     jsr add_a_to_ptr                                                  ; 299b: 20 40 22     @"
-    jmp loop_c2995                                                    ; 299e: 4c 95 29    L.)
+    jmp find_strip_data_for_cave_loop                                 ; 299e: 4c 95 29    L.)
 
-c29a1
+found_strip_data_for_cave
     lda ptr_low                                                       ; 29a1: a5 8c       ..
     sta next_ptr_low                                                  ; 29a3: 85 82       ..
     lda ptr_high                                                      ; 29a5: a5 8d       ..
     sta next_ptr_high                                                 ; 29a7: 85 83       ..
-    jsr sub_c2d00                                                     ; 29a9: 20 00 2d     .-
+    jsr write_strips                                                  ; 29a9: 20 00 2d     .-
 set_palette
     ldy cave_number                                                   ; 29ac: a4 87       ..
     ldx #1                                                            ; 29ae: a2 01       ..
 set_palette_loop
-    lda lower_nybble_is_colour_one_for_each_cave,y                    ; 29b0: b9 a4 4c    ..L
+    lda colour_1_lower_nybble_block_type_1_upper_for_each_cave,y      ; 29b0: b9 a4 4c    ..L
     and #$0f                                                          ; 29b3: 29 0f       ).
     jsr set_palette_colour_ax                                         ; 29b5: 20 35 2a     5*
     tya                                                               ; 29b8: 98          .
@@ -2168,21 +2191,21 @@ set_palette_loop
     bne set_palette_loop                                              ; 29c0: d0 ee       ..
     rts                                                               ; 29c2: 60          `
 
-unused37
+unused18
     cmp (l0060),y                                                     ; 29c3: d1 60       .`
     beq return5                                                       ; 29c5: f0 0d       ..
     lda #4                                                            ; 29c7: a9 04       ..
     jsr add_a_to_ptr                                                  ; 29c9: 20 40 22     @"
     and #$3f                                                          ; 29cc: 29 3f       )?
     cmp #$28                                                          ; 29ce: c9 28       .(
-    bne c29a1                                                         ; 29d0: d0 cf       ..
+    bne found_strip_data_for_cave                                     ; 29d0: d0 cf       ..
     ; beq $299c
     !byte $f0, $c8                                                    ; 29d2: f0 c8       ..
 
 return5
     rts                                                               ; 29d4: 60          `
 
-unused38
+unused19
     inc screen_addr1_low                                              ; 29d5: e6 8a       ..
     bne c29db                                                         ; 29d7: d0 02       ..
     inc screen_addr1_high                                             ; 29d9: e6 8b       ..
@@ -2193,7 +2216,7 @@ c29db
 
     rts                                                               ; 29df: 60          `
 
-unused39
+unused20
     !byte $7a, $d0, $bb, $60, $f0, $16, $8a, $18, $69,   8, $aa, $29  ; 29e0: 7a d0 bb... z..
     !byte $3f, $c9, $28, $d0, $d9, $18, $8a, $69, $18, $aa, $90, $d2  ; 29ec: 3f c9 28... ?.(
     !byte $e6, $8d, $d0, $ce, $60, $8d, $d0, $cc                      ; 29f8: e6 8d d0... ...
@@ -2235,7 +2258,7 @@ palette_block
     !byte 0                                                           ; 2a2c: 00          .              ; zero
     !byte 0                                                           ; 2a2d: 00          .              ; zero
 
-sub_c2a2e
+increment_next_ptr
     inc next_ptr_low                                                  ; 2a2e: e6 82       ..
     bne return6                                                       ; 2a30: d0 e7       ..
     inc next_ptr_high                                                 ; 2a32: e6 83       ..
@@ -2391,13 +2414,13 @@ get_next_ptr_byte
 return8
     rts                                                               ; 2af3: 60          `
 
-unused41
+unused22
     !byte $f0, $e5, $a9,   0                                          ; 2af4: f0 e5 a9... ...
 
 rle_bytes_table
     !byte $85, $48, $10, $ec, $ff, $0f,   0                           ; 2af8: 85 48 10... .H.
 
-unused40
+unused21
     !byte $27                                                         ; 2aff: 27          '
 
 ; *************************************************************************************
@@ -2432,9 +2455,9 @@ map_xy_position_to_map_address
 
 ; Scrolls the map by setting the tile_map_ptr and visible_top_left_map_x and y
 update_map_scroll_position
-    lda l0070                                                         ; 2b2c: a5 70       .p
+    lda map_rockford_start_position_addr_low                          ; 2b2c: a5 70       .p
     sta map_address_low                                               ; 2b2e: 85 8c       ..
-    lda l0071                                                         ; 2b30: a5 71       .q
+    lda map_rockford_start_position_addr_high                         ; 2b30: a5 71       .q
     sta map_address_high                                              ; 2b32: 85 8d       ..
     jsr map_address_to_map_xy_position                                ; 2b34: 20 00 2b     .+
     sec                                                               ; 2b37: 38          8
@@ -2487,7 +2510,7 @@ skip_bonus_level
     sta tile_map_ptr_high                                             ; 2b82: 85 86       ..
     rts                                                               ; 2b84: 60          `
 
-unused42
+unused23
     !byte $86, $60, $a0, $1e, $a2, $fa, $a9,   1, $20, $f1, $ff       ; 2b85: 86 60 a0... .`.
 
 wait_for_13_centiseconds_and_read_keys
@@ -2516,13 +2539,43 @@ wait_loop
     txa                                                               ; 2bbc: 8a          .
     jmp set_palette_colour_ax                                         ; 2bbd: 4c 35 2a    L5*
 
-unused43
-    !byte $a9,   1, $a0, $43, $91, $8c, $a0, $c4, $88, $91, $a9,   1  ; 2bc0: a9 01 a0... ...
-    !byte $a0, $43, $91, $8c, $a0, $c4, $88, $91, $8c, $f0,   8, $c0  ; 2bcc: a0 43 91... .C.
-    !byte $c0, $d0, $f7, $a0,   4, $d0, $f3, $a0, $80, $91, $8c, $85  ; 2bd8: c0 d0 f7... ...
-    !byte $76, $85, $74, $a0, $83, $91, $8c, $4a, $88, $91, $8c, $85  ; 2be4: 76 85 74... v.t
-    !byte $7a, $85, $78, $a2,   6, $a5, $87, $c9,   3, $d0,   2, $a2  ; 2bf0: 7a 85 78... z.x
-    !byte $2e, $60, $cb, $60                                          ; 2bfc: 2e 60 cb... .`.
+unused24
+    !byte $a9,   1, $a0, $43, $91, $8c, $a0, $c4, $88, $91            ; 2bc0: a9 01 a0... ...
+
+handler_9
+    lda #1                                                            ; 2bca: a9 01       ..
+    ldy #$43                                                          ; 2bcc: a0 43       .C
+    sta (ptr_low),y                                                   ; 2bce: 91 8c       ..
+    ldy #$c4                                                          ; 2bd0: a0 c4       ..
+c2bd2
+    dey                                                               ; 2bd2: 88          .
+    sta (ptr_low),y                                                   ; 2bd3: 91 8c       ..
+    beq c2bdf                                                         ; 2bd5: f0 08       ..
+    cpy #$c0                                                          ; 2bd7: c0 c0       ..
+    bne c2bd2                                                         ; 2bd9: d0 f7       ..
+    ldy #4                                                            ; 2bdb: a0 04       ..
+    bne c2bd2                                                         ; 2bdd: d0 f3       ..
+c2bdf
+    ldy #$80                                                          ; 2bdf: a0 80       ..
+    sta (ptr_low),y                                                   ; 2be1: 91 8c       ..
+    sta l0076                                                         ; 2be3: 85 76       .v
+    sta sprite_for_block_type_2                                       ; 2be5: 85 74       .t
+    ldy #$83                                                          ; 2be7: a0 83       ..
+    sta (ptr_low),y                                                   ; 2be9: 91 8c       ..
+    lsr                                                               ; 2beb: 4a          J
+    dey                                                               ; 2bec: 88          .
+    sta (ptr_low),y                                                   ; 2bed: 91 8c       ..
+    sta l007a                                                         ; 2bef: 85 7a       .z
+    sta l0078                                                         ; 2bf1: 85 78       .x
+    ldx #6                                                            ; 2bf3: a2 06       ..
+    lda cave_number                                                   ; 2bf5: a5 87       ..
+    cmp #3                                                            ; 2bf7: c9 03       ..
+    bne c2bfd                                                         ; 2bf9: d0 02       ..
+    ldx #$2e                                                          ; 2bfb: a2 2e       ..
+c2bfd
+    rts                                                               ; 2bfd: 60          `
+
+    !byte $cb, $60                                                    ; 2bfe: cb 60       .`
 
 ; Sound data packed into single bytes: channel, amplitude, pitch, duration
 in_game_sound_data
@@ -2586,23 +2639,24 @@ skip_using_default_pitch2
     lda #osword_sound                                                 ; 2c6c: a9 07       ..
     jmp osword                                                        ; 2c6e: 4c f1 ff    L..            ; SOUND command
 
-unused44
+unused25
     !byte 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0                 ; 2c71: 00 00 00... ...
 
 sub_c2c80
     lda l0048                                                         ; 2c80: a5 48       .H
     eor #$41                                                          ; 2c82: 49 41       IA
     sta l0048                                                         ; 2c84: 85 48       .H
-    lda l006d                                                         ; 2c86: a5 6d       .m
+    lda time_remaining                                                ; 2c86: a5 6d       .m
     cmp #$0b                                                          ; 2c88: c9 0b       ..
     bcs c2ca0                                                         ; 2c8a: b0 14       ..
     lda sub_second_ticks                                              ; 2c8c: a5 5c       .\
     cmp #$0b                                                          ; 2c8e: c9 0b       ..
     bne c2ca0                                                         ; 2c90: d0 0e       ..
+    ; play rising pitch as time up is approaching
     lda #$dc                                                          ; 2c92: a9 dc       ..
-    sbc l006d                                                         ; 2c94: e5 6d       .m
-    sbc l006d                                                         ; 2c96: e5 6d       .m
-    sbc l006d                                                         ; 2c98: e5 6d       .m
+    sbc time_remaining                                                ; 2c94: e5 6d       .m
+    sbc time_remaining                                                ; 2c96: e5 6d       .m
+    sbc time_remaining                                                ; 2c98: e5 6d       .m
     tay                                                               ; 2c9a: a8          .
     ldx #$88                                                          ; 2c9b: a2 88       ..
     jsr play_sound_x_pitch_y                                          ; 2c9d: 20 2c 2c     ,,
@@ -2648,23 +2702,25 @@ sub_c2ce8
 return9
     rts                                                               ; 2cef: 60          `
 
-unused45
+unused26
     !byte $85, $a6, $a8, $91, $70, $60, $a2,   3, $bd, $e3, $20, $18  ; 2cf0: 85 a6 a8... ...
     !byte $69,   1, $c9, $0a                                          ; 2cfc: 69 01 c9... i..
 
-sub_c2d00
+write_strips
     ldy #1                                                            ; 2d00: a0 01       ..
-    sty screen_addr1_high                                             ; 2d02: 84 8b       ..
+    sty map_y                                                         ; 2d02: 84 8b       ..
     dey                                                               ; 2d04: 88          .
-    sty screen_addr1_low                                              ; 2d05: 84 8a       ..
+    sty map_x                                                         ; 2d05: 84 8a       ..
     jsr map_xy_position_to_map_address                                ; 2d07: 20 15 2b     .+
 c2d0a
     lda (next_ptr_low),y                                              ; 2d0a: b1 82       ..
     inc next_ptr_low                                                  ; 2d0c: e6 82       ..
     bne c2d12                                                         ; 2d0e: d0 02       ..
     inc next_ptr_high                                                 ; 2d10: e6 83       ..
+    ; remember value
 c2d12
     pha                                                               ; 2d12: 48          H
+    ; get repeat count (from high nybble)
     lsr                                                               ; 2d13: 4a          J
     lsr                                                               ; 2d14: 4a          J
     lsr                                                               ; 2d15: 4a          J
@@ -2673,56 +2729,71 @@ c2d12
     inx                                                               ; 2d18: e8          .
     pla                                                               ; 2d19: 68          h
     and #$0f                                                          ; 2d1a: 29 0f       ).
-    sta real_keys_pressed                                             ; 2d1c: 85 7c       .|
-c2d1e
-    lda real_keys_pressed                                             ; 2d1e: a5 7c       .|
+    sta lower_nybble_value                                            ; 2d1c: 85 7c       .|
+write_strip_loop
+    lda lower_nybble_value                                            ; 2d1e: a5 7c       .|
+    ; a value of 10 means move to the next row
     cmp #$0a                                                          ; 2d20: c9 0a       ..
-    beq c2d32                                                         ; 2d22: f0 0e       ..
-    cmp loop_counter                                                  ; 2d24: c5 77       .w
-    beq c2d2a                                                         ; 2d26: f0 02       ..
-    sta (ptr_low),y                                                   ; 2d28: 91 8c       ..
-c2d2a
-    inc screen_addr1_low                                              ; 2d2a: e6 8a       ..
-    lda screen_addr1_low                                              ; 2d2c: a5 8a       ..
-    cmp #$28                                                          ; 2d2e: c9 28       .(
-    bne c2d3c                                                         ; 2d30: d0 0a       ..
-c2d32
-    sty screen_addr1_low                                              ; 2d32: 84 8a       ..
-    inc screen_addr1_high                                             ; 2d34: e6 8b       ..
-    lda screen_addr1_high                                             ; 2d36: a5 8b       ..
-    cmp #$15                                                          ; 2d38: c9 15       ..
+    beq move_to_next_row                                              ; 2d22: f0 0e       ..
+    ; if it's this cave's skip value, then don't write to the map
+    cmp value_to_not_write_as_a_strip                                 ; 2d24: c5 77       .w
+    beq skip_write_to_map                                             ; 2d26: f0 02       ..
+    sta (map_address_low),y                                           ; 2d28: 91 8c       ..
+    ; move the map position one to the right, wrapping to the next row if needed
+skip_write_to_map
+    inc map_x                                                         ; 2d2a: e6 8a       ..
+    lda map_x                                                         ; 2d2c: a5 8a       ..
+    cmp #40                                                           ; 2d2e: c9 28       .(
+    bne get_map_address                                               ; 2d30: d0 0a       ..             ; redundant instruction
+move_to_next_row
+    sty map_x                                                         ; 2d32: 84 8a       ..
+    inc map_y                                                         ; 2d34: e6 8b       ..
+    lda map_y                                                         ; 2d36: a5 8b       ..
+    cmp #21                                                           ; 2d38: c9 15       ..
     beq return10                                                      ; 2d3a: f0 08       ..
-c2d3c
+get_map_address
     jsr map_xy_position_to_map_address                                ; 2d3c: 20 15 2b     .+
     dex                                                               ; 2d3f: ca          .
-    bne c2d1e                                                         ; 2d40: d0 dc       ..
+    bne write_strip_loop                                              ; 2d40: d0 dc       ..
     beq c2d0a                                                         ; 2d42: f0 c6       ..             ; ALWAYS branch
 
 return10
     rts                                                               ; 2d44: 60          `
 
-unused46
+unused27
     !byte $31, $15, $41, $15, $11, $25, $31, $12, $21, $15, $21       ; 2d45: 31 15 41... 1.A
 
-sub_c2d50
+add_patches
     lda #<(map_row_0-1)                                               ; 2d50: a9 3f       .?
     jsr set_ptr_high_to_start_of_map_with_offset_a                    ; 2d52: 20 1c 2a     .*
 c2d55
     lda (next_ptr_low),y                                              ; 2d55: b1 82       ..
-    jsr sub_c2a2e                                                     ; 2d57: 20 2e 2a     .*
+    jsr increment_next_ptr                                            ; 2d57: 20 2e 2a     .*
+    ; remember the byte read
     pha                                                               ; 2d5a: 48          H
+    ; the top five bits are the offset into the map to change.
     lsr                                                               ; 2d5b: 4a          J
     lsr                                                               ; 2d5c: 4a          J
     lsr                                                               ; 2d5d: 4a          J
     tax                                                               ; 2d5e: aa          .
     inx                                                               ; 2d5f: e8          .
-loop_c2d60
+    ; add X to ptr (where we only use 40 out of every 64 bytes for the map)
+add_X_to_map_ptr_loop
     jsr increment_map_ptr                                             ; 2d60: 20 00 2a     .*
-    beq c2d7f                                                         ; 2d63: f0 1a       ..
+    beq pull_a_and_return                                             ; 2d63: f0 1a       ..
     dex                                                               ; 2d65: ca          .
-    bne loop_c2d60                                                    ; 2d66: d0 f8       ..
+    bne add_X_to_map_ptr_loop                                         ; 2d66: d0 f8       ..
+    ; recall the byte, and isolate the bottom three bits.
     pla                                                               ; 2d68: 68          h
     and #7                                                            ; 2d69: 29 07       ).
+    ; 0 = store value 0
+    ; 1 = skip this byte (no change)
+    ; 2 = store value 2
+    ; 3 = terminator
+    ; 4 = store value 4
+    ; 5 = store value 5
+    ; 6 = store value 6
+    ; 7 = store value 1
     cmp #1                                                            ; 2d6b: c9 01       ..
     beq c2d7c                                                         ; 2d6d: f0 0d       ..
     cmp #3                                                            ; 2d6f: c9 03       ..
@@ -2738,35 +2809,36 @@ c2d7a
 c2d7c
     jmp c2d55                                                         ; 2d7c: 4c 55 2d    LU-
 
-c2d7f
+pull_a_and_return
     pla                                                               ; 2d7f: 68          h
     rts                                                               ; 2d80: 60          `
 
-unused47
+unused28
     !byte $8a, $69, $18, $aa, $90, $d3, $e6, $8d, $d0, $cf, $60, $15  ; 2d81: 8a 69 18... .i.
     !byte $11, $15, $51                                               ; 2d8d: 11 15 51    ..Q
 
 fill_with_basics
     jsr set_ptr_high_to_start_of_map                                  ; 2d90: 20 1e 2a     .*
-    ; read byte from stage and increment to next byte
-c2d93
+    ; read byte from stage. This is done 200 times (40x20 cells, 4 cells per byte)
+read_next_byte_loop
     ldy #0                                                            ; 2d93: a0 00       ..
     lda (next_ptr_low),y                                              ; 2d95: b1 82       ..
+    ; increment to next byte
     inc next_ptr_low                                                  ; 2d97: e6 82       ..
     bne skip_increment_high_byte1                                     ; 2d99: d0 02       ..
     inc next_ptr_high                                                 ; 2d9b: e6 83       ..
 skip_increment_high_byte1
     ldx #3                                                            ; 2d9d: a2 03       ..
     stx loop_counter                                                  ; 2d9f: 86 77       .w
-    ; The top two bits of the stage byte hold the type to write into the cell. So we
-    ; shift down six times to get the index, and put the result in X.
-loop_c2da1
+    ; Extract the top two bits of the stage byte. Each pair of bits holds a type to
+    ; write into the cell. We shift down six times to get the index, and put the result
+    ; in X.
+loop_for_each_byte
     pha                                                               ; 2da1: 48          H
     lsr                                                               ; 2da2: 4a          J
     lsr                                                               ; 2da3: 4a          J
     lsr                                                               ; 2da4: 4a          J
     lsr                                                               ; 2da5: 4a          J
-c2da6
     lsr                                                               ; 2da6: 4a          J
     lsr                                                               ; 2da7: 4a          J
     tax                                                               ; 2da8: aa          .
@@ -2777,36 +2849,38 @@ c2da6
     sta (ptr_low),y                                                   ; 2dad: 91 8c       ..
 c2daf
     jsr increment_map_ptr                                             ; 2daf: 20 00 2a     .*
-    beq c2dbd                                                         ; 2db2: f0 09       ..
+    beq pull_and_return2                                              ; 2db2: f0 09       ..
+    ; recall the byte and shift twice to start reading the next pair of bits
     pla                                                               ; 2db4: 68          h
     asl                                                               ; 2db5: 0a          .
     asl                                                               ; 2db6: 0a          .
     dec loop_counter                                                  ; 2db7: c6 77       .w
-    bpl loop_c2da1                                                    ; 2db9: 10 e6       ..
-    bmi c2d93                                                         ; 2dbb: 30 d6       0.             ; ALWAYS branch
+    bpl loop_for_each_byte                                            ; 2db9: 10 e6       ..
+    bmi read_next_byte_loop                                           ; 2dbb: 30 d6       0.             ; ALWAYS branch
 
-c2dbd
+pull_and_return2
     pla                                                               ; 2dbd: 68          h
     rts                                                               ; 2dbe: 60          `
 
-unused48
+unused29
     lda #$18                                                          ; 2dbf: a9 18       ..
     jsr add_a_to_ptr                                                  ; 2dc1: 20 40 22     @"
     dec real_keys_pressed                                             ; 2dc4: c6 7c       .|
-    bne unused49                                                      ; 2dc6: d0 02       ..
+    bne unused30                                                      ; 2dc6: d0 02       ..
     pla                                                               ; 2dc8: 68          h
     rts                                                               ; 2dc9: 60          `
 
-unused49
+unused30
     pla                                                               ; 2dca: 68          h
     asl                                                               ; 2dcb: 0a          .
     asl                                                               ; 2dcc: 0a          .
     dec loop_counter                                                  ; 2dcd: c6 77       .w
-    bpl c2da6                                                         ; 2dcf: 10 d5       ..
+    ; bpl $2da6
     ; bmi $2d98
+    !byte $10, $d5                                                    ; 2dcf: 10 d5       ..
     !byte $30, $c5                                                    ; 2dd1: 30 c5       0.             ; ALWAYS branch
 
-unused50
+unused31
     !byte $11, $25, $b1, $15, $11, $15, $12, $25, $11, $15, $21, $15  ; 2dd3: 11 25 b1... .%.
     !byte $11, $15, $21, $15, $11, $25, $41, $10, $51, $10            ; 2ddf: 11 15 21... ..!
     !byte $21, $45, $21                                               ; 2de9: 21 45 21    !E!
@@ -2867,8 +2941,8 @@ loop_c2e48
     lda #$83                                                          ; 2e5d: a9 83       ..
     ldx #$27                                                          ; 2e5f: a2 27       .'
 loop_c2e61
-    sta special_cave_1,x                                              ; 2e61: 9d 00 50    ..P
-    sta l5540,x                                                       ; 2e64: 9d 40 55    .@U
+    sta special_data_1,x                                              ; 2e61: 9d 00 50    ..P
+    sta map_row_20,x                                                  ; 2e64: 9d 40 55    .@U
     dex                                                               ; 2e67: ca          .
     bpl loop_c2e61                                                    ; 2e68: 10 f7       ..
     jsr initialise_stage                                              ; 2e6a: 20 50 2f     P/
@@ -2936,7 +3010,7 @@ screen_dissolve_loop
     bpl screen_dissolve_loop                                          ; 2ee1: 10 e6       ..
     rts                                                               ; 2ee3: 60          `
 
-unused51
+unused32
     !byte $60, $20, $c6, $5a, $10, $e6, $60, $28, $25, $26, $25, $28  ; 2ee4: 60 20 c6... ` .
     !byte $25, $26, $27, $28, $25, $25, $25, $26, $20, $20, $23, $24  ; 2ef0: 25 26 27... %&'
     !byte $24, $24, $23, $20                                          ; 2efc: 24 24 23... $$#
@@ -2964,7 +3038,7 @@ sub_c2f00
     sta required_diamonds_on_status_bar                               ; 2f2a: 8d 01 32    ..2
     ldy #0                                                            ; 2f2d: a0 00       ..
     lda #$18                                                          ; 2f2f: a9 18       ..
-    sta (l006a),y                                                     ; 2f31: 91 6a       .j
+    sta (map_rockford_end_position_addr_low),y                        ; 2f31: 91 6a       .j
     lda #sprite_0                                                     ; 2f33: a9 32       .2
     sta total_diamonds_on_status_bar_high_digit                       ; 2f35: 8d 03 32    ..2
     sta total_diamonds_on_status_bar_low_digit                        ; 2f38: 8d 04 32    ..2
@@ -2976,11 +3050,11 @@ sub_c2f00
 return11
     rts                                                               ; 2f47: 60          `
 
-unused52
+unused33
     !byte $91, $6a, $e6, $4c, $60,   0,   0,   0                      ; 2f48: 91 6a e6... .j.
 
 initialise_stage
-    lda #$14                                                          ; 2f50: a9 14       ..
+    lda #20                                                           ; 2f50: a9 14       ..
     sta visible_top_left_map_x                                        ; 2f52: 85 7e       .~
     lsr                                                               ; 2f54: 4a          J
     sta visible_top_left_map_y                                        ; 2f55: 85 7f       ..
@@ -2991,67 +3065,79 @@ empty_status_bar_loop
     dey                                                               ; 2f5f: 88          .
     bpl empty_status_bar_loop                                         ; 2f60: 10 f7       ..
     ldx cave_number                                                   ; 2f62: a6 87       ..
+    ; show initial diamond score amount on status bar
     lda diamond_score_before_enough_obtained_for_each_cave,x          ; 2f64: bd 00 4b    ..K
     ldy #4                                                            ; 2f67: a0 04       ..
     jsr add_a_to_status_bar_number_at_y                               ; 2f69: 20 c0 28     .(
+    ; show cave letter on status bar
     txa                                                               ; 2f6c: 8a          .
     clc                                                               ; 2f6d: 18          .
     adc #$41                                                          ; 2f6e: 69 41       iA
     sta cave_letter_on_status_bar                                     ; 2f70: 8d 25 32    .%2
+    ; show difficulty level on status bar
     lda difficulty_level                                              ; 2f73: a5 89       ..
     clc                                                               ; 2f75: 18          .
     adc #sprite_0                                                     ; 2f76: 69 32       i2
     sta difficulty_level_on_status_bar                                ; 2f78: 8d 27 32    .'2
+    ; TODO: what is this?
     lda l4c54,x                                                       ; 2f7b: bd 54 4c    .TL
     sta l0055                                                         ; 2f7e: 85 55       .U
     sta l0051                                                         ; 2f80: 85 51       .Q
+    ; put the end tile on the map
     lda end_y,x                                                       ; 2f82: bd 18 4c    ..L
-    sta screen_addr1_high                                             ; 2f85: 85 8b       ..
+    sta map_y                                                         ; 2f85: 85 8b       ..
     lda end_x,x                                                       ; 2f87: bd 2c 4c    .,L
-    sta screen_addr1_low                                              ; 2f8a: 85 8a       ..
+    sta map_x                                                         ; 2f8a: 85 8a       ..
     jsr map_xy_position_to_map_address                                ; 2f8c: 20 15 2b     .+
     ldy #0                                                            ; 2f8f: a0 00       ..
     lda #3                                                            ; 2f91: a9 03       ..
-    sta (ptr_low),y                                                   ; 2f93: 91 8c       ..
-    lda ptr_low                                                       ; 2f95: a5 8c       ..
-    sta l006a                                                         ; 2f97: 85 6a       .j
-    lda ptr_high                                                      ; 2f99: a5 8d       ..
-    sta l006b                                                         ; 2f9b: 85 6b       .k
+    sta (map_address_low),y                                           ; 2f93: 91 8c       ..
+    lda map_address_low                                               ; 2f95: a5 8c       ..
+    sta map_rockford_end_position_addr_low                            ; 2f97: 85 6a       .j
+    lda map_address_high                                              ; 2f99: a5 8d       ..
+    sta map_rockford_end_position_addr_high                           ; 2f9b: 85 6b       .k
+    ; put the start tile on the map
     lda start_y,x                                                     ; 2f9d: bd f0 4b    ..K
-    sta screen_addr1_high                                             ; 2fa0: 85 8b       ..
+    sta map_y                                                         ; 2fa0: 85 8b       ..
     lda start_x,x                                                     ; 2fa2: bd 04 4c    ..L
-    sta screen_addr1_low                                              ; 2fa5: 85 8a       ..
+    sta map_x                                                         ; 2fa5: 85 8a       ..
     jsr map_xy_position_to_map_address                                ; 2fa7: 20 15 2b     .+
     ldy #0                                                            ; 2faa: a0 00       ..
     lda #8                                                            ; 2fac: a9 08       ..
-    sta (ptr_low),y                                                   ; 2fae: 91 8c       ..
-    lda ptr_low                                                       ; 2fb0: a5 8c       ..
-    sta l0070                                                         ; 2fb2: 85 70       .p
-    lda ptr_high                                                      ; 2fb4: a5 8d       ..
-    sta l0071                                                         ; 2fb6: 85 71       .q
+    sta (map_address_low),y                                           ; 2fae: 91 8c       ..
+    lda map_address_low                                               ; 2fb0: a5 8c       ..
+    sta map_rockford_start_position_addr_low                          ; 2fb2: 85 70       .p
+    lda map_address_high                                              ; 2fb4: a5 8d       ..
+    sta map_rockford_start_position_addr_high                         ; 2fb6: 85 71       .q
+    ; add 40 to the cave number for each difficulty level above one
     ldy difficulty_level                                              ; 2fb8: a4 89       ..
-loop_c2fba
+add_difficulty_level_loop
     cpy #2                                                            ; 2fba: c0 02       ..
-    bmi c2fc6                                                         ; 2fbc: 30 08       0.
+    bmi got_offset_to_per_stage_data                                  ; 2fbc: 30 08       0.
     txa                                                               ; 2fbe: 8a          .
     clc                                                               ; 2fbf: 18          .
-    adc #$28                                                          ; 2fc0: 69 28       i(
+    adc #40                                                           ; 2fc0: 69 28       i(
     tax                                                               ; 2fc2: aa          .
     dey                                                               ; 2fc3: 88          .
-    bne loop_c2fba                                                    ; 2fc4: d0 f4       ..
-c2fc6
+    bne add_difficulty_level_loop                                     ; 2fc4: d0 f4       ..
+    ; remember diamonds required
+got_offset_to_per_stage_data
     lda required_diamonds_for_each_cave_difficulty_level_1,x          ; 2fc6: bd 28 4b    .(K
     sta diamonds_required                                             ; 2fc9: 85 6c       .l
+    ; show diamonds required on status bar
     ldy #1                                                            ; 2fcb: a0 01       ..
     jsr add_a_to_status_bar_number_at_y                               ; 2fcd: 20 c0 28     .(
+    ; remember time remaining
     lda time_limit_for_each_cave_difficulty_level_1,x                 ; 2fd0: bd 3c 4b    .<K
-    sta l006d                                                         ; 2fd3: 85 6d       .m
+    sta time_remaining                                                ; 2fd3: 85 6d       .m
+    ; show time remaining on status bar
     ldy #$0c                                                          ; 2fd5: a0 0c       ..
     jsr add_a_to_status_bar_number_at_y                               ; 2fd7: 20 c0 28     .(
+    ; return zero
     lda #0                                                            ; 2fda: a9 00       ..
     rts                                                               ; 2fdc: 60          `
 
-unused53
+unused34
     !byte   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0  ; 2fdd: 00 00 00... ...
     !byte   0,   0,   0,   0,   0, $81,   0,   0,   0,   0, $84,   0  ; 2fe9: 00 00 00... ...
     !byte   0, $86, $81,   0,   0,   1, $81, $d9, $19, $81, $ff       ; 2ff5: 00 86 81... ...
@@ -3072,7 +3158,7 @@ c3010
 c3016
     stx l0054                                                         ; 3016: 86 54       .T
 c3018
-    lda l006d                                                         ; 3018: a5 6d       .m
+    lda time_remaining                                                ; 3018: a5 6d       .m
     cmp #sprite_0                                                     ; 301a: c9 32       .2
     bne return12                                                      ; 301c: d0 0d       ..
     lda sub_second_ticks                                              ; 301e: a5 5c       .\
@@ -3085,7 +3171,7 @@ c3018
 return12
     rts                                                               ; 302b: 60          `
 
-unused54
+unused35
     !byte $85, $57, $60, $1c, $1f, $1f, $1f, $1f, $1f, $1f, $1f, $1f  ; 302c: 85 57 60... .W`
     !byte $1f, $1f, $1f, $1f, $1f, $1f, $1f, $1f                      ; 3038: 1f 1f 1f... ...
 
@@ -3133,15 +3219,15 @@ loop_c307a
 
 c3084
     ldy #0                                                            ; 3084: a0 00       ..
-    lda (l0070),y                                                     ; 3086: b1 70       .p
+    lda (map_rockford_start_position_addr_low),y                      ; 3086: b1 70       .p
     and #$7f                                                          ; 3088: 29 7f       ).
     tax                                                               ; 308a: aa          .
     tya                                                               ; 308b: 98          .
-    sta (l0070),y                                                     ; 308c: 91 70       .p
+    sta (map_rockford_start_position_addr_low),y                      ; 308c: 91 70       .p
     txa                                                               ; 308e: 8a          .
-    sta (l006a),y                                                     ; 308f: 91 6a       .j
+    sta (map_rockford_end_position_addr_low),y                        ; 308f: 91 6a       .j
     jsr draw_grid_of_sprites                                          ; 3091: 20 00 23     .#
-    lda l006d                                                         ; 3094: a5 6d       .m
+    lda time_remaining                                                ; 3094: a5 6d       .m
     beq c30cb                                                         ; 3096: f0 33       .3
 c3098
     ldy #$13                                                          ; 3098: a0 13       ..
@@ -3153,7 +3239,7 @@ c3098
     lda #0                                                            ; 30a6: a9 00       ..
     sta l004c                                                         ; 30a8: 85 4c       .L
     sta status_text_address_low                                       ; 30aa: 85 69       .i
-    lda l006d                                                         ; 30ac: a5 6d       .m
+    lda time_remaining                                                ; 30ac: a5 6d       .m
     and #$1c                                                          ; 30ae: 29 1c       ).
     tay                                                               ; 30b0: a8          .
     iny                                                               ; 30b1: c8          .
@@ -3165,7 +3251,7 @@ c3098
     lda #2                                                            ; 30c0: a9 02       ..
     sta wait_delay_centiseconds                                       ; 30c2: 85 84       ..
     jsr wait_for_centiseconds_and_read_keys                           ; 30c4: 20 94 2b     .+
-    dec l006d                                                         ; 30c7: c6 6d       .m
+    dec time_remaining                                                ; 30c7: c6 6d       .m
     bne c3098                                                         ; 30c9: d0 cd       ..
 c30cb
     lda #<status_bar_sprite_numbers                                   ; 30cb: a9 00       ..
@@ -3188,7 +3274,7 @@ sub_c30dd
     and #2                                                            ; 30e9: 29 02       ).
     rts                                                               ; 30eb: 60          `
 
-unused55
+unused36
     !byte $62, $29,   2, $60,   0,   0,   0,   0,   0,   0,   0,   0  ; 30ec: 62 29 02... b).
     !byte   0,   0,   0,   0,   0,   0,   0,   0                      ; 30f8: 00 00 00... ...
 demonstration_keys
@@ -3213,7 +3299,7 @@ demonstration_key_durations
 entry_point
     ldx #0                                                            ; 31c0: a2 00       ..
 loop_c31c2
-    lda credits,x                                                     ; 31c2: bd 00 54    ..T
+    lda map_row_15,x                                                  ; 31c2: bd 00 54    ..T
     sta copy_of_credits,x                                             ; 31c5: 9d 00 33    ..3
     dex                                                               ; 31c8: ca          .
     bne loop_c31c2                                                    ; 31c9: d0 f7       ..
@@ -3232,7 +3318,7 @@ show_credits_loop
     bne show_credits_loop                                             ; 31e2: d0 f6       ..
     jmp loop_c31cb                                                    ; 31e4: 4c cb 31    L.1
 
-unused56
+unused37
     !byte $31, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff  ; 31e7: 31 ff ff... 1..
     !byte $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff  ; 31f3: ff ff ff... ...
     !byte $ff                                                         ; 31ff: ff          .
@@ -3511,7 +3597,7 @@ copy_of_credits
 ; 120 LDA #&7D:LDY #&80:JSR &2329
 ; 130 JSR &2292:LDX
 ; 
-unused57
+unused38
     !byte $50, $0e                                                    ; 336c: 50 0e       P.
     !text " JSR 10829"                                                ; 336e: 20 4a 53...  JS
     !byte $0d,   0, $5a, $1e                                          ; 3378: 0d 00 5a... ..Z
@@ -3679,7 +3765,7 @@ show_menu
     ldy #1                                                            ; 3a2a: a0 01       ..
 handle_menu_loop
     lda #0                                                            ; 3a2c: a9 00       ..
-    sta timeout_until_demo_mode                                       ; 3a2e: 85 6a       .j
+    sta map_rockford_end_position_addr_low                            ; 3a2e: 85 6a       .j
     stx cave_number                                                   ; 3a30: 86 87       ..
     sty difficulty_level                                              ; 3a32: 84 89       ..
     txa                                                               ; 3a34: 8a          .
@@ -3720,7 +3806,7 @@ waiting_for_demo_loop
     bcs return14                                                      ; 3a77: b0 68       .h
     asl                                                               ; 3a79: 0a          .
     bcs show_rockford_again_and_play_game                             ; 3a7a: b0 55       .U
-    dec timeout_until_demo_mode                                       ; 3a7c: c6 6a       .j
+    dec map_rockford_end_position_addr_low                            ; 3a7c: c6 6a       .j
     bne waiting_for_demo_loop                                         ; 3a7e: d0 c5       ..
 
     ; demo mode
@@ -3748,7 +3834,7 @@ self_modify_move_left_or_right
     tax                                                               ; 3aa2: aa          .
 store_new_difficulty_level_selected
     sty difficulty_level                                              ; 3aa3: 84 89       ..
-    lda number_of_difficuly_levels_available_for_each_cave,x          ; 3aa5: bd 68 4c    .hL
+    lda number_of_difficuly_levels_available_in_menu_for_each_cave,x  ; 3aa5: bd 68 4c    .hL
     cmp difficulty_level                                              ; 3aa8: c5 89       ..
     bcc self_modify_move_left_or_right                                ; 3aaa: 90 f2       ..
     jmp handle_menu_loop                                              ; 3aac: 4c 2c 3a    L,:
@@ -3786,7 +3872,7 @@ show_rockford_again_and_play_game
 return14
     rts                                                               ; 3ae1: 60          `
 
-unused58
+unused39
     !byte $65, $20,   0, $3b, $4c,   0, $3a, $60, $ff, $ff, $ff, $ff  ; 3ae2: 65 20 00... e .
     !byte $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff  ; 3aee: ff ff ff... ...
     !byte $ff, $ff, $ff, $ff, $ff, $ff                                ; 3afa: ff ff ff... ...
@@ -3823,10 +3909,10 @@ loop_c3b36
 c3b3f
     ldx cave_number                                                   ; 3b3f: a6 87       ..
     lda difficulty_level                                              ; 3b41: a5 89       ..
-    cmp number_of_difficuly_levels_available_for_each_cave,x          ; 3b43: dd 68 4c    .hL
+    cmp number_of_difficuly_levels_available_in_menu_for_each_cave,x  ; 3b43: dd 68 4c    .hL
     bmi skip_adding_new_difficulty_level_to_menu                      ; 3b46: 30 03       0.
     ; add new difficulty level to menu
-    sta number_of_difficuly_levels_available_for_each_cave,x          ; 3b48: 9d 68 4c    .hL
+    sta number_of_difficuly_levels_available_in_menu_for_each_cave,x  ; 3b48: 9d 68 4c    .hL
 skip_adding_new_difficulty_level_to_menu
     jsr sub_c2e00                                                     ; 3b4b: 20 00 2e     ..
     ldy #5                                                            ; 3b4e: a0 05       ..
@@ -3900,7 +3986,7 @@ sub_c3bc1
 return15
     rts                                                               ; 3bcc: 60          `
 
-unused59
+unused40
     !byte $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff  ; 3bcd: ff ff ff... ...
     !byte $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff  ; 3bd9: ff ff ff... ...
     !byte $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff  ; 3be5: ff ff ff... ...
@@ -4235,136 +4321,123 @@ unused59
     !text ".AVEC"                                                     ; 46f2: 2e 41 56... .AV
     !byte $0d,   2, $8a, $16                                          ; 46f7: 0d 02 8a... ...
     !text "LDX #"                                                     ; 46fb: 4c 44 58... LDX
-
-special_cave_0
-    !byte $5a, $f2, $e2, $6a, $81, $f2, $d2, $6a, $71,   2            ; 4700: 5a f2 e2... Z..
-    !byte $61,   2, $21,   0, $21,   2, $61,   2, $e1, $0b            ; 470a: 61 02 21... a.!
-    !byte $61, $0b, $21, $0b, $21, $0b, $61, $0b, $61, $60            ; 4714: 61 0b 21... a.!
-    !byte $0c, $f1, $d1, $0c, $2a, $62, $0c, $a1, $0c, $22            ; 471e: 0c f1 d1... ...
-
-    !byte $0c, $d1, $0c, $2a, $60, $0c, $f1, $d1, $0c, $3a            ; 4728: 0c d1 0c... ...
-    !byte $62, $0c, $a1, $0c, $22, $0c, $d1, $0c, $2a, $60            ; 4732: 62 0c a1... b..
-    !byte $0c, $f1, $d1, $0c, $3a, $71, $0b, $61, $0b, $21            ; 473c: 0c f1 d1... ...
-    !byte $0b, $21, $0b, $61, $0b, $61, $fa, $3a, $7a, $81            ; 4746: 0b 21 0b... .!.
-
-    !byte   9, $61,   9, $61,   9, $61,   9, $ba, $6a, $71            ; 4750: 09 61 09... .a.
-    !byte $20, $41, $20, $41, $20, $41, $20, $c1, $20, $41            ; 475a: 20 41 20...  A
-    !byte $20, $41, $20, $41, $20, $c1,   0,   4,   6, $41            ; 4764: 20 41 20...  A
-    !byte   0,   4,   6, $41,   0,   4,   6, $41,   0,   4            ; 476e: 00 04 06... ...
-
-    !byte   6, $3a, $71, $20, $41, $20, $41, $20, $41, $20            ; 4778: 06 3a 71... .:q
-    !byte $c1, $20, $41, $20, $41, $20, $41, $20, $c1,   0            ; 4782: c1 20 41... . A
-    !byte   4,   6, $41,   0,   4,   6, $41,   0,   4,   6            ; 478c: 04 06 41... ..A
-    !byte $41,   0,   4,   6, $4a, $92,   1, $f3, $13,   1            ; 4796: 41 00 04... A..
-
-    !byte $92, $1b, $70, $0b, $f3, $13, $0b, $70, $0b, $20            ; 47a0: 92 1b 70... ..p
-    !byte   6,   4, $60, $f3, $13, $60,   4,   6, $10, $a2            ; 47aa: 06 04 60... ..`
-    !byte $f3, $13, $a2, $a0, $f3, $13, $c0,   6,   4, $60            ; 47b4: f3 13 a2... ...
-    !byte $f3, $13, $60,   4,   6, $10, $a2, $f3, $13, $a2            ; 47be: f3 13 60... ..`
-
-    !byte $a0, $f3, $13, $c0,   6,   4, $60, $f3, $13, $60            ; 47c8: a0 f3 13... ...
-    !byte   4,   6, $10, $a2, $f3, $13, $a2, $a0, $f3, $13            ; 47d2: 04 06 10... ...
-    !byte $c0,   6,   4, $60, $f3, $13, $60,   4,   6, $10            ; 47dc: c0 06 04... ...
-    !byte $1b, $72, $0b, $f3, $13, $0b, $72, $1b, $6a, $0a            ; 47e6: 1b 72 0b... .r.
-
-    !byte $f1, $f1, $11,   4, $f1, $f1,   1, $b2, $31,   4            ; 47f0: f1 f1 11... ...
-    !byte $f1, $f1, $21, $c2, $6a, $f1, $f1, $11,   4, $81            ; 47fa: f1 f1 21... ..!
-    !byte   4, $5a, $f1, $31,   7, $0a, $31,   4, $f1, $c1            ; 4804: 04 5a f1... .Z.
-    !byte   4, $41, $0a, $f0, $f0, $10,   4, $f0, $f0,   0            ; 480e: 04 41 0a... .A.
-
-    !byte $b2, $30,   4, $0a, $c2, $4a, $f0, $f0, $10,   4            ; 4818: b2 30 04... .0.
-    !byte $f0, $f0,   0, $a2, $1a, $c2, $81, $0a, $b0,   4            ; 4822: f0 f0 00... ...
-    !byte $0a, $d0, $7d, $0a, $f0, $20,   4, $4a, $4a, $6a            ; 482c: 0a d0 7d... ..}
-    !byte $43, $62,   1, $42, $63, $52,   1, $52, $63, $0b            ; 4836: 43 62 01... Cb.
-
-    !byte $a0, $0b, $63, $0b, $a0, $0b, $73, $ab, $83, $ab            ; 4840: a0 0b 63... ..c
-    !byte $5a, $f3,   3, $0b, $62, $0b, $f3, $e3, $f0, $30            ; 484a: 5a f3 03... Z..
-    !byte $f3, $33,   2, $63,   2, $f3, $23, $bb,   2, $63            ; 4854: f3 33 02... .3.
-    !byte   2, $bb, $63, $c2, $63, $c2, $0a, $73, $0b, $b2            ; 485e: 02 bb 63... ..c
-
-    !byte $63, $b2, $0b, $13, $0a,   1, $b2,   0, $72, $0a            ; 4868: 63 b2 0b... c..
-    !byte   1,   2, $31,   4, $c1,   4, $0b, $0a,   1,   2            ; 4872: 01 02 31... ..1
-    !byte   1,   2,   6,   2,   1, $52,   0, $52, $0a, $5b            ; 487c: 01 02 06... ...
-    !byte   1, $0b,   4, $81,   4, $0b, $0a, $81, $32,   0            ; 4886: 01 0b 04... ...
-
-    !byte $32, $0a, $81, $0b,   4, $41,   4, $0b, $0a, $a1            ; 4890: 32 0a 81... 2..
-    !byte $12,   0, $12, $0a, $51, $40, $0b, $20, $0b, $40            ; 489a: 12 00 12... ...
-    !byte $0a, $51, $e0, $0a, $51, $e6, $0a, $31, $0b, $51            ; 48a4: 0a 51 e0... .Q.
-    !byte $0b, $22, $0b, $0a, $31,   0, $41,   4, $41,   4            ; 48ae: 0b 22 0b... .".
-
-    !byte $0a, $31,   4, $31, $0b, $62, $0b, $0a, $31, $0b            ; 48b8: 0a 31 04... .1.
-    !byte $21,   4, $81,   4, $0a, $61, $0b, $a2, $0b, $0a            ; 48c2: 21 04 81... !..
-    !byte $5b,   4, $c1,   4, $0a, $f2, $42, $0b, $2a, $31            ; 48cc: 5b 04 c1... [..
-    !byte   4, $41,   2, $21,   4, $41,   2, $21,   4, $41            ; 48d6: 04 41 02... .A.
-
-    !byte   2, $21,   4, $31,   3, $91, $0b, $81, $0b, $81            ; 48e0: 02 21 04... .!.
-    !byte $0b, $4a, $f1, $f1, $51,   2,   3, $91, $0b, $81            ; 48ea: 0b 4a f1... .J.
-    !byte $0b, $81, $0b, $51,   2,   1,   3, $41, $82,   1            ; 48f4: 0b 81 0b... ...
-    !byte $82,   1, $82, $11,   2, $11,   3, $f1, $f1, $21            ; 48fe: 82 01 82... ...
-
-    !byte   2, $21,   3, $f1, $f1, $11,   2, $31,   3, $81            ; 4908: 02 21 03... .!.
-    !byte   2, $f1, $61,   2, $41,   3, $81, $0b, $11, $f2            ; 4912: 02 f1 61... ..a
-    !byte   2, $21,   2, $51,   3, $f1, $e1,   2, $61,   3            ; 491c: 02 21 02... .!.
-    !byte $f1, $d1,   2, $71,   3, $f1, $c1,   2, $81,   3            ; 4926: f1 d1 02... ...
-
-    !byte $f1, $b1,   2, $2a, $31,   4, $31, $0b, $0a, $1a            ; 4930: f1 b1 02... ...
-    !byte $91,   2, $21,   2, $21,   2, $21,   2, $71,   9            ; 493a: 91 02 21... ..!
-    !byte $91, $72, $0b, $12,   1, $0b, $21, $0b, $21, $0b            ; 4944: 91 72 0b... .r.
-    !byte $3a, $11, $a2, $f1, $11,   9, $3a, $11, $e2, $0a            ; 494e: 3a 11 a2... :..
-
-    !byte $f1, $e1,   9, $2a, $11, $a2, $3a, $91, $0b, $21            ; 4958: f1 e1 09... ...
-    !byte $0b, $21, $0b, $21, $0b, $0a, $0b, $21, $0b, $0a            ; 4962: 0b 21 0b... .!.
-    !byte $f0, $30,   7, $ea, $40, $f2, $d2, $90, $fe, $de            ; 496c: f0 30 07... .0.
-    !byte $90, $f5, $d5, $90, $f1, $d1, $90, $f1, $d1, $40            ; 4976: 90 f5 d5... ...
-
-    !byte $3a, $f1, $51,   6,   1,   6,   1,   6,   1,   6            ; 4980: 3a f1 51... :.Q
-    !byte   1,   6,   1,   6, $f1, $c1,   5,   1,   5,   1            ; 498a: 01 06 01... ...
-    !byte   5,   1,   5,   1,   5,   1,   5, $2a, $a1,   0            ; 4994: 05 01 05... ...
-    !byte $0b,   0, $0b,   0, $0b,   0, $0b,   0, $0b, $0e            ; 499e: 0b 00 0b... ...
-
-    !byte $0a, $a1, $a0, $0a, $a1, $70, $0e, $10, $0a, $a1            ; 49a8: 0a a1 a0... ...
-    !byte $a0, $0a, $a1, $50, $0e, $30, $0a, $a1, $a0, $0a            ; 49b2: a0 0a a1... ...
-    !byte $a1, $30, $0e, $50, $0a, $a1, $a0, $0a, $a1, $10            ; 49bc: a1 30 0e... .0.
-    !byte $0e, $70, $0a, $a1, $a0, $0a, $a1, $0e, $0b,   0            ; 49c6: 0e 70 0a... .p.
-
-    !byte $0b,   0, $0b,   0, $0b,   0, $0b,   0, $1a, $0a            ; 49d0: 0b 00 0b... ...
-    !byte $10,   2, $f0, $40,   2, $0a, $20,   2, $f0, $20            ; 49da: 10 02 f0... ...
-    !byte   2, $0a, $30,   2, $f0,   0,   2, $0a, $40,   2            ; 49e4: 02 0a 30... ..0
-    !byte $e0,   2, $0a, $50,   2, $c0,   2, $0a, $60,   2            ; 49ee: e0 02 0a... ...
-
-    !byte $a0,   2, $0a, $70,   2, $80,   2, $0a, $80,   2            ; 49f8: a0 02 0a... ...
-    !byte $60,   2, $0a, $90,   2, $40,   2, $0a, $a0,   2            ; 4a02: 60 02 0a... `..
-    !byte $20,   2, $0a, $b0, $21, $0a, $b0, $2d, $7a, $6a            ; 4a0c: 20 02 0a...  ..
-    !byte $61, $5d, $11, $5d, $0a, $61,   2, $31,   2, $11            ; 4a16: 61 5d 11... a].
-
-    !byte   2, $31,   2, $0a, $61, $0b, $31, $0b, $11, $0b            ; 4a20: 02 31 02... .1.
-    !byte $31, $0b, $4a, $61, $0b, $32, $0b, $11, $0b, $32            ; 4a2a: 31 0b 4a... 1.J
-    !byte $0b, $2a, $81,   9, $61,   9, $61,   9, $61,   9            ; 4a34: 0b 2a 81... .*.
-    !byte $2a, $f0, $20, $0b, $0a, $90,   5, $0a, $90,   1            ; 4a3e: 2a f0 20... *.
-
-    !byte $6a, $90, $0e, $0a, $f3, $23, $0b, $9a,   1,   5            ; 4a48: 6a 90 0e... j..
-    !byte   6, $e1,   5, $0b, $0a, $11,   5,   6, $c1,   5            ; 4a52: 06 e1 05... ...
-    !byte $0a,   1,   4,   1,   5,   6, $a1,   5,   1,   4            ; 4a5c: 0a 01 04... ...
-    !byte $0a,   1,   5,   4,   1,   5,   6, $81,   5,   1            ; 4a66: 0a 01 05... ...
-
-    !byte   4,   5, $0a, $11,   5,   4,   1,   5,   6, $61            ; 4a70: 04 05 0a... ...
-    !byte   5,   1,   4,   5, $0a, $21,   5,   4,   1,   5            ; 4a7a: 05 01 04... ...
-    !byte   6, $41,   5,   1,   4,   5, $0a, $31,   5,   4            ; 4a84: 06 41 05... .A.
-    !byte   1,   5,   6, $21,   5,   1,   4,   5, $0a, $41            ; 4a8e: 01 05 06... ...
-
-    !byte 5, 4, 1, 5, 6, 1, 5, 1, 4, 5                                ; 4a98: 05 04 01... ...
-    !byte $0a, $51,   5,   4,   1, $15,   1,   4,   5, $0a            ; 4aa2: 0a 51 05... .Q.
-    !byte $61,   5,   4, $11,   4,   5, $0a, $f3, $23, $0b            ; 4aac: 61 05 04... a..
-    !byte $9a, $f0, $20, $0b, $5a, $e0, $36, $0a, $e0, $36            ; 4ab6: 9a f0 20... ..
-
-    !byte $0a, $e0, $36, $0a, $e4, $36, $0b, $0a, $f3, $33            ; 4ac0: 0a e0 36... ..6
-    !byte $9a, $a1, $25, $41, $0b, $0a, $a1, $25, $1a, $a1            ; 4aca: 9a a1 25... ..%
-    !byte $2d, $0a, $71,   5, $11, $20, $0a, $81,   5,   1            ; 4ad4: 2d 0a 71... -.q
-    !byte $20, $0a, $91,   5, $20, $0a, $a1, $2d, $0a, $a1            ; 4ade: 20 0a 91...  ..
-
-    !byte $20, $0a, $a1, $20, $0a, $f3, $23, $0b, $9a, $90            ; 4ae8: 20 0a a1...  ..
-    !byte $6a, $90, $0e, $0a, $f3, $23, $0b, $9a, $2a,   3            ; 4af2: 6a 90 0e... j..
-    !byte $34,   3, $3e,   3                                          ; 4afc: 34 03 3e... 4.>
+strip_data
+strip_data_for_cave_0
+    !byte $5a, $f2, $e2, $6a, $81, $f2, $d2, $6a                      ; 4700: 5a f2 e2... Z..
+strip_data_for_cave_1
+    !byte $71,   2, $61,   2, $21,   0, $21,   2, $61,   2, $e1, $0b  ; 4708: 71 02 61... q.a
+    !byte $61, $0b, $21, $0b, $21, $0b, $61, $0b, $61, $60, $0c, $f1  ; 4714: 61 0b 21... a.!
+    !byte $d1, $0c, $2a, $62, $0c, $a1, $0c, $22, $0c, $d1, $0c, $2a  ; 4720: d1 0c 2a... ..*
+    !byte $60, $0c, $f1, $d1, $0c, $3a, $62, $0c, $a1, $0c, $22, $0c  ; 472c: 60 0c f1... `..
+    !byte $d1, $0c, $2a, $60, $0c, $f1, $d1, $0c, $3a, $71, $0b, $61  ; 4738: d1 0c 2a... ..*
+    !byte $0b, $21, $0b, $21, $0b, $61, $0b, $61                      ; 4744: 0b 21 0b... .!.
+strip_data_for_cave_2
+    !byte $fa, $3a                                                    ; 474c: fa 3a       .:
+strip_data_for_cave_3
+    !byte $7a, $81,   9, $61,   9, $61,   9, $61,   9, $ba            ; 474e: 7a 81 09... z..
+strip_data_for_cave_4
+    !byte $6a, $71, $20, $41, $20, $41, $20, $41, $20, $c1, $20, $41  ; 4758: 6a 71 20... jq
+    !byte $20, $41, $20, $41, $20, $c1,   0,   4,   6, $41,   0,   4  ; 4764: 20 41 20...  A
+    !byte   6, $41,   0,   4,   6, $41,   0,   4,   6, $3a, $71, $20  ; 4770: 06 41 00... .A.
+    !byte $41, $20, $41, $20, $41, $20, $c1, $20, $41, $20, $41, $20  ; 477c: 41 20 41... A A
+    !byte $41, $20, $c1,   0,   4,   6, $41,   0,   4,   6, $41,   0  ; 4788: 41 20 c1... A .
+    !byte   4,   6, $41,   0,   4,   6, $4a                           ; 4794: 04 06 41... ..A
+strip_data_for_cave_5
+    !byte $92,   1, $f3, $13,   1, $92, $1b, $70, $0b, $f3, $13, $0b  ; 479b: 92 01 f3... ...
+    !byte $70, $0b, $20,   6,   4, $60, $f3, $13, $60,   4,   6, $10  ; 47a7: 70 0b 20... p.
+    !byte $a2, $f3, $13, $a2, $a0, $f3, $13, $c0,   6,   4, $60, $f3  ; 47b3: a2 f3 13... ...
+    !byte $13, $60,   4,   6, $10, $a2, $f3, $13, $a2, $a0, $f3, $13  ; 47bf: 13 60 04... .`.
+    !byte $c0,   6,   4, $60, $f3, $13, $60,   4,   6, $10, $a2, $f3  ; 47cb: c0 06 04... ...
+    !byte $13, $a2, $a0, $f3, $13, $c0,   6,   4, $60, $f3, $13, $60  ; 47d7: 13 a2 a0... ...
+    !byte   4,   6, $10, $1b, $72, $0b, $f3, $13, $0b, $72, $1b, $6a  ; 47e3: 04 06 10... ...
+strip_data_for_cave_6
+    !byte $0a, $f1, $f1, $11,   4, $f1, $f1,   1, $b2, $31,   4, $f1  ; 47ef: 0a f1 f1... ...
+    !byte $f1, $21, $c2, $6a, $f1, $f1, $11,   4, $81,   4, $5a, $f1  ; 47fb: f1 21 c2... .!.
+    !byte $31,   7, $0a, $31,   4, $f1, $c1,   4, $41                 ; 4807: 31 07 0a... 1..
+strip_data_for_cave_7
+    !byte $0a, $f0, $f0, $10,   4, $f0, $f0,   0, $b2, $30,   4, $0a  ; 4810: 0a f0 f0... ...
+    !byte $c2, $4a, $f0, $f0, $10,   4, $f0, $f0,   0, $a2, $1a, $c2  ; 481c: c2 4a f0... .J.
+    !byte $81, $0a, $b0,   4, $0a, $d0, $7d, $0a, $f0, $20,   4, $4a  ; 4828: 81 0a b0... ...
+    !byte $4a                                                         ; 4834: 4a          J
+strip_data_for_cave_8
+    !byte $6a, $43, $62,   1, $42, $63, $52,   1, $52, $63, $0b, $a0  ; 4835: 6a 43 62... jCb
+    !byte $0b, $63, $0b, $a0, $0b, $73, $ab, $83, $ab, $5a, $f3,   3  ; 4841: 0b 63 0b... .c.
+    !byte $0b, $62, $0b, $f3, $e3, $f0, $30, $f3, $33,   2, $63,   2  ; 484d: 0b 62 0b... .b.
+    !byte $f3, $23, $bb,   2, $63,   2, $bb, $63, $c2, $63, $c2, $0a  ; 4859: f3 23 bb... .#.
+    !byte $73, $0b, $b2, $63, $b2, $0b, $13                           ; 4865: 73 0b b2... s..
+strip_data_for_cave_9
+    !byte $0a,   1, $b2,   0, $72, $0a,   1,   2, $31,   4, $c1,   4  ; 486c: 0a 01 b2... ...
+    !byte $0b, $0a,   1,   2,   1,   2,   6,   2,   1, $52,   0, $52  ; 4878: 0b 0a 01... ...
+    !byte $0a, $5b,   1, $0b,   4, $81,   4, $0b, $0a, $81, $32,   0  ; 4884: 0a 5b 01... .[.
+    !byte $32, $0a, $81, $0b,   4, $41,   4, $0b, $0a, $a1, $12,   0  ; 4890: 32 0a 81... 2..
+    !byte $12, $0a, $51, $40, $0b, $20, $0b, $40, $0a, $51, $e0, $0a  ; 489c: 12 0a 51... ..Q
+    !byte $51, $e6, $0a, $31, $0b, $51, $0b, $22, $0b, $0a, $31,   0  ; 48a8: 51 e6 0a... Q..
+    !byte $41,   4, $41,   4, $0a, $31,   4, $31, $0b, $62, $0b, $0a  ; 48b4: 41 04 41... A.A
+    !byte $31, $0b, $21,   4, $81,   4, $0a, $61, $0b, $a2, $0b, $0a  ; 48c0: 31 0b 21... 1.!
+    !byte $5b,   4, $c1,   4, $0a, $f2, $42, $0b, $2a                 ; 48cc: 5b 04 c1... [..
+strip_data_for_cave_10
+    !byte $31,   4, $41,   2, $21,   4, $41,   2, $21,   4, $41,   2  ; 48d5: 31 04 41... 1.A
+    !byte $21,   4, $31,   3, $91, $0b, $81, $0b, $81, $0b, $4a, $f1  ; 48e1: 21 04 31... !.1
+    !byte $f1, $51,   2,   3, $91, $0b, $81, $0b, $81, $0b, $51,   2  ; 48ed: f1 51 02... .Q.
+    !byte   1,   3, $41, $82,   1, $82,   1, $82, $11,   2, $11,   3  ; 48f9: 01 03 41... ..A
+    !byte $f1, $f1, $21,   2, $21,   3, $f1, $f1, $11,   2, $31,   3  ; 4905: f1 f1 21... ..!
+    !byte $81,   2, $f1, $61,   2, $41,   3, $81, $0b, $11, $f2,   2  ; 4911: 81 02 f1... ...
+    !byte $21,   2, $51,   3, $f1, $e1,   2, $61,   3, $f1, $d1,   2  ; 491d: 21 02 51... !.Q
+    !byte $71,   3, $f1, $c1,   2, $81,   3, $f1, $b1,   2, $2a, $31  ; 4929: 71 03 f1... q..
+    !byte   4, $31, $0b, $0a                                          ; 4935: 04 31 0b... .1.
+strip_data_for_cave_11
+    !byte $1a, $91,   2, $21,   2, $21,   2, $21,   2, $71,   9, $91  ; 4939: 1a 91 02... ...
+    !byte $72, $0b, $12,   1, $0b, $21, $0b, $21, $0b, $3a, $11, $a2  ; 4945: 72 0b 12... r..
+    !byte $f1, $11,   9, $3a, $11, $e2, $0a, $f1, $e1,   9, $2a, $11  ; 4951: f1 11 09... ...
+    !byte $a2, $3a, $91, $0b, $21, $0b, $21, $0b, $21, $0b, $0a, $0b  ; 495d: a2 3a 91... .:.
+    !byte $21, $0b, $0a                                               ; 4969: 21 0b 0a    !..
+strip_data_for_cave_12
+    !byte $f0, $30,   7, $ea, $40, $f2, $d2, $90, $fe, $de, $90, $f5  ; 496c: f0 30 07... .0.
+    !byte $d5, $90, $f1, $d1, $90, $f1, $d1, $40                      ; 4978: d5 90 f1... ...
+strip_data_for_cave_13
+    !byte $3a, $f1, $51,   6,   1,   6,   1,   6,   1,   6,   1,   6  ; 4980: 3a f1 51... :.Q
+    !byte   1,   6, $f1, $c1,   5,   1,   5,   1,   5,   1,   5,   1  ; 498c: 01 06 f1... ...
+    !byte   5,   1,   5, $2a, $a1,   0, $0b,   0, $0b,   0, $0b,   0  ; 4998: 05 01 05... ...
+    !byte $0b,   0, $0b, $0e, $0a, $a1, $a0, $0a, $a1, $70, $0e, $10  ; 49a4: 0b 00 0b... ...
+    !byte $0a, $a1, $a0, $0a, $a1, $50, $0e, $30, $0a, $a1, $a0, $0a  ; 49b0: 0a a1 a0... ...
+    !byte $a1, $30, $0e, $50, $0a, $a1, $a0, $0a, $a1, $10, $0e, $70  ; 49bc: a1 30 0e... .0.
+    !byte $0a, $a1, $a0, $0a, $a1, $0e, $0b,   0, $0b,   0, $0b,   0  ; 49c8: 0a a1 a0... ...
+    !byte $0b,   0, $0b,   0, $1a                                     ; 49d4: 0b 00 0b... ...
+strip_data_for_cave_14
+    !byte $0a, $10,   2, $f0, $40,   2, $0a, $20,   2, $f0, $20,   2  ; 49d9: 0a 10 02... ...
+    !byte $0a, $30,   2, $f0,   0,   2, $0a, $40,   2, $e0,   2, $0a  ; 49e5: 0a 30 02... .0.
+    !byte $50,   2, $c0,   2, $0a, $60,   2, $a0,   2, $0a, $70,   2  ; 49f1: 50 02 c0... P..
+    !byte $80,   2, $0a, $80,   2, $60,   2, $0a, $90,   2, $40,   2  ; 49fd: 80 02 0a... ...
+    !byte $0a, $a0,   2, $20,   2, $0a, $b0, $21, $0a, $b0, $2d, $7a  ; 4a09: 0a a0 02... ...
+strip_data_for_cave_15
+    !byte $6a, $61, $5d, $11, $5d, $0a, $61,   2, $31,   2, $11,   2  ; 4a15: 6a 61 5d... ja]
+    !byte $31,   2, $0a, $61, $0b, $31, $0b, $11, $0b, $31, $0b, $4a  ; 4a21: 31 02 0a... 1..
+    !byte $61, $0b, $32, $0b, $11, $0b, $32, $0b, $2a, $81,   9, $61  ; 4a2d: 61 0b 32... a.2
+    !byte   9, $61,   9, $61,   9, $2a                                ; 4a39: 09 61 09... .a.
+strip_data_for_cave_16
+    !byte $f0, $20, $0b, $0a, $90,   5, $0a, $90,   1, $6a, $90, $0e  ; 4a3f: f0 20 0b... . .
+    !byte $0a, $f3, $23, $0b, $9a                                     ; 4a4b: 0a f3 23... ..#
+strip_data_for_cave_17
+    !byte   1,   5,   6, $e1,   5, $0b, $0a, $11,   5,   6, $c1,   5  ; 4a50: 01 05 06... ...
+    !byte $0a,   1,   4,   1,   5,   6, $a1,   5,   1,   4, $0a,   1  ; 4a5c: 0a 01 04... ...
+    !byte   5,   4,   1,   5,   6, $81,   5,   1,   4,   5, $0a, $11  ; 4a68: 05 04 01... ...
+    !byte   5,   4,   1,   5,   6, $61,   5,   1,   4,   5, $0a, $21  ; 4a74: 05 04 01... ...
+    !byte   5,   4,   1,   5,   6, $41,   5,   1,   4,   5, $0a, $31  ; 4a80: 05 04 01... ...
+    !byte   5,   4,   1,   5,   6, $21,   5,   1,   4,   5, $0a, $41  ; 4a8c: 05 04 01... ...
+    !byte   5,   4,   1,   5,   6,   1,   5,   1,   4,   5, $0a, $51  ; 4a98: 05 04 01... ...
+    !byte   5,   4,   1, $15,   1,   4,   5, $0a, $61,   5,   4, $11  ; 4aa4: 05 04 01... ...
+    !byte   4,   5, $0a, $f3, $23, $0b, $9a                           ; 4ab0: 04 05 0a... ...
+strip_data_for_cave_18
+    !byte $f0, $20, $0b, $5a, $e0, $36, $0a, $e0, $36, $0a, $e0, $36  ; 4ab7: f0 20 0b... . .
+    !byte $0a, $e4, $36, $0b, $0a, $f3, $33, $9a                      ; 4ac3: 0a e4 36... ..6
+strip_data_for_cave_19
+    !byte $a1, $25, $41, $0b, $0a, $a1, $25, $1a, $a1, $2d, $0a, $71  ; 4acb: a1 25 41... .%A
+    !byte   5, $11, $20, $0a, $81,   5,   1, $20, $0a, $91,   5, $20  ; 4ad7: 05 11 20... ..
+    !byte $0a, $a1, $2d, $0a, $a1, $20, $0a, $a1, $20, $0a, $f3, $23  ; 4ae3: 0a a1 2d... ..-
+    !byte $0b, $9a                                                    ; 4aef: 0b 9a       ..
+unused41
+    !byte $90, $6a, $90, $0e, $0a, $f3, $23, $0b, $9a, $2a,   3, $34  ; 4af1: 90 6a 90... .j.
+    !byte   3, $3e,   3                                               ; 4afd: 03 3e 03    .>.
 
 ; *************************************************************************************
 diamond_score_before_enough_obtained_for_each_cave
@@ -4427,22 +4500,22 @@ cave_play_order
 l4c54
     !byte  0,  0,  0,  0,  0,  0, 40, 25,  0,  0                      ; 4c54: 00 00 00... ...
     !byte  0,  0, 32,  0, 10, 20,  0,  0,  0,  4                      ; 4c5e: 00 00 20... ..
-number_of_difficuly_levels_available_for_each_cave
+number_of_difficuly_levels_available_in_menu_for_each_cave
     !byte 5, 0, 0, 0, 3, 0, 0, 0, 3, 0                                ; 4c68: 05 00 00... ...
     !byte   0,   0,   3,   0,   0,   0, $80, $80, $80, $80            ; 4c72: 00 00 03... ...
-l4c7c
+length_of_strip_data_for_each_cave
     !byte   8, $44,   2, $0a, $43, $54, $21, $25, $37, $69            ; 4c7c: 08 44 02... .D.
     !byte $64, $33, $14, $59, $3c, $2a, $11, $67, $14, $26            ; 4c86: 64 33 14... d3.
-lower_nybble_is_initial_cell_for_each_cave
+fill_cell_in_lower_nybble_strip_value_to_skip_in_upper_for_each_cave
     !byte $11, $11, $11, $11, $11, $31, $11,   1, $35, $11            ; 4c90: 11 11 11... ...
     !byte $11, $11,   1, $11,   1, $11,   0, $11,   0, $11            ; 4c9a: 11 11 01... ...
-lower_nybble_is_colour_one_for_each_cave
+colour_1_lower_nybble_block_type_1_upper_for_each_cave
     !byte $15, $15, $23, $15,   6, $15,   2,   3, $41,   3            ; 4ca4: 15 15 23... ..#
     !byte $56, $15, $12,   6, $51, $16,   2,   5,   4,   5            ; 4cae: 56 15 12... V..
-lower_nybble_is_colour_two_for_each_cave
+colour_2_lower_nybble_block_type_2_upper_for_each_cave
     !byte $41, $44, $42, $14,   4, $51, $54, $51, $45,   2            ; 4cb8: 41 44 42... ADB
     !byte $52, $42, $14,   4, $54, $55,   4,   2,   1,   4            ; 4cc2: 52 42 14... RB.
-lower_nybble_is_colour_three_for_each_cave
+colour_3_lower_nybble_block_type_3_upper_for_each_cave
     !byte $57, $57, $57, $13,   7, $57, $57, $57, $47,   7            ; 4ccc: 57 57 57... WWW
     !byte $57, $57, $57,   7, $57, $57,   6,   7,   7,   7            ; 4cd6: 57 57 57... WWW
 cave_to_data_set
@@ -4451,212 +4524,184 @@ cave_to_data_set
 ; *************************************************************************************
 data_set_0
 data_sets
-    !byte $9d                                                         ; 4cf4: 9d          .
-    !byte $43                                                         ; 4cf5: 43          C
-    !byte $6f                                                         ; 4cf6: 6f          o
-    !byte $43                                                         ; 4cf7: 43          C
-    !byte $d3                                                         ; 4cf8: d3          .
-    !byte $40                                                         ; 4cf9: 40          @
-    !byte $bb                                                         ; 4cfa: bb          .
-    !byte $43                                                         ; 4cfb: 43          C
-    !byte $21                                                         ; 4cfc: 21          !
-    !byte $c0                                                         ; 4cfd: c0          .
-    !byte $ea                                                         ; 4cfe: ea          .
-    !byte $43                                                         ; 4cff: 43          C
-    !byte $2c                                                         ; 4d00: 2c          ,
-    !byte $42                                                         ; 4d01: 42          B
-    !byte $19                                                         ; 4d02: 19          .
-    !byte $44                                                         ; 4d03: 44          D
-    !byte $5e                                                         ; 4d04: 5e          ^
-    !byte $43                                                         ; 4d05: 43          C
-    !byte $54                                                         ; 4d06: 54          T
-    !byte $44                                                         ; 4d07: 44          D
+    !byte $9d, $43, $6f, $43                                          ; 4cf4: 9d 43 6f... .Co            ; Difficulty 1: basics=0x4e9d, map_start=0x5043, patch_addr=0x436f
+    !byte $d3, $40, $bb, $43                                          ; 4cf8: d3 40 bb... .@.            ; Difficulty 2: basics=0x4ed3, map_start=0x5040, patch_addr=0x43bb
+    !byte $21, $c0, $ea, $43                                          ; 4cfc: 21 c0 ea... !..            ; Difficulty 3: basics=0x4f21, map_start=0x5040, patch_addr=0x43ea
+    !byte $2c, $42, $19, $44                                          ; 4d00: 2c 42 19... ,B.            ; Difficulty 4: basics=0x4e2c, map_start=0x5042, patch_addr=0x4419
+    !byte $5e, $43, $54, $44                                          ; 4d04: 5e 43 54... ^CT            ; Difficulty 5: basics=0x4e5e, map_start=0x5043, patch_addr=0x4454
 data_set_1
-    !byte $52                                                         ; 4d08: 52          R
-    !byte $42                                                         ; 4d09: 42          B
-    !byte $79                                                         ; 4d0a: 79          y
-    !byte $45                                                         ; 4d0b: 45          E
-    !byte $28                                                         ; 4d0c: 28          (
-    !byte $40                                                         ; 4d0d: 40          @
-    !byte $b0                                                         ; 4d0e: b0          .
-    !byte $45                                                         ; 4d0f: 45          E
-    !byte $cd                                                         ; 4d10: cd          .
-    !byte $43                                                         ; 4d11: 43          C
-    !byte $de                                                         ; 4d12: de          .
-    !byte $45                                                         ; 4d13: 45          E
-    !byte $e7                                                         ; 4d14: e7          .
-    !byte $43                                                         ; 4d15: 43          C
-    !byte $0f                                                         ; 4d16: 0f          .
-    !byte $46                                                         ; 4d17: 46          F
-    !byte $5a                                                         ; 4d18: 5a          Z
-    !byte $43                                                         ; 4d19: 43          C
-    !byte $3e                                                         ; 4d1a: 3e          >
-    !byte $46                                                         ; 4d1b: 46          F
+    !byte $52, $42, $79, $45                                          ; 4d08: 52 42 79... RBy            ; Difficulty 1: basics=0x4e52, map_start=0x5042, patch_addr=0x4579
+    !byte $28, $40, $b0, $45                                          ; 4d0c: 28 40 b0... (@.            ; Difficulty 2: basics=0x4e28, map_start=0x5040, patch_addr=0x45b0
+    !byte $cd, $43, $de, $45                                          ; 4d10: cd 43 de... .C.            ; Difficulty 3: basics=0x4ecd, map_start=0x5043, patch_addr=0x45de
+    !byte $e7, $43, $0f, $46                                          ; 4d14: e7 43 0f... .C.            ; Difficulty 4: basics=0x4ee7, map_start=0x5043, patch_addr=0x460f
+    !byte $5a, $43, $3e, $46                                          ; 4d18: 5a 43 3e... ZC>            ; Difficulty 5: basics=0x4e5a, map_start=0x5043, patch_addr=0x463e
 data_set_2
-    !byte $28                                                         ; 4d1c: 28          (
-    !byte $40                                                         ; 4d1d: 40          @
-    !byte 0                                                           ; 4d1e: 00          .
-    !byte 0                                                           ; 4d1f: 00          .
-    !byte $e7                                                         ; 4d20: e7          .
-    !byte $45                                                         ; 4d21: 45          E
-    !byte 0                                                           ; 4d22: 00          .
-    !byte $43                                                         ; 4d23: 43          C
-    !byte $b1                                                         ; 4d24: b1          .
-    !byte $41                                                         ; 4d25: 41          A
-    !byte 0                                                           ; 4d26: 00          .
-    !byte 0                                                           ; 4d27: 00          .
-    !byte $ac                                                         ; 4d28: ac          .
-    !byte $41                                                         ; 4d29: 41          A
-    !byte 7                                                           ; 4d2a: 07          .
-    !byte $43                                                         ; 4d2b: 43          C
-    !byte $92                                                         ; 4d2c: 92          .
-    !byte $43                                                         ; 4d2d: 43          C
-    !byte $1b                                                         ; 4d2e: 1b          .
-    !byte $43                                                         ; 4d2f: 43          C
+    !byte $28, $40,   0,   0                                          ; 4d1c: 28 40 00... (@.            ; Difficulty 1: basics=0x4e28, map_start=0x5040, patch_addr=0x0
+    !byte $e7, $45,   0, $43                                          ; 4d20: e7 45 00... .E.            ; Difficulty 2: basics=0x4ee7, map_start=0x5045, patch_addr=0x4300
+    !byte $b1, $41,   0,   0                                          ; 4d24: b1 41 00... .A.            ; Difficulty 3: basics=0x4eb1, map_start=0x5041, patch_addr=0x0
+    !byte $ac, $41,   7, $43                                          ; 4d28: ac 41 07... .A.            ; Difficulty 4: basics=0x4eac, map_start=0x5041, patch_addr=0x4307
+    !byte $92, $43, $1b, $43                                          ; 4d2c: 92 43 1b... .C.            ; Difficulty 5: basics=0x4e92, map_start=0x5043, patch_addr=0x431b
 data_set_3
-    !byte $28                                                         ; 4d30: 28          (
-    !byte $40                                                         ; 4d31: 40          @
-    !byte $69                                                         ; 4d32: 69          i
-    !byte $3e                                                         ; 4d33: 3e          >
-    !byte $28                                                         ; 4d34: 28          (
-    !byte $40                                                         ; 4d35: 40          @
-    !byte $a1                                                         ; 4d36: a1          .
-    !byte $3e                                                         ; 4d37: 3e          >
-    !byte $28                                                         ; 4d38: 28          (
-    !byte $40                                                         ; 4d39: 40          @
-    !byte $da                                                         ; 4d3a: da          .
-    !byte $3e                                                         ; 4d3b: 3e          >
-    !byte $28                                                         ; 4d3c: 28          (
-    !byte $40                                                         ; 4d3d: 40          @
-    !byte $29                                                         ; 4d3e: 29          )
-    !byte $3f                                                         ; 4d3f: 3f          ?
-    !byte $28                                                         ; 4d40: 28          (
-    !byte $40                                                         ; 4d41: 40          @
-    !byte $5e                                                         ; 4d42: 5e          ^
-    !byte $3f                                                         ; 4d43: 3f          ?
+    !byte $28, $40, $69, $3e                                          ; 4d30: 28 40 69... (@i            ; Difficulty 1: basics=0x4e28, map_start=0x5040, patch_addr=0x3e69
+    !byte $28, $40, $a1, $3e                                          ; 4d34: 28 40 a1... (@.            ; Difficulty 2: basics=0x4e28, map_start=0x5040, patch_addr=0x3ea1
+    !byte $28, $40, $da, $3e                                          ; 4d38: 28 40 da... (@.            ; Difficulty 3: basics=0x4e28, map_start=0x5040, patch_addr=0x3eda
+    !byte $28, $40, $29, $3f                                          ; 4d3c: 28 40 29... (@)            ; Difficulty 4: basics=0x4e28, map_start=0x5040, patch_addr=0x3f29
+    !byte $28, $40, $5e, $3f                                          ; 4d40: 28 40 5e... (@^            ; Difficulty 5: basics=0x4e28, map_start=0x5040, patch_addr=0x3f5e
 data_set_4
-    !byte $28                                                         ; 4d44: 28          (
-    !byte $40                                                         ; 4d45: 40          @
-    !byte 0                                                           ; 4d46: 00          .
-    !byte 0                                                           ; 4d47: 00          .
-    !byte $6d                                                         ; 4d48: 6d          m
-    !byte $43                                                         ; 4d49: 43          C
-    !byte 0                                                           ; 4d4a: 00          .
-    !byte 0                                                           ; 4d4b: 00          .
-    !byte 9                                                           ; 4d4c: 09          .
-    !byte $c3                                                         ; 4d4d: c3          .
-    !byte 0                                                           ; 4d4e: 00          .
-    !byte 0                                                           ; 4d4f: 00          .
-    !byte $4d                                                         ; 4d50: 4d          M
-    !byte $41                                                         ; 4d51: 41          A
-    !byte 0                                                           ; 4d52: 00          .
-    !byte 0                                                           ; 4d53: 00          .
-    !byte $0e                                                         ; 4d54: 0e          .
-    !byte $c3                                                         ; 4d55: c3          .
-    !byte 0                                                           ; 4d56: 00          .
-    !byte 0                                                           ; 4d57: 00          .
+    !byte $28, $40,   0,   0                                          ; 4d44: 28 40 00... (@.            ; Difficulty 1: basics=0x4e28, map_start=0x5040, patch_addr=0x0
+    !byte $6d, $43,   0,   0                                          ; 4d48: 6d 43 00... mC.            ; Difficulty 2: basics=0x4e6d, map_start=0x5043, patch_addr=0x0
+    !byte   9, $c3,   0,   0                                          ; 4d4c: 09 c3 00... ...            ; Difficulty 3: basics=0x4f09, map_start=0x5043, patch_addr=0x0
+    !byte $4d, $41,   0,   0                                          ; 4d50: 4d 41 00... MA.            ; Difficulty 4: basics=0x4e4d, map_start=0x5041, patch_addr=0x0
+    !byte $0e, $c3,   0,   0                                          ; 4d54: 0e c3 00... ...            ; Difficulty 5: basics=0x4f0e, map_start=0x5043, patch_addr=0x0
 data_set_5
-    !byte $1b                                                         ; 4d58: 1b          .
-    !byte $41                                                         ; 4d59: 41          A
-    !byte $ff                                                         ; 4d5a: ff          .
-    !byte $3c                                                         ; 4d5b: 3c          <
-    !byte $ee                                                         ; 4d5c: ee          .
-    !byte $42                                                         ; 4d5d: 42          B
-    !byte $2a                                                         ; 4d5e: 2a          *
-    !byte $3d                                                         ; 4d5f: 3d          =
-    !byte $2a                                                         ; 4d60: 2a          *
-    !byte $41                                                         ; 4d61: 41          A
-    !byte $5a                                                         ; 4d62: 5a          Z
-    !byte $3d                                                         ; 4d63: 3d          =
-    !byte $2f                                                         ; 4d64: 2f          /
-    !byte $41                                                         ; 4d65: 41          A
-    !byte $88                                                         ; 4d66: 88          .
-    !byte $3d                                                         ; 4d67: 3d          =
-    !byte $61                                                         ; 4d68: 61          a
-    !byte $42                                                         ; 4d69: 42          B
-    !byte $ad                                                         ; 4d6a: ad          .
-    !byte $3d                                                         ; 4d6b: 3d          =
+    !byte $1b, $41, $ff, $3c                                          ; 4d58: 1b 41 ff... .A.            ; Difficulty 1: basics=0x4e1b, map_start=0x5041, patch_addr=0x3cff
+    !byte $ee, $42, $2a, $3d                                          ; 4d5c: ee 42 2a... .B*            ; Difficulty 2: basics=0x4eee, map_start=0x5042, patch_addr=0x3d2a
+    !byte $2a, $41, $5a, $3d                                          ; 4d60: 2a 41 5a... *AZ            ; Difficulty 3: basics=0x4e2a, map_start=0x5041, patch_addr=0x3d5a
+    !byte $2f, $41, $88, $3d                                          ; 4d64: 2f 41 88... /A.            ; Difficulty 4: basics=0x4e2f, map_start=0x5041, patch_addr=0x3d88
+    !byte $61, $42, $ad, $3d                                          ; 4d68: 61 42 ad... aB.            ; Difficulty 5: basics=0x4e61, map_start=0x5042, patch_addr=0x3dad
 data_set_6
-    !byte $cd                                                         ; 4d6c: cd          .
-    !byte $43                                                         ; 4d6d: 43          C
-    !byte $46                                                         ; 4d6e: 46          F
-    !byte $3c                                                         ; 4d6f: 3c          <
-    !byte $bf                                                         ; 4d70: bf          .
-    !byte $40                                                         ; 4d71: 40          @
-    !byte $70                                                         ; 4d72: 70          p
-    !byte $3c                                                         ; 4d73: 3c          <
-    !byte $0d                                                         ; 4d74: 0d          .
-    !byte $c0                                                         ; 4d75: c0          .
-    !byte $9b                                                         ; 4d76: 9b          .
-    !text "<WB"                                                       ; 4d77: 3c 57 42    <WB
-    !byte $bf                                                         ; 4d7a: bf          .
-    !text "<7@"                                                       ; 4d7b: 3c 37 40    <7@
-    !byte $da, $3c                                                    ; 4d7e: da 3c       .<
+    !byte $cd, $43, $46, $3c                                          ; 4d6c: cd 43 46... .CF            ; Difficulty 1: basics=0x4ecd, map_start=0x5043, patch_addr=0x3c46
+    !byte $bf, $40, $70, $3c                                          ; 4d70: bf 40 70... .@p            ; Difficulty 2: basics=0x4ebf, map_start=0x5040, patch_addr=0x3c70
+    !byte $0d, $c0, $9b, $3c                                          ; 4d74: 0d c0 9b... ...            ; Difficulty 3: basics=0x4f0d, map_start=0x5040, patch_addr=0x3c9b
+    !byte $57, $42, $bf, $3c                                          ; 4d78: 57 42 bf... WB.            ; Difficulty 4: basics=0x4e57, map_start=0x5042, patch_addr=0x3cbf
+    !byte $37, $40, $da, $3c                                          ; 4d7c: 37 40 da... 7@.            ; Difficulty 5: basics=0x4e37, map_start=0x5040, patch_addr=0x3cda
 data_set_7
-    !byte $ae, $40, $f5                                               ; 4d80: ae 40 f5    .@.
-    !text "@fB@A"                                                     ; 4d83: 40 66 42... @fB
-    !byte $dd                                                         ; 4d88: dd          .
-    !text "@lA"                                                       ; 4d89: 40 6c 41    @lA
-    !byte   6, $bf, $99, $41, $82, $3f, $c4, $41                      ; 4d8c: 06 bf 99... ...
+    !byte $ae, $40, $f5, $40                                          ; 4d80: ae 40 f5... .@.            ; Difficulty 1: basics=0x4eae, map_start=0x5040, patch_addr=0x40f5
+    !byte $66, $42, $40, $41                                          ; 4d84: 66 42 40... fB@            ; Difficulty 2: basics=0x4e66, map_start=0x5042, patch_addr=0x4140
+    !byte $dd, $40, $6c, $41                                          ; 4d88: dd 40 6c... .@l            ; Difficulty 3: basics=0x4edd, map_start=0x5040, patch_addr=0x416c
+    !byte   6, $bf, $99, $41                                          ; 4d8c: 06 bf 99... ...            ; Difficulty 4: basics=0x4f06, map_start=0x503f, patch_addr=0x4199
+    !byte $82, $3f, $c4, $41                                          ; 4d90: 82 3f c4... .?.            ; Difficulty 5: basics=0x4e82, map_start=0x503f, patch_addr=0x41c4
 data_set_8
-    !byte $28, $40, $92, $3f, $0d, $c0, $c9                           ; 4d94: 28 40 92... (@.
-    !text "?FB"                                                       ; 4d9b: 3f 46 42    ?FB
-    !byte $15, $40,   9                                               ; 4d9e: 15 40 09    .@.
-    !text "AR@"                                                       ; 4da1: 41 52 40    AR@
-    !byte $ae, $40, $b4, $40                                          ; 4da4: ae 40 b4... .@.
+    !byte $28, $40, $92, $3f                                          ; 4d94: 28 40 92... (@.            ; Difficulty 1: basics=0x4e28, map_start=0x5040, patch_addr=0x3f92
+    !byte $0d, $c0, $c9, $3f                                          ; 4d98: 0d c0 c9... ...            ; Difficulty 2: basics=0x4f0d, map_start=0x5040, patch_addr=0x3fc9
+    !byte $46, $42, $15, $40                                          ; 4d9c: 46 42 15... FB.            ; Difficulty 3: basics=0x4e46, map_start=0x5042, patch_addr=0x4015
+    !byte   9, $41, $52, $40                                          ; 4da0: 09 41 52... .AR            ; Difficulty 4: basics=0x4e09, map_start=0x5041, patch_addr=0x4052
+    !byte $ae, $40, $b4, $40                                          ; 4da4: ae 40 b4... .@.            ; Difficulty 5: basics=0x4eae, map_start=0x5040, patch_addr=0x40b4
 data_set_9
-    !text "(@eF"                                                      ; 4da8: 28 40 65... (@e
-    !byte $ae, $42, $8a, $46, $1b, $41, $bc                           ; 4dac: ae 42 8a... .B.
-    !text "FrA"                                                       ; 4db3: 46 72 41    FrA
-    !byte 0                                                           ; 4db6: 00          .
-    !text ">FBC>"                                                     ; 4db7: 3e 46 42... >FB
+    !byte $28, $40, $65, $46                                          ; 4da8: 28 40 65... (@e            ; Difficulty 1: basics=0x4e28, map_start=0x5040, patch_addr=0x4665
+    !byte $ae, $42, $8a, $46                                          ; 4dac: ae 42 8a... .B.            ; Difficulty 2: basics=0x4eae, map_start=0x5042, patch_addr=0x468a
+    !byte $1b, $41, $bc, $46                                          ; 4db0: 1b 41 bc... .A.            ; Difficulty 3: basics=0x4e1b, map_start=0x5041, patch_addr=0x46bc
+    !byte $72, $41,   0, $3e                                          ; 4db4: 72 41 00... rA.            ; Difficulty 4: basics=0x4e72, map_start=0x5041, patch_addr=0x3e00
+    !byte $46, $42, $43, $3e                                          ; 4db8: 46 42 43... FBC            ; Difficulty 5: basics=0x4e46, map_start=0x5042, patch_addr=0x3e43
 data_set_10
-    !byte $28, $40, $84, $44, $cd, $43, $b8, $44, $89, $43, $ef, $44  ; 4dbc: 28 40 84... (@.
-    !byte $2d, $c2, $11, $45, $0d, $c0, $3d, $45                      ; 4dc8: 2d c2 11... -..
+    !byte $28, $40, $84, $44                                          ; 4dbc: 28 40 84... (@.            ; Difficulty 1: basics=0x4e28, map_start=0x5040, patch_addr=0x4484
+    !byte $cd, $43, $b8, $44                                          ; 4dc0: cd 43 b8... .C.            ; Difficulty 2: basics=0x4ecd, map_start=0x5043, patch_addr=0x44b8
+    !byte $89, $43, $ef, $44                                          ; 4dc4: 89 43 ef... .C.            ; Difficulty 3: basics=0x4e89, map_start=0x5043, patch_addr=0x44ef
+    !byte $2d, $c2, $11, $45                                          ; 4dc8: 2d c2 11... -..            ; Difficulty 4: basics=0x4f2d, map_start=0x5042, patch_addr=0x4511
+    !byte $0d, $c0, $3d, $45                                          ; 4dcc: 0d c0 3d... ..=            ; Difficulty 5: basics=0x4f0d, map_start=0x5040, patch_addr=0x453d
 data_set_11
-    !byte $cd, $43, $f1                                               ; 4dd0: cd 43 f1    .C.
-    !text "A/@>B"                                                     ; 4dd3: 41 2f 40... A/@
-    !byte $fd                                                         ; 4dd8: fd          .
-    !text "AnB"                                                       ; 4dd9: 41 6e 42    AnB
-    !byte $b4, $41, $a6                                               ; 4ddc: b4 41 a6    .A.
-    !text "BpA"                                                       ; 4ddf: 42 70 41    BpA
-    !byte   0, $3c                                                    ; 4de2: 00 3c       .<
+    !byte $cd, $43, $f1, $41                                          ; 4dd0: cd 43 f1... .C.            ; Difficulty 1: basics=0x4ecd, map_start=0x5043, patch_addr=0x41f1
+    !byte $2f, $40, $3e, $42                                          ; 4dd4: 2f 40 3e... /@>            ; Difficulty 2: basics=0x4e2f, map_start=0x5040, patch_addr=0x423e
+    !byte $fd, $41, $6e, $42                                          ; 4dd8: fd 41 6e... .An            ; Difficulty 3: basics=0x4efd, map_start=0x5041, patch_addr=0x426e
+    !byte $b4, $41, $a6, $42                                          ; 4ddc: b4 41 a6... .A.            ; Difficulty 4: basics=0x4eb4, map_start=0x5041, patch_addr=0x42a6
+    !byte $70, $41,   0, $3c                                          ; 4de0: 70 41 00... pA.            ; Difficulty 5: basics=0x4e70, map_start=0x5041, patch_addr=0x3c00
 data_set_12
-    !byte $cd                                                         ; 4de4: cd          .
-    !text "C$C"                                                       ; 4de5: 43 24 43    C$C
-    !byte $b3, $3f,   0,   0                                          ; 4de8: b3 3f 00... .?.
-    !text "RB;CUA"                                                    ; 4dec: 52 42 3b... RB;
-    !byte 0, 0                                                        ; 4df2: 00 00       ..
-    !text "&?TC"                                                      ; 4df4: 26 3f 54... &?T
+    !byte $cd, $43, $24, $43                                          ; 4de4: cd 43 24... .C$            ; Difficulty 1: basics=0x4ecd, map_start=0x5043, patch_addr=0x4324
+    !byte $b3, $3f,   0,   0                                          ; 4de8: b3 3f 00... .?.            ; Difficulty 2: basics=0x4eb3, map_start=0x503f, patch_addr=0x0
+    !byte $52, $42, $3b, $43                                          ; 4dec: 52 42 3b... RB;            ; Difficulty 3: basics=0x4e52, map_start=0x5042, patch_addr=0x433b
+    !byte $55, $41,   0,   0                                          ; 4df0: 55 41 00... UA.            ; Difficulty 4: basics=0x4e55, map_start=0x5041, patch_addr=0x0
+    !byte $26, $3f, $54, $43                                          ; 4df4: 26 3f 54... &?T            ; Difficulty 5: basics=0x4e26, map_start=0x503f, patch_addr=0x4354
+
+unused42
     !byte   9,   4,   0, $0c, $11,   5,   1, $18,   9,   2, $0b, $23  ; 4df8: 09 04 00... ...
-    !byte $1b,   7,   2, $19, $0c,   0, $0d, $0a,   4,   9,   5,   1  ; 4e04: 1b 07 02... ...
-    !byte $0c, $17,   7,   2, $18, $0b,   4,   2,   6,   5,   9, $10  ; 4e10: 0c 17 07... ...
-    !byte $0f,   0, $15, $c1,   0, $3f, $c3,   4, $c4,   3,   1, $0c  ; 4e1c: 0f 00 15... ...
-    !byte $31, $47, $c4, $0d, $c3,   0, $40, $c0, $0d, $20,   0, $48  ; 4e28: 31 47 c4... 1G.
-    !byte $c4,   5, $41, $30, $0c, $33,   1, $1c,   0, $10, $e0, $c0  ; 4e34: c4 05 41... ..A
-    !byte $10,   3, $17,   0,   1, $14, $21,   7, $70, $c0, $10, $30  ; 4e40: 10 03 17... ...
-    !byte   0, $cf,   0,   4, $f1,   1, $0c, $50, $c5, $80,   0, $cf  ; 4e4c: 00 cf 00... ...
-    !byte   0,   4, $3c, $30,   4, $0c,   0, $33, $c0,   3,   9, $40  ; 4e58: 00 04 3c... ..<
-    !byte   3, $14, $33, $c0, $40, $33, $c0,   1, $0c, $4c,   1,   2  ; 4e64: 03 14 33... ..3
-    !byte   0,   8, $c1, $70, $c4, $40, $70, $8c, $33,   0, $45,   8  ; 4e70: 00 08 c1... ...
-    !byte $c1, $70, $c2, $10, $10, $c4, $0c, $50,   3, $dc, $21, $1c  ; 4e7c: c1 70 c2... .p.
-    !byte $1c,   4,   8, $c0, $11, $40,   3, $dc, $31, $14,   4, $31  ; 4e88: 1c 04 08... ...
-    !byte $47, $14,   4, $cc                                          ; 4e94: 47 14 04... G..
+    !byte $1b,   7,   2, $19, $0c                                     ; 4e04: 1b 07 02... ...
+
+basics_for_data_set_9_difficulty_4
+    !byte   0, $0d, $0a,   4,   9,   5,   1, $0c, $17,   7,   2, $18  ; 4e09: 00 0d 0a... ...
+    !byte $0b,   4,   2,   6,   5,   9                                ; 4e15: 0b 04 02... ...
+basics_for_data_set_6_difficulty_1
+    !byte $10, $0f,   0, $15, $c1,   0, $3f, $c3,   4, $c4,   3       ; 4e1b: 10 0f 00... ...
+basics_for_data_set_13_difficulty_5
+    !byte   1, $0c                                                    ; 4e26: 01 0c       ..
+basics_for_data_set_2_difficulty_2
+    !byte $31, $47                                                    ; 4e28: 31 47       1G
+basics_for_data_set_6_difficulty_3
+    !byte $c4, $0d                                                    ; 4e2a: c4 0d       ..
+basics_for_data_set_1_difficulty_4
+    !byte $c3,   0, $40                                               ; 4e2c: c3 00 40    ..@
+basics_for_data_set_6_difficulty_4
+    !byte $c0, $0d, $20,   0, $48, $c4,   5, $41                      ; 4e2f: c0 0d 20... ..
+basics_for_data_set_7_difficulty_5
+    !byte $30, $0c, $33,   1, $1c,   0, $10, $e0, $c0, $10,   3, $17  ; 4e37: 30 0c 33... 0.3
+    !byte   0,   1, $14                                               ; 4e43: 00 01 14    ...
+basics_for_data_set_9_difficulty_3
+    !byte $21,   7, $70, $c0, $10, $30,   0                           ; 4e46: 21 07 70... !.p
+basics_for_data_set_5_difficulty_4
+    !byte $cf,   0,   4, $f1,   1                                     ; 4e4d: cf 00 04... ...
+basics_for_data_set_2_difficulty_1
+    !byte $0c, $50, $c5                                               ; 4e52: 0c 50 c5    .P.
+basics_for_data_set_13_difficulty_4
+    !byte $80,   0                                                    ; 4e55: 80 00       ..
+basics_for_data_set_7_difficulty_4
+    !byte $cf,   0,   4                                               ; 4e57: cf 00 04    ...
+basics_for_data_set_2_difficulty_5
+    !byte $3c, $30,   4, $0c                                          ; 4e5a: 3c 30 04... <0.
+basics_for_data_set_1_difficulty_5
+    !byte   0, $33, $c0                                               ; 4e5e: 00 33 c0    .3.
+basics_for_data_set_6_difficulty_5
+    !byte   3,   9, $40,   3, $14                                     ; 4e61: 03 09 40... ..@
+basics_for_data_set_8_difficulty_2
+    !byte $33, $c0, $40, $33, $c0,   1, $0c                           ; 4e66: 33 c0 40... 3.@
+basics_for_data_set_5_difficulty_2
+    !byte $4c,   1,   2                                               ; 4e6d: 4c 01 02    L..
+basics_for_data_set_12_difficulty_5
+    !byte 0, 8                                                        ; 4e70: 00 08       ..
+basics_for_data_set_10_difficulty_4
+    !byte $c1, $70, $c4, $40, $70, $8c, $33,   0, $45,   8, $c1, $70  ; 4e72: c1 70 c4... .p.
+    !byte $c2, $10, $10, $c4                                          ; 4e7e: c2 10 10... ...
+basics_for_data_set_8_difficulty_5
+    !byte $0c, $50,   3, $dc, $21, $1c, $1c                           ; 4e82: 0c 50 03... .P.
+basics_for_data_set_11_difficulty_3
+    !byte   4,   8, $c0, $11, $40,   3, $dc, $31, $14                 ; 4e89: 04 08 c0... ...
+basics_for_data_set_3_difficulty_5
+    !byte   4, $31, $47, $14,   4, $cc                                ; 4e92: 04 31 47... .1G
     !text "@", $5c, "0"                                               ; 4e98: 40 5c 30    @\0
-    !byte   4, $0c,   0, $53, $14,   4, $cc, $48, $47,   7,   0, $c3  ; 4e9b: 04 0c 00... ...
-    !byte $3c,   1,   0, $50, $77, $0c,   1,   2,   1, $34, $0c, $11  ; 4ea7: 3c 01 00... <..
-    !byte $4b, $10, $17,   4, $80, $70, $cc, $0c, $70,   0, $43, $12  ; 4eb3: 4b 10 17... K..
+    !byte   4, $0c                                                    ; 4e9b: 04 0c       ..
+basics_for_data_set_1_difficulty_1
+    !byte   0, $53, $14,   4, $cc, $48, $47,   7,   0, $c3, $3c,   1  ; 4e9d: 00 53 14... .S.
+    !byte   0, $50, $77                                               ; 4ea9: 00 50 77    .Pw
+basics_for_data_set_3_difficulty_4
+    !byte $0c,   1                                                    ; 4eac: 0c 01       ..
+basics_for_data_set_8_difficulty_1
+    !byte   2,   1, $34                                               ; 4eae: 02 01 34    ..4
+basics_for_data_set_3_difficulty_3
+    !byte $0c, $11                                                    ; 4eb1: 0c 11       ..
+basics_for_data_set_13_difficulty_2
+    !byte $4b                                                         ; 4eb3: 4b          K
+basics_for_data_set_12_difficulty_4
+    !byte $10, $17,   4, $80, $70, $cc, $0c, $70,   0, $43, $12       ; 4eb4: 10 17 04... ...
+basics_for_data_set_7_difficulty_2
     !byte   0, $c5, $0c, $5c,   0, $0c, $70,   0, $41, $c3,   0, $40  ; 4ebf: 00 c5 0c... ...
-    !byte $c0,   3, $3c,   0, $10, $c0,   4, $31, $43, $14,   4,   3  ; 4ecb: c0 03 3c... ..<
-    !byte $3c,   0, $10, $e0, $c0,   0, $30,   0, $ce,   0, $0c,   5  ; 4ed7: 3c 00 10... <..
-    !byte   7,   8, $43, $3c,   4,   0, $ce,   0,   4, $31, $88, $c3  ; 4ee3: 07 08 43... ..C
-    !byte   0, $45,   0, $3d, $c3, $11, $c1, $c0, $70, $cc,   1, $14  ; 4eef: 00 45 00... .E.
-    !byte   0, $35, $c3,   1, $40, $43, $14, $31, $40, $1f, $c4,   5  ; 4efb: 00 35 c3... .5.
-    !byte $c1, $20, $1c,   6,   4, $31, $40, $0c, $e0, $84, $70, $70  ; 4f07: c1 20 1c... . .
-    !byte $84, $31, $c0, $10,   1,   7, $70, $c0, $10, $20, $13, $40  ; 4f13: 84 31 c0... .1.
-    !byte   1, $16, $b1,   1, $70, $4c,   7, $0c, $c0, $47,   0,   4  ; 4f1f: 01 16 b1... ...
-    !byte $31, $20, $0c, $50, $c5, $c0,   0, $c7,   0,   4, $1c, $30  ; 4f2b: 31 20 0c... 1 .
-    !byte   4, $0c,   0, $33, $c0,   1, $0c, $40, $43, $14            ; 4f37: 04 0c 00... ...
+    !byte $c0,   3                                                    ; 4ecb: c0 03       ..
+basics_for_data_set_2_difficulty_3
+    !byte $3c,   0, $10, $c0,   4, $31                                ; 4ecd: 3c 00 10... <..
+basics_for_data_set_1_difficulty_2
+    !byte $43, $14,   4,   3, $3c,   0, $10, $e0, $c0,   0            ; 4ed3: 43 14 04... C..
+basics_for_data_set_8_difficulty_3
+    !byte $30,   0, $ce,   0, $0c,   5,   7,   8, $43, $3c            ; 4edd: 30 00 ce... 0..
+basics_for_data_set_2_difficulty_4
+    !byte   4,   0, $ce,   0,   4, $31, $88                           ; 4ee7: 04 00 ce... ...
+basics_for_data_set_6_difficulty_2
+    !byte $c3,   0, $45,   0, $3d, $c3, $11, $c1, $c0, $70, $cc,   1  ; 4eee: c3 00 45... ..E
+    !byte $14,   0, $35                                               ; 4efa: 14 00 35    ..5
+basics_for_data_set_12_difficulty_3
+    !byte $c3,   1, $40, $43, $14, $31, $40, $1f, $c4                 ; 4efd: c3 01 40... ..@
+basics_for_data_set_8_difficulty_4
+    !byte   5, $c1, $20                                               ; 4f06: 05 c1 20    ..
+basics_for_data_set_5_difficulty_3
+    !byte $1c,   6,   4, $31                                          ; 4f09: 1c 06 04... ...
+basics_for_data_set_7_difficulty_3
+    !byte $40                                                         ; 4f0d: 40          @
+basics_for_data_set_5_difficulty_5
+    !byte $0c, $e0, $84, $70, $70, $84, $31, $c0, $10,   1,   7, $70  ; 4f0e: 0c e0 84... ...
+    !byte $c0, $10, $20, $13, $40,   1, $16                           ; 4f1a: c0 10 20... ..
+basics_for_data_set_1_difficulty_3
+    !byte $b1,   1, $70, $4c,   7, $0c, $c0, $47,   0,   4, $31, $20  ; 4f21: b1 01 70... ..p
+basics_for_data_set_11_difficulty_4
+    !byte $0c, $50, $c5, $c0,   0, $c7,   0,   4, $1c, $30,   4, $0c  ; 4f2d: 0c 50 c5... .P.
+    !byte   0, $33, $c0,   1, $0c, $40, $43, $14                      ; 4f39: 00 33 c0... .3.
+
+unused43
     !text "1@`3"                                                      ; 4f41: 31 40 60... 1@`
     !byte $c0, $31, $0e, $0c,   1,   3,   0, $0c, $e0,   0, $c0, $50  ; 4f45: c0 31 0e... .1.
     !byte $10, $c4, $33, $c0, $40, $0c, $e0,   0, $43, $12,   0, $40  ; 4f51: 10 c4 33... ..3
@@ -4674,7 +4719,7 @@ data_set_12
     !byte $c0, $30, $30, $0c, $33,   0,   0,   0,   0,   0,   0,   0  ; 4fe1: c0 30 30... .00
     !byte   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0  ; 4fed: 00 00 00... ...
     !byte   0,   0,   0,   0,   0,   0,   0                           ; 4ff9: 00 00 00... ...
-special_cave_1
+special_data_1
     !byte $83, $83, $83, $83, $83, $83, $83, $83, $83, $83            ; 5000: 83 83 83... ...
     !byte $83, $83, $83, $83, $83, $83, $83, $83, $83, $83            ; 500a: 83 83 83... ...
     !byte $83, $83, $83, $83, $83, $83, $83, $83, $83, $83            ; 5014: 83 83 83... ...
@@ -4690,7 +4735,7 @@ backwards_status_bar
     !text "REYALP"                                                    ; 5034: 52 45 59... REY
     !byte sprite_space                                                ; 503a: 00          .
     !byte sprite_1                                                    ; 503b: 33          3
-unused60
+unused44
     !byte $83, $83, $83,   1                                          ; 503c: 83 83 83... ...
 
 map_row_0
@@ -4698,6 +4743,7 @@ map_row_0
     !byte $80, $81, $81, $81, $81, $81, $81, $81, $81, $81            ; 504a: 80 81 81... ...
     !byte $81, $81, $81, $81, $81, $81, $81, $81, $81, $81            ; 5054: 81 81 81... ...
     !byte $81, $81, $81, $81, $81, $81, $81, $81, $81, $83            ; 505e: 81 81 81... ...
+
 default_status_bar
     !text "PLAYER"                                                    ; 5068: 50 4c 41... PLA
     !byte sprite_space                                                ; 506e: 00          .
@@ -4712,8 +4758,7 @@ default_status_bar
     !text "A"                                                         ; 5079: 41          A
     !byte sprite_slash                                                ; 507a: 3e          >
     !byte sprite_2                                                    ; 507b: 34          4
-
-unused61
+unused45
     !byte $83, $83, $83, $83                                          ; 507c: 83 83 83... ...
 
 map_row_1
@@ -4722,7 +4767,7 @@ map_row_1
     !byte $81, $81, $81, $81, $81, $81, $81, $81, $81, $81            ; 5094: 81 81 81... ...
     !byte $81, $81, $81, $81, $81, $81, $81, $81, $81, $83            ; 509e: 81 81 81... ...
 
-unused62
+unused46
     !byte   1, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83  ; 50a8: 01 83 83... ...
     !byte $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83  ; 50b4: 83 83 83... ...
 
@@ -4732,7 +4777,7 @@ map_row_2
     !byte $81, $81, $81, $81, $81, $81, $81, $81, $81, $81            ; 50d4: 81 81 81... ...
     !byte $81, $81, $81, $81, $81, $81, $81, $81, $81, $83            ; 50de: 81 81 81... ...
 
-unused63
+unused47
     !byte   1, $83, $83, $83, $83, $83, $83,   8, $83, $83,   2, $83  ; 50e8: 01 83 83... ...
     !byte $83, $83, $83, $83,   5, $83,   5,   4, $83, $83, $83, $83  ; 50f4: 83 83 83... ...
 
@@ -4747,7 +4792,7 @@ unused_fragment_of_basic1
     !byte $0d,   0, $1e, $23                                          ; 512c: 0d 00 1e... ...
     !text "*KEY7 *SAVE C.GA"                                          ; 5130: 2a 4b 45... *KE
 
-map_row_5
+map_row_4
     !byte $83, $81, $81, $81, $81, $81, $81, $81, $81, $81            ; 5140: 83 81 81... ...
     !byte $80, $81, $81, $81, $81, $81, $81, $81, $81, $81            ; 514a: 80 81 81... ...
     !byte $81, $81, $96, $81, $96, $81, $96, $81, $96, $81            ; 5154: 81 81 96... ...
@@ -4759,106 +4804,107 @@ unused_fragment_of_basic2
     !text " *FX 178,0,0"                                              ; 516f: 20 2a 46...  *F
     !byte $0d,   0, $46, $0c, $20                                     ; 517b: 0d 00 46... ..F
 
-map_row_6
+map_row_5
     !byte $83, $81, $81, $81, $81, $81, $81, $81, $81, $81            ; 5180: 83 81 81... ...
     !byte $80, $81, $81, $81, $81, $81, $81, $81, $80, $80            ; 518a: 80 81 81... ...
     !byte $80, $81, $85, $81, $85, $81, $85, $81, $85, $81            ; 5194: 80 81 85... ...
     !byte $85, $81, $85, $81, $81, $81, $81, $81, $81, $83            ; 519e: 85 81 85... ...
 
-unused64
+unused48
     !byte $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83  ; 51a8: 83 83 83... ...
     !byte $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83  ; 51b4: 83 83 83... ...
 
-map_row_7
+map_row_6
     !byte $83, $81, $81, $81, $81, $81, $81, $81, $81, $81            ; 51c0: 83 81 81... ...
     !byte $80, $81, $81, $81, $81, $81, $81, $81, $80, $80            ; 51ca: 80 81 81... ...
     !byte $80, $81, $81, $81, $81, $81, $81, $81, $81, $81            ; 51d4: 80 81 81... ...
     !byte $81, $81, $81, $81, $81, $81, $81, $81, $81, $83            ; 51de: 81 81 81... ...
 
-unused65
+unused49
     !byte $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83  ; 51e8: 83 83 83... ...
     !byte $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83  ; 51f4: 83 83 83... ...
 
-map_row_8
+map_row_7
     !byte $83, $81, $81, $81, $81, $81, $81, $81, $81, $81            ; 5200: 83 81 81... ...
     !byte $80, $80, $80, $8e, $9e, $9e, $80, $80, $80, $80            ; 520a: 80 80 80... ...
     !byte $80, $81, $81, $81, $81, $81, $81, $81, $81, $81            ; 5214: 80 81 81... ...
     !byte $81, $81, $81, $81, $81, $81, $81, $81, $81, $83            ; 521e: 81 81 81... ...
 
-unused66
+unused50
     !byte $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83  ; 5228: 83 83 83... ...
     !byte $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83  ; 5234: 83 83 83... ...
 
-map_row_9
+map_row_8
     !byte $83, $81, $81, $81, $81, $81, $81, $81, $81, $81            ; 5240: 83 81 81... ...
     !byte $81, $80, $81, $80, $81, $80, $81, $80, $84, $80            ; 524a: 81 80 81... ...
     !byte $84, $80, $81, $81, $81, $81, $81, $81, $81, $81            ; 5254: 84 80 81... ...
     !byte $81, $81, $81, $81, $81, $81, $81, $81, $81, $83            ; 525e: 81 81 81... ...
 
-unused67
+unused51
     !byte $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83  ; 5268: 83 83 83... ...
     !byte $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83  ; 5274: 83 83 83... ...
 
-map_row_10
+map_row_9
     !byte $83, $81, $81, $81, $81, $81, $81, $81, $81, $81            ; 5280: 83 81 81... ...
     !byte $81, $8e, $81, $80, $81, $80, $81, $80, $81, $80            ; 528a: 81 8e 81... ...
     !byte $81, $80, $81, $81, $81, $81, $81, $81, $81, $81            ; 5294: 81 80 81... ...
     !byte $81, $81, $81, $81, $81, $81, $81, $81, $81, $83            ; 529e: 81 81 81... ...
 
-unused68
+unused52
     !byte $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83  ; 52a8: 83 83 83... ...
     !byte $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83  ; 52b4: 83 83 83... ...
 
-map_row_11
+map_row_10
     !byte $83, $81, $81, $81, $81, $81, $81, $81, $81, $81            ; 52c0: 83 81 81... ...
     !byte $81, $80, $81, $80, $81, $80, $81, $80, $81, $80            ; 52ca: 81 80 81... ...
     !byte $81, $80, $81, $81, $81, $81, $81, $81, $81, $81            ; 52d4: 81 80 81... ...
     !byte $81, $81, $81, $81, $81, $81, $81, $81, $81, $83            ; 52de: 81 81 81... ...
 
-unused69
+unused53
     !byte $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83  ; 52e8: 83 83 83... ...
     !byte $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83  ; 52f4: 83 83 83... ...
 
-map_row_12
+map_row_11
     !byte $83, $81, $81, $81, $81, $81, $81, $81, $81, $81            ; 5300: 83 81 81... ...
     !byte $81, $80, $81, $80, $81, $80, $81, $80, $81, $80            ; 530a: 81 80 81... ...
     !byte $81, $80, $81, $81, $81, $81, $81, $81, $81, $81            ; 5314: 81 80 81... ...
     !byte $81, $81, $81, $81, $81, $81, $81, $81, $81, $83            ; 531e: 81 81 81... ...
 
-unused70
+unused54
     !byte $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83  ; 5328: 83 83 83... ...
     !byte $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83  ; 5334: 83 83 83... ...
 
-map_row_13
+map_row_12
     !byte $83, $81, $81, $81, $81, $81, $81, $81, $81, $81            ; 5340: 83 81 81... ...
     !byte $81, $80, $81, $80, $81, $80, $81, $80, $81, $80            ; 534a: 81 80 81... ...
     !byte $81, $80, $81, $81, $81, $81, $81, $81, $81, $81            ; 5354: 81 80 81... ...
     !byte $81, $81, $81, $81, $81, $81, $81, $81, $81, $83            ; 535e: 81 81 81... ...
 
-unused71
+unused55
     !byte $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83  ; 5368: 83 83 83... ...
     !byte $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83  ; 5374: 83 83 83... ...
 
-map_row_14
+map_row_13
     !byte $83, $81, $81, $81, $81, $81, $81, $81, $81, $81            ; 5380: 83 81 81... ...
     !byte $81, $80, $81, $80, $81, $80, $81, $80, $81, $c4            ; 538a: 81 80 81... ...
     !byte $81, $80, $81, $81, $81, $81, $81, $81, $81, $81            ; 5394: 81 80 81... ...
     !byte $81, $81, $81, $81, $81, $81, $81, $81, $81, $83            ; 539e: 81 81 81... ...
 
-unused72
+unused56
     !byte $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83  ; 53a8: 83 83 83... ...
     !byte $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83  ; 53b4: 83 83 83... ...
 
-map_row_15
+map_row_14
     !byte $83, $81, $81, $81, $81, $81, $81, $81, $81, $81            ; 53c0: 83 81 81... ...
     !byte $81, $80, $81, $80, $81, $80, $81, $80, $81, $80            ; 53ca: 81 80 81... ...
     !byte $81, $80, $81, $81, $81, $81, $81, $81, $81, $81            ; 53d4: 81 80 81... ...
     !byte $81, $81, $81, $81, $81, $81, $81, $81, $81, $83            ; 53de: 81 81 81... ...
 
-unused73
+unused57
     !byte $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83  ; 53e8: 83 83 83... ...
     !byte $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83  ; 53f4: 83 83 83... ...
 
+map_row_15
 credits
     !byte sprite_full_stop                                            ; 5400: 40          @
     !byte sprite_full_stop                                            ; 5401: 40          @
@@ -4892,6 +4938,7 @@ credits
     !text "J"                                                         ; 543d: 4a          J
     !byte sprite_full_stop                                            ; 543e: 40          @
     !text "M"                                                         ; 543f: 4d          M
+map_row_16
     !byte sprite_full_stop                                            ; 5440: 40          @
     !text "BARNES"                                                    ; 5441: 42 41 52... BAR
     !byte sprite_comma                                                ; 5447: 3f          ?
@@ -4915,6 +4962,8 @@ credits
     !byte sprite_comma                                                ; 5478: 3f          ?
     !text "CRAIG"                                                     ; 5479: 43 52 41... CRA
     !byte sprite_space                                                ; 547e: 00          .
+l547f
+map_row_17 = l547f+1
     !text "DARRELL"                                                   ; 547f: 44 41 52... DAR
     !byte sprite_comma                                                ; 5486: 3f          ?
     !text "T"                                                         ; 5487: 54          T
@@ -4937,6 +4986,8 @@ credits
     !byte sprite_comma                                                ; 54b5: 3f          ?
     !text "SOLAR"                                                     ; 54b6: 53 4f 4c... SOL
     !byte sprite_space                                                ; 54bb: 00          .
+l54bc
+map_row_18 = l54bc+4
     !text "WORKSHOP"                                                  ; 54bc: 57 4f 52... WOR
     !byte sprite_comma                                                ; 54c4: 3f          ?
     !text "ELSIE"                                                     ; 54c5: 45 4c 53... ELS
@@ -4955,21 +5006,26 @@ credits
     !byte sprite_space                                                ; 54f6: 00          .
     !text "MONSTERS"                                                  ; 54f7: 4d 4f 4e... MON
     !byte sprite_full_stop                                            ; 54ff: 40          @
-l5500
-    !byte $83, $81, $81, $81, $81, $81, $81, $81, $81, $81, $81, $81  ; 5500: 83 81 81... ...
-    !byte $81, $81, $81, $81, $81, $81, $81, $81, $81, $81, $81, $81  ; 550c: 81 81 81... ...
-    !byte $81, $81, $81, $81, $81, $81, $81, $81, $81, $81, $81, $81  ; 5518: 81 81 81... ...
-    !byte $81, $81, $81, $83,   1, $83, $83, $83, $83, $83, $83, $83  ; 5524: 81 81 81... ...
-    !byte $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83  ; 5530: 83 83 83... ...
-    !byte $83, $83, $83, $83                                          ; 553c: 83 83 83... ...
-l5540
-    !byte $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83  ; 5540: 83 83 83... ...
-    !byte $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83  ; 554c: 83 83 83... ...
-    !byte $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83  ; 5558: 83 83 83... ...
-    !byte $83, $83, $83, $83                                          ; 5564: 83 83 83... ...
+
+map_row_19
+    !byte $83, $81, $81, $81, $81, $81, $81, $81, $81, $81            ; 5500: 83 81 81... ...
+    !byte $81, $81, $81, $81, $81, $81, $81, $81, $81, $81            ; 550a: 81 81 81... ...
+    !byte $81, $81, $81, $81, $81, $81, $81, $81, $81, $81            ; 5514: 81 81 81... ...
+    !byte $81, $81, $81, $81, $81, $81, $81, $81, $81, $83            ; 551e: 81 81 81... ...
+
+unused58
+    !byte   1, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83  ; 5528: 01 83 83... ...
+    !byte $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83  ; 5534: 83 83 83... ...
+
+map_row_20
+    !byte $83, $83, $83, $83, $83, $83, $83, $83, $83, $83            ; 5540: 83 83 83... ...
+    !byte $83, $83, $83, $83, $83, $83, $83, $83, $83, $83            ; 554a: 83 83 83... ...
+    !byte $83, $83, $83, $83, $83, $83, $83, $83, $83, $83            ; 5554: 83 83 83... ...
+    !byte $83, $83, $83, $83, $83, $83, $83, $83, $83, $83            ; 555e: 83 83 83... ...
+
 
 ; unused copy of routine at $5700
-unused74
+unused59
     lda #osbyte_flush_buffer_class                                    ; 5568: a9 0f       ..
     ldx #0                                                            ; 556a: a2 00       ..
     jsr osbyte                                                        ; 556c: 20 f4 ff     ..            ; Flush all buffers (X=0)
@@ -4981,19 +5037,29 @@ loop_c5571
     bpl loop_c5571                                                    ; 5578: 10 f7       ..
     rts                                                               ; 557a: 60          `
 
-unused75
-    !byte $a9,   0, $85, $8e, $a9, $83, $b8, $e5, $8e, $aa, $a0, $ff  ; 557b: a9 00 85... ...
-    !byte $a9, $80, $a0, $f4, $ff, $8a, $f0, $e6, $a6, $8e, $8a, $8a  ; 5587: a9 80 a0... ...
-    !byte $8a, $8a, $85, $8f, $bd, $d0, $d6, $a8, $e0, $80, $d0, $84  ; 5593: 8a 8a 85... ...
-    !byte $c0, $c1, $f0, $c5, $b9, $80, $d6, $c9, $83, $90, $1a, $a8  ; 559f: c0 c1 f0... ...
-    !byte $bd, $d3, $56, $d0,   6, $b9, $1a, $56, $9d, $d3, $56, $b9  ; 55ab: bd d3 56... ..V
-    !byte $0e, $56, $48, $b9, $14, $56, $a8, $68, $de, $d3, $56, $10  ; 55b7: 0e 56 48... .VH
-    !byte $12, $48, $29,   3, $a8, $a9,   0, $9d, $d3, $56, $b9, $ee  ; 55c3: 12 48 29... .H)
-    !byte $56, $a8, $68, $29, $fc,   9,   1, $48, $bd, $d3, $56, $d0  ; 55cf: 56 a8 68... V.h
-    !byte   3, $fe, $d0, $56, $68, $a6, $8f, $9d, $bc, $56, $98, $9d  ; 55db: 03 fe d0... ...
-    !byte $be, $56, $8a, $18, $69, $b8, $aa, $a0, $56, $a9,   7, $20  ; 55e7: be 56 8a... .V.
-    !byte $f1, $ff, $e6, $8e, $26, $8e, $e0,   3, $d0, $82, $60, $83  ; 55f3: f1 ff e6... ...
-    !byte $83                                                         ; 55ff: 83          .
+unused62
+    !byte $a9,   0, $85, $8e, $a9                                     ; 557b: a9 00 85... ...
+
+map_row_21
+    !byte $83, $b8, $e5, $8e, $aa, $a0, $ff, $a9, $80, $a0            ; 5580: 83 b8 e5... ...
+    !byte $f4, $ff, $8a, $f0, $e6, $a6, $8e, $8a, $8a, $8a            ; 558a: f4 ff 8a... ...
+    !byte $8a, $85, $8f, $bd, $d0, $d6, $a8, $e0, $80, $d0            ; 5594: 8a 85 8f... ...
+    !byte $84, $c0, $c1, $f0, $c5, $b9, $80, $d6, $c9, $83            ; 559e: 84 c0 c1... ...
+
+unused60
+    !byte $90, $1a, $a8, $bd, $d3, $56, $d0,   6, $b9, $1a, $56, $9d  ; 55a8: 90 1a a8... ...
+    !byte $d3, $56, $b9, $0e, $56, $48, $b9, $14, $56, $a8, $68, $de  ; 55b4: d3 56 b9... .V.
+
+map_row_22
+    !byte $d3, $56, $10, $12, $48, $29,   3, $a8, $a9,   0            ; 55c0: d3 56 10... .V.
+    !byte $9d, $d3, $56, $b9, $ee, $56, $a8, $68, $29, $fc            ; 55ca: 9d d3 56... ..V
+    !byte   9,   1, $48, $bd, $d3, $56, $d0,   3, $fe, $d0            ; 55d4: 09 01 48... ..H
+    !byte $56, $68, $a6, $8f, $9d, $bc, $56, $98, $9d, $be            ; 55de: 56 68 a6... Vh.
+
+unused61
+    !byte $56, $8a, $18, $69, $b8, $aa, $a0, $56, $a9,   7, $20, $f1  ; 55e8: 56 8a 18... V..
+    !byte $ff, $e6, $8e, $26, $8e, $e0,   3, $d0, $82, $60, $83, $83  ; 55f4: ff e6 8e... ...
+
 tune_pitches_and_commands
     !byte $48, $58, $5c, $64, $58, $5c, $64, $70, $5c, $64, $70, $78  ; 5600: 48 58 5c... HX\
     !byte $49, $45, $19,   5, $11, $24, $20, $19,   5, $13,   9, $25  ; 560c: 49 45 19... IE.
@@ -5043,7 +5109,7 @@ tune_start_position_per_channel
     !byte 0, 0, 0                                                     ; 56eb: 00 00 00    ...
 tune_note_durations_table
     !byte  3,  6,  9, 12                                              ; 56ee: 03 06 09... ...
-unused76
+unused63
     !byte 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0                    ; 56f2: 00 00 00... ...
 
 reset_tune
@@ -5136,7 +5202,7 @@ move_to_next_tune_channel
     bne update_channels_loop                                          ; 5793: d0 82       ..
     rts                                                               ; 5795: 60          `
 
-unused77
+unused64
     !byte $d0,   7, $c8, $c0,   6, $d0,   2, $a0,   1, $84, $89, $85  ; 5796: d0 07 c8... ...
     !byte $87, $c9, $10, $30, $9d, $ee, $1e, $32, $d0, $98, $60,   0  ; 57a2: 87 c9 10... ...
     !byte   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0  ; 57ae: 00 00 00... ...
@@ -5226,11 +5292,8 @@ pydis_end
 !if (<sound1) != $b8 {
     !error "Assertion failed: <sound1 == $b8"
 }
-!if (<special_cave_0) != $00 {
-    !error "Assertion failed: <special_cave_0 == $00"
-}
-!if (<special_cave_1) != $00 {
-    !error "Assertion failed: <special_cave_1 == $00"
+!if (<special_data_1) != $00 {
+    !error "Assertion failed: <special_data_1 == $00"
 }
 !if (<sprite_addr_0) != $40 {
     !error "Assertion failed: <sprite_addr_0 == $40"
@@ -5550,6 +5613,9 @@ pydis_end
 !if (<status_bar_sprite_numbers) != $00 {
     !error "Assertion failed: <status_bar_sprite_numbers == $00"
 }
+!if (<strip_data) != $00 {
+    !error "Assertion failed: <strip_data == $00"
+}
 !if (<zeroed_status_bar) != $f0 {
     !error "Assertion failed: <zeroed_status_bar == $f0"
 }
@@ -5598,11 +5664,8 @@ pydis_end
 !if (>sound1) != $56 {
     !error "Assertion failed: >sound1 == $56"
 }
-!if (>special_cave_0) != $47 {
-    !error "Assertion failed: >special_cave_0 == $47"
-}
-!if (>special_cave_1) != $50 {
-    !error "Assertion failed: >special_cave_1 == $50"
+!if (>special_data_1) != $50 {
+    !error "Assertion failed: >special_data_1 == $50"
 }
 !if (>sprite_addr_0) != $19 {
     !error "Assertion failed: >sprite_addr_0 == $19"
@@ -5922,8 +5985,17 @@ pydis_end
 !if (>status_bar_sprite_numbers) != $32 {
     !error "Assertion failed: >status_bar_sprite_numbers == $32"
 }
+!if (>strip_data) != $47 {
+    !error "Assertion failed: >strip_data == $47"
+}
 !if (>tile_map) != $32 {
     !error "Assertion failed: >tile_map == $32"
+}
+!if (c2461 - after_branch) != $26 {
+    !error "Assertion failed: c2461 - after_branch == $26"
+}
+!if (c249a - after_branch) != $5f {
+    !error "Assertion failed: c249a - after_branch == $5f"
 }
 !if (command_note_durations - 200) != $5614 {
     !error "Assertion failed: command_note_durations - 200 == $5614"

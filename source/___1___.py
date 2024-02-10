@@ -119,10 +119,29 @@ load(0x1300, "original/___1___", "6502")
 #   This is to make the addresses unique.
 #
 substitute_labels = {
+    (0x295c, 0x2973): {
+        "l0048": "remember_y",
+    },
     (0x2a00, 0x2a28): {
         "real_keys_pressed": "x_loop_counter",
     },
     (0x2b00, 0x2b85): {
+        "ptr_low":  "map_address_low",
+        "ptr_high": "map_address_high",
+        "screen_addr1_low":  "map_x",
+        "screen_addr1_high": "map_y",
+    },
+    (0x2900, 0x2d45): {
+        "loop_counter": "value_to_not_write_as_a_strip",
+    },
+    (0x2d00, 0x2d45): {
+        "ptr_low":  "map_address_low",
+        "ptr_high": "map_address_high",
+        "screen_addr1_low":  "map_x",
+        "screen_addr1_high": "map_y",
+        "real_keys_pressed": "lower_nybble_value",
+    },
+    (0x2f82, 0x2fb8): {
         "ptr_low":  "map_address_low",
         "ptr_high": "map_address_high",
         "screen_addr1_low":  "map_x",
@@ -143,8 +162,13 @@ label(0x0062, "keys_to_process")
 label(0x0065, "demo_mode_tick_count")
 label(0x0067, "demo_key_duration")
 label(0x0069, "status_text_address_low")
+label(0x006a, "map_rockford_end_position_addr_low")
+label(0x006b, "map_rockford_end_position_addr_high")
 label(0x006c, "diamonds_required")
+label(0x006d, "time_remaining")
 label(0x006f, "bonus_life_available")
+label(0x0070, "map_rockford_start_position_addr_low")
+label(0x0071, "map_rockford_start_position_addr_high")
 label(0x0073, "sprite_for_block_type_1")
 label(0x0074, "sprite_for_block_type_2")
 label(0x0075, "sprite_for_block_type_3")
@@ -185,12 +209,12 @@ tile_map:
 $00 = empty
 $01 = earth
 $02 = wall
-$03 = titanium wall
+$03 = end position
 $04 = diamond
 $05 = rock
 $06 = exit
 $07 = fungus
-$08 = player
+$08 = rockford
 $09 = 4x4 earth square with monster pacing inside
 $0a = animate explosion the player
 $0b = Letter D/ Vertical column of earth?
@@ -472,23 +496,34 @@ for i in range(0x2228, 0x2228+8):
     expr(i, acorn.inkey_enum)
     byte(i)
 
+data_sets_present = []
+for addr in range(0x4ce0, 0x4cf4):
+    if get_u8_binary(addr) < 128:
+        data_sets_present.append(get_u8_binary(addr))
+
+basics = {}
 j = 0
-k = 0
-for i in range(0, 130):
-    addr = 0x4cf4 + 2*i
-    level_addr = get_u8_binary(addr) + 256*get_u8_binary(addr + 1)
+for data_set in range(len(data_sets_present)):
+    addr = 0x4cf4 + data_set * 20
+    label(addr, "data_set_"+ str(j))
+    j += 1
 
-    byte(0x4cf4 + i)
-    if (i % 10) == 0:
-        label(0x4cf4 + 2*i, "data_set_"+ str(j))
-        j += 1
-        k = 0
+    for difficulty in range(5):
+        byte(addr, 4)
+        basics_addr = 0x4e00 + get_u8_binary(addr)
+        map_start = get_u8_binary(addr + 1)
+        if map_start >= 128:
+            basics_addr += 0x100
+            map_start = map_start & 127
+        map_start += 0x5000
+        patch_addr = get_u8_binary(addr + 2) + 256*get_u8_binary(addr + 3)
+        comment(addr, f"Difficulty {difficulty+1}: basics={hex(basics_addr)}, map_start={hex(map_start)}, patch_addr={hex(patch_addr)}", inline=True)
+        addr += 4
+        if not basics_addr in basics:
+            basics[basics_addr] = f"basics_for_data_set_{j}_difficulty_{difficulty+1}"
+            label(basics_addr, basics[basics_addr])
 
-    if level_addr != 0:
-        #name = "data_" + str(j) + "_"+str(k)
-        #label(level_addr, name)
-        #expr(addr, name)
-        k += 1
+blank(0x4df8)
 
 constant(20, "total_caves")
 constant(0xac, "opcode_ldy_abs")
@@ -536,6 +571,18 @@ unused(0x20df)
 
 label(0x2150, "index_to_cell_type")
 byte(0x2156, 9)
+byte(0x21c0, 16)
+byte(0x21d0, 12)
+byte(0x21dc, 4)
+label(0x21c0, "handler_table_low")
+label(0x21d0, "handler_table_high")
+for i in range(16):
+    addr1 = 0x21c0+i
+    addr2 = 0x21d0+i
+    addr = get_u8_binary(addr1) + 256*get_u8_binary(addr2)
+    if addr != 0:
+        label(addr, f"handler_{i}")
+        entry(addr)
 
 label(0x2228, "inkey_keys_table")
 blank(0x2230)
@@ -554,13 +601,14 @@ label(0x2276, "increment_ptr_using_40_bytes_out_of_every_64")
 label(0x2292, "reset_grid_of_sprites")
 label(0x2296, "reset_grid_of_sprites_loop")
 label(0x229e, "clear_backwards_status_bar_loop")
-unused(0x22a5)
 entry(0x22a5)
-unused(0x22b1)
-expr(0x22b4, make_lo("special_cave_1"))
-expr(0x22b8, make_hi("special_cave_1"))
+expr(0x22b4, make_lo("special_data_1"))
+expr(0x22b8, make_hi("special_data_1"))
 unused(0x22f9)
 entry(0x22f9)
+comment(0x22fb, "sta $2c16", indent=1)
+nonentry(0x22fb)
+entry(0x22fe)
 unused(0x22ff)
 entry(0x22ff)
 
@@ -598,46 +646,39 @@ label(0x23a9, "skip_draw_sprite")
 decimal(0x23b9)
 label(0x23db, "return2")
 unused(0x23dc)
-unused_entry(0x23e8)
-unused_entry(0x23f0)
-unused(0x23f0)
 entry(0x23f9)
 unused(0x23fe)
 
-expr(0x240e, make_hi("special_cave_1"))
-expr(0x2412, make_lo("special_cave_1"))
+comment(0x2400, "write to branch offset (self-modifying code)", indent=1)
+ab(0x2402)
+blank(0x2404)
+expr(0x2401, "c249a - after_branch")
+comment(0x2405, "write to branch offset (self-modifying code)", indent=1)
+expr(0x2405, "c2461 - after_branch")
+label(0x243b, "after_branch")
+expr(0x240e, make_hi("special_data_1"))
+expr(0x2412, make_lo("special_data_1"))
 
+expr(0x2507, "sprite_for_block_type_1-1")
 ri(0x2509)
+expr(0x256d, "sprite_for_block_type_1-1")
+expr(0x2577, "sprite_for_block_type_1-1")
 entry(0x2598)
 label(0x25f5, "return3")
 unused_entry(0x25f6)
 unused_entry(0x25fc)
 
-unused_entry(0x2600)
-unused(0x2609)
-unused(0x260e)
-unused(0x2616)
-unused(0x2618)
-unused(0x2626)
-unused(0x262b)
-unused(0x2636)
-unused(0x2667)
-unused(0x2674)
-unused(0x2678)
 blank(0x2689)
 label(0x2689, "read_keys")
 label(0x2691, "read_keys_loop")
-unused_entry(0x26ad)
-unused(0x26c3)
-unused(0x26cd)
-unused(0x26d7)
-unused(0x26da)
-entry(0x26df)
+#unused_entry(0x26ab)
+unused(0x26df)
 expr(0x26fa, make_lo("status_bar_sprite_numbers"))
-unused(0x26fd)
+unused(0x26fe)
 
 label(0x2700, "start_gameplay")
 label(0x2735, "update_demo_mode")
+expr(0x2736, make_lo("status_bar_sprite_numbers"))
 expr(0x273e, make_lo("scrolling_pause_text"))
 comment(0x2777, "decrement time remaining", indent=1)
 expr(0x2781, make_lo("out_of_time_message"))
@@ -662,40 +703,52 @@ label(0x2898, "increment_status_bar_number")
 expr(0x28a3, "sprite_0")
 expr(0x28b1, "sprite_0")
 label(0x28c0, "add_a_to_status_bar_number_at_y")
+unused(0x28d4)
+byte(0x28d4, 44)
 label(0x28aa, "decrement_status_bar_number")
 
 label(0x2900, "prepare_level")
 comment(0x2910, "high nybbles in the cave colour arrays store the sprite to use for three basic block types. copy them into sprite_for_block_type_1/2/3", indent=1)
 label(0x2914, "loop_three_times")
+expr(0x291c, "sprite_for_block_type_1-1")
+comment(0x291d, "add number of caves to Y, in order to get next block type", indent=1)
 expr(0x2920, "total_caves")
-comment(0x2927, "look up the data set needed for the cave number", indent=1)
-comment(0x292f, "start the pointer at data_sets", indent=1)
-comment(0x2937, "Loop counter X is data set number.\nAdd X * twenty bytes to pointer to get to 'data_set_X' address", indent=1)
+comment(0x2922, "increment loop counter X", indent=1)
+comment(0x2927, "look up which data set needed from the cave number", indent=1)
+comment(0x292f, "start with ptr = data_sets", indent=1)
 expr(0x2930, make_lo("data_sets"))
 expr(0x2934, make_hi("data_sets"))
+comment(0x2937, "Loop counter X is data set number.\nAdd X * twenty bytes to pointer to get to 'data_set_X' address", indent=1)
 label(0x293a, "add_twenty_times_x_loop")
+expr(0x293b, "total_caves")
 label(0x2942, "got_data_set_X_address")
 comment(0x2946, "set offset in Y = 4*(difficulty level-1)", indent=1)
-expr(0x293b, "total_caves")
 comment(0x2951, "set next_ptr = $4e00+?ptr, and if top bit of (ptr?1) is set, increment high byte", indent=1)
+comment(0x2959, "use the lower seven bits of (ptr?1) as ptr_low", indent=1)
 comment(0x2964, "set ptr_low = (ptr?1) AND &7F", indent=1)
+label(0x2964, "store_ptr_low_and_fill_with_basics")
 comment(0x2969, "reset ptr to the start of the data_set_X", indent=1)
-expr(0x2983, make_lo("special_cave_0"))
-expr(0x2987, make_hi("special_cave_0"))
+comment(0x2971, "recall Y and read the next two bytes as an address. Can be zero. For details?", indent=1)
+label(0x2982, "add_strips")
+expr(0x2983, make_lo("strip_data"))
+expr(0x2987, make_hi("strip_data"))
+comment(0x298a, "get value to skip when writing strips to the map", indent=1)
+label(0x2995, "find_strip_data_for_cave_loop")
+label(0x29a1, "found_strip_data_for_cave")
 nonentry(0x299a)
 nonentry(0x299c)
 label(0x29ac, "set_palette")
 label(0x29b0, "set_palette_loop")
 unused_entry(0x29c3)
+nonentry(0x29d2)
+comment(0x29d2, "beq $299c", indent=1)
 label(0x29d4, "return5")
 unused_entry(0x29d5)
 nonentry(0x29dd)
 byte(0x29dd, 2)
 comment(0x29dd, "bne $299a", indent=1)
-unused(0x29e0)
-nonentry(0x29d2)
-comment(0x29d2, "beq $299c", indent=1)
 entry(0x29df)
+unused(0x29e0)
 
 label(0x2a00, "increment_map_ptr")
 label(0x2a17, "skip_increment_high_byte2")
@@ -705,6 +758,7 @@ label(0x2a1c, "set_ptr_high_to_start_of_map_with_offset_a")
 label(0x2a1e, "set_ptr_high_to_start_of_map")
 expr(0x2a1b, make_lo("map_row_0"))
 expr(0x2a1f, make_hi("map_row_0"))
+label(0x2a2e, "increment_next_ptr")
 label(0x2a29, "palette_block")
 label(0x2a2a, "palette_block+1")
 byte(0x2a29)
@@ -817,40 +871,64 @@ label(0x2c5f, "skip_using_default_pitch2")
 expr(0x2c5d, "in_game_sound_data+2")
 expr(0x2c63, "in_game_sound_data+3")
 unused(0x2c71)
+comment(0x2c92, "play rising pitch as time up is approaching", indent=1)
 expr(0x2ca6, "in_game_sound_data+2")
 unused(0x2cf0)
 label(0x2cef, "return9")
-comment(0x22fb, "sta $2c16", indent=1)
-nonentry(0x22fb)
-entry(0x22fe)
 
-expr(0x2736, make_lo("status_bar_sprite_numbers"))
-
+label(0x2d00, "write_strips")
+comment(0x2d12, "remember value", indent=1)
+comment(0x2d13, "get repeat count (from high nybble)", indent=1)
+label(0x2d1e, "write_strip_loop")
+comment(0x2d20, "a value of 10 means move to the next row", indent=1)
+comment(0x2d24, "if it's this cave's skip value, then don't write to the map", indent=1)
+label(0x2d2a, "skip_write_to_map")
+comment(0x2d2a, "move the map position one to the right, wrapping to the next row if needed", indent=1)
+decimal(0x2d2f)
+ri(0x2d30)
+label(0x2d32, "move_to_next_row")
+decimal(0x2d39)
+label(0x2d3c, "get_map_address")
 ab(0x2d42)
 blank(0x2d44)
 label(0x2d44, "return10")
 unused(0x2d45)
+label(0x2d50, "add_patches")
 expr(0x2d51, make_lo("map_row_0-1"))
+comment(0x2d5a, "remember the byte read", indent=1)
+comment(0x2d5b, "the top five bits are the offset into the map to change.", indent=1)
+comment(0x2d60, "add X to ptr (where we only use 40 out of every 64 bytes for the map)", indent=1)
+label(0x2d60, "add_X_to_map_ptr_loop")
+comment(0x2d68, "recall the byte, and isolate the bottom three bits.", indent=1)
+comment(0x2d6b, """0 = store value 0
+1 = skip this byte (no change)
+2 = store value 2
+3 = terminator
+4 = store value 4
+5 = store value 5
+6 = store value 6
+7 = store value 1""", indent=1)
+label(0x2d7f, "pull_a_and_return")
 unused(0x2d81)
 label(0x2d90, "fill_with_basics")
-comment(0x2d93, "read byte from stage and increment to next byte", indent=1)
+comment(0x2d93, "read byte from stage. This is done 200 times (40x20 cells, 4 cells per byte)", indent=1)
+label(0x2d93, "read_next_byte_loop")
+comment(0x2d97, "increment to next byte", indent=1)
 label(0x2d9d, "skip_increment_high_byte1")
-comment(0x2da1, "The top two bits of the stage byte hold the type to write into the cell. So we shift down six times to get the index, and put the result in X.", indent=1)
+comment(0x2da1, "Extract the top two bits of the stage byte. Each pair of bits holds a type to write into the cell. We shift down six times to get the index, and put the result in X.", indent=1)
+label(0x2da1, "loop_for_each_byte")
 comment(0x2da9, "if the index is zero, don't write to the map.", indent=1)
 comment(0x2dab, "X=1,2 or 3. Look up the sprite to store in the cell (in the map).", indent=1)
 expr(0x2dac, "sprite_for_block_type_1-1")
-
-
-expr(0x2507, "sprite_for_block_type_1-1")
-expr(0x256d, "sprite_for_block_type_1-1")
-expr(0x2577, "sprite_for_block_type_1-1")
-expr(0x291c, "sprite_for_block_type_1-1")
-
+comment(0x2db4, "recall the byte and shift twice to start reading the next pair of bits", indent=1)
+label(0x2dbd, "pull_and_return2")
 ab(0x2dbb)
 blank(0x2dbd)
 unused_entry(0x2dbf)
 unused(0x2dca)
-comment(0x2dd1, "bmi $2d98", indent=1)
+comment(0x2dcf, "bpl $2da6\nbmi $2d98", indent=1)
+nonentry(0x2dcf)
+byte(0x2dcf, 2)
 nonentry(0x2dd1)
 ab(0x2dd1)
 blank(0x2dd3)
@@ -872,11 +950,27 @@ byte(0x2ee4, 28)
 expr(0x2f0a, "sprite_0")
 expr(0x2f15, "sprite_0")
 expr(0x2f34, "sprite_0")
+decimal(0x2f51)
+comment(0x2f64, "show initial diamond score amount on status bar", indent=1)
+comment(0x2f6c, "show cave letter on status bar", indent=1)
+comment(0x2f73, "show difficulty level on status bar", indent=1)
 label(0x2f47, "return11")
 unused(0x2f48)
 label(0x2f50, "initialise_stage")
 label(0x2f59, "empty_status_bar_loop")
 expr(0x2f77, "sprite_0")
+comment(0x2f7b, "TODO: what is this?", indent=1)
+comment(0x2f82, "put the end tile on the map", indent=1)
+comment(0x2f9d, "put the start tile on the map", indent=1)
+comment(0x2fb8, "add 40 to the cave number for each difficulty level above one", indent=1)
+label(0x2fba, "add_difficulty_level_loop")
+comment(0x2fc6, "remember diamonds required", indent=1)
+label(0x2fc6, "got_offset_to_per_stage_data")
+comment(0x2fcb, "show diamonds required on status bar", indent=1)
+comment(0x2fd0, "remember time remaining", indent=1)
+comment(0x2fd5, "show time remaining on status bar", indent=1)
+comment(0x2fda, "return zero", indent=1)
+decimal(0x2fc1)
 unused(0x2fdd)
 
 expr(0x301b, "sprite_0")
@@ -1049,11 +1143,20 @@ expr(0x3bc9, "sprite_0")
 unused(0x3bcd)
 label(0x3bcc, "return15")
 
-ten_by_four(0x4700, "special_cave_0")
-for i in range(0, 24):
-    ten_by_four(0x4728+i*40)
-blank(0x4ae8)
-ten_by_two(0x4ae8)
+#ten_by_four(0x4700, "strip_data")
+label(0x4700, "strip_data")
+addr = 0x4700
+for i in range(20):
+    length = get_u8_binary(0x4c7c + i)
+    label(addr, f"strip_data_for_cave_{i}")
+    byte(addr, length)
+    addr += length
+#for i in range(0, 24):
+#    ten_by_four(0x4728+i*40)
+#blank(0x4ae8)
+#ten_by_two(0x4ae8)
+
+unused(0x4af1)
 
 blank(0x4b00)
 label(0x4b00, "diamond_score_before_enough_obtained_for_each_cave")
@@ -1099,78 +1202,47 @@ for i in range(20):
     decimal(0x4c54 + i)
 ten_by_two(0x4c40)
 ten_by_two(0x4c54)
-label(0x4c68, "number_of_difficuly_levels_available_for_each_cave")
+label(0x4c68, "number_of_difficuly_levels_available_in_menu_for_each_cave")
 ten_by_two(0x4c68)
-ten_by_two(0x4c7c)
-ten_by_two(0x4c90, "lower_nybble_is_initial_cell_for_each_cave")
-ten_by_two(0x4ca4, "lower_nybble_is_colour_one_for_each_cave")
-ten_by_two(0x4ca4+20*1, "lower_nybble_is_colour_two_for_each_cave")
-ten_by_two(0x4ca4+20*2, "lower_nybble_is_colour_three_for_each_cave")
+ten_by_two(0x4c7c, "length_of_strip_data_for_each_cave")
+ten_by_two(0x4c90, "fill_cell_in_lower_nybble_strip_value_to_skip_in_upper_for_each_cave")
+ten_by_two(0x4ca4, "colour_1_lower_nybble_block_type_1_upper_for_each_cave")
+ten_by_two(0x4ca4+20*1, "colour_2_lower_nybble_block_type_2_upper_for_each_cave")
+ten_by_two(0x4ca4+20*2, "colour_3_lower_nybble_block_type_3_upper_for_each_cave")
 ten_by_two(0x4ca4+20*3, "cave_to_data_set")
 stars(0x4cf4)
 label(0x4cf4, "data_sets")
 
-label(0x5000, "special_cave_1")
+unused(0x4df8)
+blank(0x4e09)
+blank(0x4f41)
+unused(0x4f41)
+
+label(0x5000, "special_data_1")
 byte(0x5000, 10)
 byte(0x5000+10, 10)
 byte(0x5000+20, 10)
 byte(0x5000+30, 10)
 label(0x5028, "backwards_status_bar")
 unused(0x503c)
-ten_by_four(0x5040, "map_row_0")
+#ten_by_four(0x5040, "map_row_0")
 label(0x5068, "default_status_bar")
 string(0x5079, 1)
-blank(0x507c)
 unused(0x507c)
-
-ten_by_four(0x5080, "map_row_1")
-blank(0x50a8)
-unused(0x50a8)
-
-ten_by_four(0x50c0, "map_row_2")
-blank(0x50e8)
-unused(0x50e8)
-
-ten_by_four(0x5100, "map_row_3")
-blank(0x5128)
 label(0x5128, "unused_fragment_of_basic1")
 byte(0x512c, 4)
-
-ten_by_four(0x5140, "map_row_5")
-blank(0x5168)
 label(0x5168, "unused_fragment_of_basic2")
 byte(0x517b, 5)
 
-ten_by_four(0x5180, "map_row_6")
-blank(0x51a8)
-unused(0x51a8)
-ten_by_four(0x51c0, "map_row_7")
-blank(0x51e8)
-unused(0x51e8)
-ten_by_four(0x5200, "map_row_8")
-blank(0x5228)
-unused(0x5228)
-ten_by_four(0x5240, "map_row_9")
-blank(0x5268)
-unused(0x5268)
-ten_by_four(0x5280, "map_row_10")
-blank(0x52a8)
-unused(0x52a8)
-ten_by_four(0x52c0, "map_row_11")
-blank(0x52e8)
-unused(0x52e8)
-ten_by_four(0x5300, "map_row_12")
-blank(0x5328)
-unused(0x5328)
-ten_by_four(0x5340, "map_row_13")
-blank(0x5368)
-unused(0x5368)
-ten_by_four(0x5380, "map_row_14")
-blank(0x53a8)
-unused(0x53a8)
-ten_by_four(0x53c0, "map_row_15")
-blank(0x53e8)
-unused(0x53e8)
+for i in range(23):
+    addr = 0x5040+i*64
+    if i != 15 and i != 16 and i != 17 and i != 18:
+        ten_by_four(addr, f"map_row_{i}")
+        blank(addr+40)
+        if i != 0 and i != 3 and i != 4:
+            unused(addr+40)
+    else:
+        label(addr, f"map_row_{i}")
 
 message(0x5400, 0x5500)
 
@@ -1179,9 +1251,10 @@ label(0x5400, "credits")
 
 comment(0x5568, "unused copy of routine at $5700")
 entry(0x5568)
-unused(0x5568)
+#unused(0x5568)
 unused(0x557b)
 
+blank(0x5600)
 byte(0x5600, 0xb8)
 label(0x5600, "tune_pitches_and_commands")
 label(0x573b, "skip_end_of_tune_check")
