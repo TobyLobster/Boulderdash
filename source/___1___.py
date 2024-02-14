@@ -17,6 +17,64 @@ config.set_show_cpu_state(False)
 config.set_show_char_literals(False)
 config.set_show_all_labels(False)
 
+# NOTE:
+#
+#   Ranges here are *binary* NOT the *runtime* addresses as used everywhere else.
+#   This is to make the addresses unique.
+#
+substitute_labels = {
+    (0x2300, 0x2c00): {
+        "sprite_for_block_type_2": "cell_up",
+    },
+    (0x2400, 0x2500): {
+        "tile_map_ptr_low": "tile_y",
+        "tile_map_ptr_high": "tile_x",
+    },
+    (0x2626, 0x2689): {
+        "sprite_for_block_type_1": "neighbouring_cell_variable",
+    },
+    (0x295c, 0x2973): {
+        "l0048": "remember_y",
+    },
+    (0x2a00, 0x2a28): {
+        "real_keys_pressed": "x_loop_counter",
+    },
+    (0x2b00, 0x2b85): {
+        "ptr_low":  "map_address_low",
+        "ptr_high": "map_address_high",
+        "screen_addr1_low":  "map_x",
+        "screen_addr1_high": "map_y",
+    },
+    (0x2900, 0x2d45): {
+        "loop_counter": "value_to_not_write_as_a_strip",
+    },
+    (0x2d00, 0x2d45): {
+        "ptr_low":  "map_address_low",
+        "ptr_high": "map_address_high",
+        "screen_addr1_low":  "map_x",
+        "screen_addr1_high": "map_y",
+        "real_keys_pressed": "lower_nybble_value",
+    },
+    (0x22d3, 0x22d5): {
+        "l0072": "dissolve_to_solid_flag",
+    },
+    (0x28c0, 0x28d3): {
+        "l0072": "amount_to_increment_status_bar",
+    },
+    (0x2ebf, 0x2ec1): {
+        "l0072": "dissolve_to_solid_flag",
+    },
+    (0x2f82, 0x2fb8): {
+        "ptr_low":  "map_address_low",
+        "ptr_high": "map_address_high",
+        "screen_addr1_low":  "map_x",
+        "screen_addr1_high": "map_y",
+    },
+    (0x3a00, 0x3b00): {
+        "l006a": "timeout_until_demo_mode",
+    },
+}
+
 # Common helper routines
 class SubstituteLabels():
     def __init__(self, substitute_labels):
@@ -62,16 +120,23 @@ def ri(addr, message=""):
         message = "redundant instruction"
     comment(addr, message, inline=True)
 
+return_count = 1
+
+def ret(addr):
+    global return_count
+    label(addr, f"return{return_count}")
+    return_count += 1
+
 unused_count = 1
 
 def unused(addr):
     global unused_count
-    label(addr, "unused"+str(unused_count))
+    label(addr, f"unused{unused_count}")
     unused_count += 1
 
 def unused_entry(addr):
     global unused_count
-    entry(addr, "unused"+str(unused_count))
+    entry(addr, f"unused{unused_count}")
     unused_count += 1
 
 def stars(addr, message=""):
@@ -113,45 +178,6 @@ def message(start_addr, end_addr):
 
 load(0x1300, "original/___1___", "6502")
 
-# NOTE:
-#
-#   Ranges here are *binary* NOT the *runtime* addresses as used everywhere else.
-#   This is to make the addresses unique.
-#
-substitute_labels = {
-    (0x295c, 0x2973): {
-        "l0048": "remember_y",
-    },
-    (0x2a00, 0x2a28): {
-        "real_keys_pressed": "x_loop_counter",
-    },
-    (0x2b00, 0x2b85): {
-        "ptr_low":  "map_address_low",
-        "ptr_high": "map_address_high",
-        "screen_addr1_low":  "map_x",
-        "screen_addr1_high": "map_y",
-    },
-    (0x2900, 0x2d45): {
-        "loop_counter": "value_to_not_write_as_a_strip",
-    },
-    (0x2d00, 0x2d45): {
-        "ptr_low":  "map_address_low",
-        "ptr_high": "map_address_high",
-        "screen_addr1_low":  "map_x",
-        "screen_addr1_high": "map_y",
-        "real_keys_pressed": "lower_nybble_value",
-    },
-    (0x2f82, 0x2fb8): {
-        "ptr_low":  "map_address_low",
-        "ptr_high": "map_address_high",
-        "screen_addr1_low":  "map_x",
-        "screen_addr1_high": "map_y",
-    },
-    (0x3a00, 0x3b00): {
-        "l006a": "timeout_until_demo_mode",
-    },
-}
-
 label(0x0046, "data_set_ptr_low")
 label(0x0047, "data_set_ptr_high")
 label(0x0059, "countdown_while_switching_palette")
@@ -159,6 +185,7 @@ label(0x005c, "sub_second_ticks")
 label(0x005d, "previous_direction_keys")
 label(0x005e, "just_pressed_direction_keys")
 label(0x0062, "keys_to_process")
+label(0x0064, "neighbour_cell_contents")
 label(0x0065, "demo_mode_tick_count")
 label(0x0067, "demo_key_duration")
 label(0x0069, "status_text_address_low")
@@ -167,11 +194,14 @@ label(0x006b, "map_rockford_end_position_addr_high")
 label(0x006c, "diamonds_required")
 label(0x006d, "time_remaining")
 label(0x006f, "bonus_life_available")
-label(0x0070, "map_rockford_start_position_addr_low")
-label(0x0071, "map_rockford_start_position_addr_high")
+label(0x0070, "map_rockford_current_position_addr_low")
+label(0x0071, "map_rockford_current_position_addr_high")
 label(0x0073, "sprite_for_block_type_1")
-label(0x0074, "sprite_for_block_type_2")
+label(0x0074, "cell_up")
 label(0x0075, "sprite_for_block_type_3")
+label(0x0076, "cell_left")
+label(0x0078, "cell_right")
+label(0x007a, "cell_down")
 label(0x007c, "real_keys_pressed")
 label(0x0073, "grid_x")
 label(0x0077, "loop_counter")
@@ -202,26 +232,41 @@ s = SubstituteLabels(substitute_labels)
 set_label_maker_hook(s.substitute_label_maker)
 
 comment(0x1300, """
-Caves: A-P + Four bonus caves
+Caves: 20 caves total (16 main caves A-P plus four bonus caves Q-T)
+Difficulty levels: 1-5
 
 tile_map:
 
 $00 = empty
 $01 = earth
 $02 = wall
-$03 = end position
+$03 = titanium wall
 $04 = diamond
 $05 = rock
-$06 = exit
+$06 = firefly
 $07 = fungus
 $08 = rockford
-$09 = 4x4 earth square with monster pacing inside
-$0a = animate explosion the player
-$0b = Letter D/ Vertical column of earth?
-$0c = Horizontal row of earth?
-$0d = rock
+$09 = 4x4 earth square with firefly pacing inside
+$0a = animated player exploding
+$0b = Vertical column?
+$0c = Horizontal row?
+$0d = wall??
 $0e = butterfly
-$0f = player
+$0f = player?
+
+After post processing/during gameplay:
+$08 = flashing titanium wall and earth before player appears
+$18 = flashing exit
+$21 = explosion frame #1
+$11 = explosion frame #2
+$0f = player looking out
+$1f = player walking left
+$2f = player walking right
+
+$43 = explosion out effect #1
+$33 = explosion out effect #2
+$23 = explosion out effect #3
+$13 = explosion out effect #4
 """)
 
 sprites = {
@@ -459,6 +504,23 @@ ranges = [(0x1ee0, 0x1ef0),
           (0x507a, 0x507c),
           ]
 
+constant(0x0, "map_space")
+constant(0x1, "map_earth")
+constant(0x2, "map_wall")
+constant(0x3, "map_titanium_wall")
+constant(0x4, "map_diamond")
+constant(0x5, "map_rock1")
+constant(0x6, "map_exit")
+constant(0x7, "map_fungus")
+constant(0x8, "map_player1")
+constant(0x9, "map_earth_plus_firefly_4x4")
+constant(0xa, "map_explosion")
+constant(0xb, "map_vertical_strip")
+constant(0xc, "map_horizontal_strip")
+constant(0xd, "map_rock2")       # second type
+constant(0xe, "map_butterfly")
+constant(0xf, "map_player2")     # second type?
+
 for r in ranges:
     for i in range(r[0], r[1]):
         byte(i)
@@ -479,10 +541,11 @@ for i in range(0, 105):
     expr(0x2000+i, make_lo(name))
     expr(0x2080+i, make_hi(name))
 
-#byte(0x2061, 0x2080-0x2061)
-#byte(0x20df, 0x2100-0x20df)
+unused(0x2069)
+byte(0x2069, 0x2080-0x2069)
+unused(0x20e9)
+byte(0x20e9, 0x2100-0x20e9)
 
-unused(0x24f7)
 i = 1
 while i < len(addrs):
     length = addrs[i] - addrs[i-1]
@@ -547,28 +610,38 @@ string(0x1f56, 1)
 blank(0x1f5a)
 byte(0x1f5a, 38)
 label(0x1f80, "cell_type_to_sprite")
-byte(0x1f87, 8)
-byte(0x1f87+8, 8)
-byte(0x1f87+2*8, 8)
-byte(0x1f87+3*8, 8)
-byte(0x1f87+4*8, 8)
-byte(0x1f87+5*8, 8)
-byte(0x1f87+6*8, 8)
-byte(0x1f87+7*8, 8)
-byte(0x1f87+8*8, 8)
-byte(0x1f87+9*8, 8)
-byte(0x1f87+10*8, 8)
-byte(0x1f87+11*8, 8)
-byte(0x1f87+12*8, 8)
-byte(0x1f87+13*8, 8)
+message(0x1f80, 0x2000)
+#byte(0x1f87, 8)
+#byte(0x1f87+8, 8)
+#byte(0x1f87+2*8, 8)
+#byte(0x1f87+3*8, 8)
+#byte(0x1f87+4*8, 8)
+#byte(0x1f87+5*8, 8)
+#byte(0x1f87+6*8, 8)
+#byte(0x1f87+7*8, 8)
+#byte(0x1f87+8*8, 8)
+#byte(0x1f87+9*8, 8)
+#byte(0x1f87+10*8, 8)
+#byte(0x1f87+11*8, 8)
+#byte(0x1f87+12*8, 8)
+#byte(0x1f87+13*8, 8)
+label(0x1f87, "two_state_animated_sprites1")
+label(0x1fc7, "two_state_animated_sprites2")
+for i in range(0x1f80, 0x2000, 16):
+    blank(i)
 
-
+blank(0x2000)
 label(0x2000, "sprite_addresses_low")
 label(0x2007, "sprite_titanium_addressA")
 label(0x2060, "sprite_titanium_addressB")
 label(0x2080, "sprite_addresses_high")
 unused(0x20df)
 
+byte(0x2120, 16)
+label(0x2120, "cell_value_to_fill_vertically")
+label(0x26c3, "fill_with_a")
+blank(0x2130)
+unused(0x2130)
 label(0x2150, "index_to_cell_type")
 byte(0x2156, 9)
 byte(0x21c0, 16)
@@ -583,7 +656,19 @@ for i in range(16):
     if addr != 0:
         label(addr, f"handler_{i}")
         entry(addr)
+        expr(addr1, make_lo(f"handler_{i}"))
+        expr(addr2, make_hi(f"handler_{i}"))
 
+label(0x2200, "neighbouring_cell_variable_from_direction_index")
+byte(0x2200)
+byte(0x2201)
+byte(0x2202)
+byte(0x2203)
+expr(0x2200, "cell_right")
+expr(0x2201, "cell_left")
+expr(0x2202, "cell_up")
+expr(0x2203, "cell_down")
+label(0x2224, "rockford_cell_value_for_direction")
 label(0x2228, "inkey_keys_table")
 blank(0x2230)
 unused(0x2230)
@@ -591,7 +676,7 @@ entry(0x2230)
 label(0x2238, "increment_ptr_and_clear_carry")
 label(0x223e, "skip_increment")
 label(0x2240, "add_a_to_ptr")
-label(0x2249, "return1")
+ret(0x2249)
 label(0x224a, "reverse_nybbles_and_add_one")
 comment(0x2256, "Clears the entire map to initial_cell_fill_value.\nClears the visible grid to $ff", indent=1)
 label(0x2256, "clear_map_and_grid")
@@ -604,6 +689,9 @@ label(0x229e, "clear_backwards_status_bar_loop")
 entry(0x22a5)
 expr(0x22b4, make_lo("map_row_0"))
 expr(0x22b8, make_hi("map_row_0"))
+decimal(0x22bc)
+label(0x22bd, "loop_over_rows")
+label(0x22dc, "skip_to_next_row")
 unused(0x22f9)
 entry(0x22f9)
 comment(0x22fb, "sta $2c16", indent=1)
@@ -625,6 +713,7 @@ label(0x2325, "draw_grid_at_regular_screen_address")
 expr(0x2326, make_lo("start_of_grid_screen_address"))
 expr(0x2328, make_hi("start_of_grid_screen_address"))
 label(0x2329, "draw_grid")
+expr(0x242a, "map_diamond")
 expr(0x232c, make_hi("backwards_status_bar"))
 expr(0x232e, make_lo("backwards_status_bar"))
 label(0x233b, "instruction_for_self_modification")
@@ -644,38 +733,71 @@ comment(0x2381, "This next loop draws a single sprite in the grid.\nIt draws two
 label(0x2383, "draw_sprite_loop")
 label(0x23a9, "skip_draw_sprite")
 decimal(0x23b9)
-label(0x23db, "return2")
+ret(0x23db)
 unused(0x23dc)
 entry(0x23f9)
 unused(0x23fe)
 
 comment(0x2400, "set branch offset (self modifying code)", indent=1)
+expr(0x2401, "c249a - after_branch")
 ab(0x2402)
 blank(0x2404)
-expr(0x2401, "c249a - after_branch")
 comment(0x2404, "set branch offset (self modifying code)", indent=1)
 expr(0x2405, "c2461 - after_branch")
-label(0x243b, "after_branch")
+label(0x2406, "set_branch_offset")
+comment(0x2409, "twenty rows", indent=1)
+decimal(0x240a)
 expr(0x240e, make_hi("map_row_0"))
 expr(0x2412, make_lo("map_row_0"))
+comment(0x2417, "loop through the twenty rows of map", indent=1)
+label(0x2417, "tile_map_y_loop")
+comment(0x2417, "38 columns", inline=True)
+decimal(0x2418)
+label(0x2423, "tile_map_x_loop")
+comment(0x2423, "loop through the 38 columns of map", indent=1)
+label(0x2439, "branch_instruction")
+label(0x243a, "branch_offset")
+label(0x243b, "after_branch")
+comment(0x2453, "store the new next cell down", indent=1)
+label(0x2467, "move_to_next_cell")
+comment(0x2469, "store the previous cell value back into the map", indent=1)
+comment(0x246f, "update the previous_cell variable with the current cell value from x", indent=1)
+comment(0x2471, "update the current cell value x from the next_cell variable", indent=1)
+comment(0x2473, "move ptr to next position", indent=1)
+comment(0x2475, "loop back for the rest of the columns", indent=1)
+comment(0x2479, "store the final previous_cell for the row", indent=1)
+comment(0x247d, "move ptr to the start of the next row. Stride is 64, 38 entries done, so remainder to add is 64-38=26", indent=1)
+decimal(0x247e)
+comment(0x2482, "loop back for the rest of the rows", indent=1)
+decimal(0x2487)
+label(0x2488, "clear_top_bit_on_final_row_loop")
+comment(0x2493, "clear top bit on end position", indent=1)
+unused(0x24f7)
 
 expr(0x2507, "sprite_for_block_type_1-1")
 ri(0x2509)
+label(0x250b, "unnecessary_branch")
 expr(0x256d, "sprite_for_block_type_1-1")
 expr(0x2577, "sprite_for_block_type_1-1")
 entry(0x2598)
-label(0x25f5, "return3")
+ret(0x25f5)
 unused_entry(0x25f6)
 unused_entry(0x25fc)
 
-#addr = $2614
-
+label(0x260e, "check_for_direction_key_pressed")
+label(0x2626, "direction_key_pressed")
+ab(0x2687)
+label(0x262b, "get_direction_index_loop")
+comment(0x263b, "read cell contents from the given neighbouring cell variable y", indent=1)
+label(0x2667, "check_for_return_pressed")
+comment(0x266d, "return (and direction) is pressed", indent=1)
 blank(0x2689)
 label(0x2689, "read_keys")
 label(0x2691, "read_keys_loop")
-#unused_entry(0x26ab)
+unused(0x26ab)
 unused(0x26df)
 expr(0x26fa, make_lo("status_bar_sprite_numbers"))
+ret(0x26fd)
 unused(0x26fe)
 
 label(0x2700, "start_gameplay")
@@ -684,7 +806,7 @@ expr(0x2736, make_lo("status_bar_sprite_numbers"))
 expr(0x273e, make_lo("scrolling_pause_text"))
 comment(0x2777, "decrement time remaining", indent=1)
 expr(0x2781, make_lo("out_of_time_message"))
-label(0x27ef, "return4")
+ret(0x27ef)
 unused(0x27f0)
 byte(0x27f0,16)
 
@@ -744,7 +866,7 @@ label(0x29b0, "set_palette_loop")
 unused_entry(0x29c3)
 nonentry(0x29d2)
 comment(0x29d2, "beq $299c", indent=1)
-label(0x29d4, "return5")
+ret(0x29d4)
 unused_entry(0x29d5)
 nonentry(0x29dd)
 byte(0x29dd, 2)
@@ -754,7 +876,7 @@ unused(0x29e0)
 
 label(0x2a00, "increment_map_ptr")
 label(0x2a17, "skip_increment_high_byte2")
-label(0x2a19, "return6")
+ret(0x2a19)
 label(0x2a1a, "set_ptr_to_start_of_map")
 label(0x2a1c, "set_ptr_high_to_start_of_map_with_offset_a")
 label(0x2a1e, "set_ptr_high_to_start_of_map")
@@ -811,7 +933,7 @@ label(0x2ac3, "draw_big_rockford_loop")
 stars(0x2ab5)
 expr(0x2ab6, make_hi("big_rockford_destination_screen_address"))
 expr(0x2aba, make_lo("big_rockford_destination_screen_address"))
-label(0x2ab4, "return7")
+ret(0x2ab4)
 expr(0x2abe, make_hi("big_rockford_sprite"))
 label(0x2aca, "check_if_byte_is_an_rle_byte_loop")
 label(0x2ad4, "get_repeat_count")
@@ -820,7 +942,7 @@ label(0x2adc, "copy_x_bytes_in_rle_loop")
 blank(0x2af8)
 label(0x2af8, "rle_bytes_table")
 label(0x2aeb, "get_next_ptr_byte")
-label(0x2af3, "return8")
+ret(0x2af3)
 blank(0x2aff)
 unused(0x2aff)
 unused(0x2af4)
@@ -876,7 +998,7 @@ unused(0x2c71)
 comment(0x2c92, "play rising pitch as time up is approaching", indent=1)
 expr(0x2ca6, "in_game_sound_data+2")
 unused(0x2cf0)
-label(0x2cef, "return9")
+ret(0x2cef)
 
 label(0x2d00, "write_strips")
 comment(0x2d12, "remember value", indent=1)
@@ -893,7 +1015,7 @@ decimal(0x2d39)
 label(0x2d3c, "get_map_address")
 ab(0x2d42)
 blank(0x2d44)
-label(0x2d44, "return10")
+ret(0x2d44)
 unused(0x2d45)
 label(0x2d50, "add_patches")
 expr(0x2d51, make_lo("map_row_1-1"))
@@ -941,9 +1063,21 @@ byte(0x2de9, 3)
 expr(0x2e0b, make_lo("players_and_men_status_bar"))
 expr(0x2e13, make_lo("bonus_life_text"))
 expr(0x2e1b, make_lo("scrolling_pause_text"))
+comment(0x2e3c, "draw titanium wall borders", indent=1)
+decimal(0x2e40)
+comment(0x2e3f, "loop over all rows", indent=1)
+label(0x2e41, "write_left_and_right_borders_loop")
+label(0x2e48, "hide_cells_loop")
+decimal(0x2e42)
+comment(0x2e43, "write the right hand border", indent=1)
+comment(0x2e51, "write the left hand border", indent=1)
+comment(0x2e5d, "write the top and bottom borders", indent=1)
+decimal(0x2e60)
+label(0x2e61, "write_top_and_bottom_borders_loop")
 expr(0x2e80, "sprite_0")
 expr(0x2e8a, make_lo("game_over_text"))
 expr(0x2e93, "sprite_1")
+label(0x2ebd, "play_scren_dissolve_to_solid")
 label(0x2ebf, "play_screen_dissolve_effect")
 label(0x2ec9, "screen_dissolve_loop")
 unused(0x2ee4)
@@ -956,7 +1090,7 @@ decimal(0x2f51)
 comment(0x2f64, "show initial diamond score amount on status bar", indent=1)
 comment(0x2f6c, "show cave letter on status bar", indent=1)
 comment(0x2f73, "show difficulty level on status bar", indent=1)
-label(0x2f47, "return11")
+ret(0x2f47)
 unused(0x2f48)
 label(0x2f50, "initialise_stage")
 label(0x2f59, "empty_status_bar_loop")
@@ -976,14 +1110,14 @@ decimal(0x2fc1)
 unused(0x2fdd)
 
 expr(0x301b, "sprite_0")
-label(0x302b, "return12")
+ret(0x302b)
 unused(0x302c)
 expr(0x3047, make_lo("pause_message"))
 expr(0x3056, make_lo("pause_message"))
 expr(0x305e, make_lo("players_and_men_status_bar"))
 expr(0x3077, make_lo("out_of_time_message"))
 expr(0x30cc, make_lo("status_bar_sprite_numbers"))
-label(0x30dc, "return13")
+ret(0x30dc)
 unused(0x30ec)
 
 label(0x3100, "demonstration_keys")
@@ -1128,7 +1262,7 @@ expr(0x3a83, "sprite_0")
 label(0x3a84, "zero_score_on_status_bar_loop")
 expr(0x3aca, "'S'")
 label(0x3ad1, "show_rockford_again_and_play_game")
-label(0x3ae1, "return14")
+ret(0x3ae1)
 unused(0x3ae2)
 
 label(0x3b00, "play_game")
@@ -1143,7 +1277,7 @@ expr(0x3b92, "sprite_0")
 expr(0x3bc3, "'A'")
 expr(0x3bc9, "sprite_0")
 unused(0x3bcd)
-label(0x3bcc, "return15")
+ret(0x3bcc)
 
 #ten_by_four(0x4700, "strip_data")
 label(0x4700, "strip_data")
@@ -1244,6 +1378,9 @@ message(0x5400, 0x5500)
 
 blank(0x5400)
 label(0x5400, "credits")
+label(0x2450, "jsr_handler_instruction")
+label(0x2451, "handler_low")
+label(0x2452, "handler_high")
 
 comment(0x5568, "unused copy of routine at $5700")
 entry(0x5568)
