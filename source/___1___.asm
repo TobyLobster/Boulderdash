@@ -1331,13 +1331,14 @@ draw_grid_of_sprites
     lda #>grid_of_screen_sprites                                      ; 2319: a9 0c       ..
     sta grid_compare_address_high                                     ; 231b: 8d 5d 23    .]#
     sta grid_write_address_high                                       ; 231e: 8d 62 23    .b#
-    ldx #<zeroed_status_bar                                           ; 2321: a2 f0       ..
-    bne c234a                                                         ; 2323: d0 25       .%             ; ALWAYS branch
+    ; X = number of cells on screen (loop counter)
+    ldx #$f0                                                          ; 2321: a2 f0       ..
+    bne draw_grid                                                     ; 2323: d0 25       .%             ; ALWAYS branch
 
-draw_grid_at_regular_screen_address
+draw_status_bar
     ldy #<start_of_grid_screen_address                                ; 2325: a0 c0       ..
     lda #>start_of_grid_screen_address                                ; 2327: a9 5b       .[
-draw_grid
+draw_single_row_of_sprites
     sta screen_addr1_high                                             ; 2329: 85 8b       ..
     lda #>backwards_status_bar                                        ; 232b: a9 50       .P
     ldx #<backwards_status_bar                                        ; 232d: a2 28       .(
@@ -1351,11 +1352,11 @@ status_text_address_high = instruction_for_self_modification+1
     sta tile_map_ptr_high                                             ; 233d: 85 86       ..
     lda #opcode_ldy_abs                                               ; 233f: a9 ac       ..
     sta load_instruction                                              ; 2341: 8d 57 23    .W#
-    ; X is the column counter
+    ; X is the cell counter (20 for a single row)
     ldx #20                                                           ; 2344: a2 14       ..
     lda status_text_address_low                                       ; 2346: a5 69       .i
     sta tile_map_ptr_low                                              ; 2348: 85 85       ..
-c234a
+draw_grid
     sty screen_addr1_low                                              ; 234a: 84 8a       ..
 draw_grid_loop
     ldy #0                                                            ; 234c: a0 00       ..
@@ -1364,7 +1365,7 @@ grid_draw_row_loop
     lda (tile_map_ptr_low),y                                          ; 2350: b1 85       ..
     tay                                                               ; 2352: a8          .
     bpl load_instruction                                              ; 2353: 10 02       ..
-    ; Y=9 indicates the titanium wall
+    ; Y=9 indicates the titanium wall (while revealing the grid)
     ldy #9                                                            ; 2355: a0 09       ..
     ; this next instruction is either:
     ;     'ldy cell_type_to_sprite' [which in this context is a NOP] OR
@@ -2087,7 +2088,7 @@ c2752
 
 c2762
     jsr draw_grid_of_sprites                                          ; 2762: 20 00 23     .#
-    jsr draw_grid_at_regular_screen_address                           ; 2765: 20 25 23     %#
+    jsr draw_status_bar                                               ; 2765: 20 25 23     %#
     jsr sub_c3000                                                     ; 2768: 20 00 30     .0
     lda l005b                                                         ; 276b: a5 5b       .[
     beq c2787                                                         ; 276d: f0 18       ..
@@ -3247,7 +3248,7 @@ play_screen_dissolve_effect
 screen_dissolve_loop
     jsr sub_c22b3                                                     ; 2ec9: 20 b3 22     ."
     jsr draw_grid_of_sprites                                          ; 2ecc: 20 00 23     .#
-    jsr draw_grid_at_regular_screen_address                           ; 2ecf: 20 25 23     %#
+    jsr draw_status_bar                                               ; 2ecf: 20 25 23     %#
     lda tick_counter                                                  ; 2ed2: a5 5a       .Z
     asl                                                               ; 2ed4: 0a          .
     and #$0f                                                          ; 2ed5: 29 0f       ).
@@ -3495,7 +3496,7 @@ c3098
     jsr play_sound_x_pitch_y                                          ; 30b4: 20 2c 2c     ,,
     jsr animate_flashing_spaces_and_check_for_bonus_life              ; 30b7: 20 56 2a     V*
     jsr draw_grid_of_sprites                                          ; 30ba: 20 00 23     .#
-    jsr draw_grid_at_regular_screen_address                           ; 30bd: 20 25 23     %#
+    jsr draw_status_bar                                               ; 30bd: 20 25 23     %#
     lda #2                                                            ; 30c0: a9 02       ..
     sta wait_delay_centiseconds                                       ; 30c2: 85 84       ..
     jsr wait_for_centiseconds_and_read_keys                           ; 30c4: 20 94 2b     .+
@@ -3506,7 +3507,7 @@ c30cb
     sta status_text_address_low                                       ; 30cd: 85 69       .i
 sub_c30cf
     jsr draw_grid_of_sprites                                          ; 30cf: 20 00 23     .#
-    jsr draw_grid_at_regular_screen_address                           ; 30d2: 20 25 23     %#
+    jsr draw_status_bar                                               ; 30d2: 20 25 23     %#
     jsr wait_for_13_centiseconds_and_read_keys                        ; 30d5: 20 90 2b     .+
     lda keys_to_process                                               ; 30d8: a5 62       .b
     and #2                                                            ; 30da: 29 02       ).
@@ -3514,7 +3515,7 @@ return14
     rts                                                               ; 30dc: 60          `
 
 sub_c30dd
-    jsr draw_grid_at_regular_screen_address                           ; 30dd: 20 25 23     %#
+    jsr draw_status_bar                                               ; 30dd: 20 25 23     %#
     lda #0                                                            ; 30e0: a9 00       ..
     sta wait_delay_centiseconds                                       ; 30e2: 85 84       ..
     jsr wait_for_centiseconds_and_read_keys                           ; 30e4: 20 94 2b     .+
@@ -3560,7 +3561,7 @@ loop_c31cb
     lda #<status_bar_sprite_numbers                                   ; 31d6: a9 00       ..
     sta status_text_address_low                                       ; 31d8: 85 69       .i
 show_credits_loop
-    jsr draw_grid_at_regular_screen_address                           ; 31da: 20 25 23     %#
+    jsr draw_status_bar                                               ; 31da: 20 25 23     %#
     jsr wait_for_13_centiseconds_and_read_keys                        ; 31dd: 20 90 2b     .+
     inc status_text_address_low                                       ; 31e0: e6 69       .i
     bne show_credits_loop                                             ; 31e2: d0 f6       ..
@@ -3999,14 +4000,14 @@ show_menu
     sta status_text_address_low                                       ; 3a0e: 85 69       .i
     lda #>screen_addr_row_28                                          ; 3a10: a9 7b       .{
     ldy #<screen_addr_row_28                                          ; 3a12: a0 00       ..
-    jsr draw_grid                                                     ; 3a14: 20 29 23     )#
+    jsr draw_single_row_of_sprites                                    ; 3a14: 20 29 23     )#
     ; show highscore line
     jsr reset_grid_of_sprites                                         ; 3a17: 20 92 22     ."
     lda #<highscore_high_status_bar                                   ; 3a1a: a9 50       .P
     sta status_text_address_low                                       ; 3a1c: 85 69       .i
     lda #>screen_addr_row_30                                          ; 3a1e: a9 7d       .}
     ldy #<screen_addr_row_30                                          ; 3a20: a0 80       ..
-    jsr draw_grid                                                     ; 3a22: 20 29 23     )#
+    jsr draw_single_row_of_sprites                                    ; 3a22: 20 29 23     )#
 ; store cave letter and difficulty level number
     jsr reset_grid_of_sprites                                         ; 3a25: 20 92 22     ."
     ldx #0                                                            ; 3a28: a2 00       ..
@@ -4028,7 +4029,7 @@ handle_menu_loop
 waiting_for_demo_loop
     lda #<number_of_players_status_bar                                ; 3a45: a9 78       .x
     sta status_text_address_low                                       ; 3a47: 85 69       .i
-    jsr draw_grid_at_regular_screen_address                           ; 3a49: 20 25 23     %#
+    jsr draw_status_bar                                               ; 3a49: 20 25 23     %#
     jsr update_tune                                                   ; 3a4c: 20 13 57     .W
     lda #9                                                            ; 3a4f: a9 09       ..
     jsr wait_for_a_centiseconds_and_read_keys                         ; 3a51: 20 92 2b     .+
@@ -5898,9 +5899,6 @@ pydis_end
 }
 !if (<strip_data) != $00 {
     !error "Assertion failed: <strip_data == $00"
-}
-!if (<zeroed_status_bar) != $f0 {
-    !error "Assertion failed: <zeroed_status_bar == $f0"
 }
 !if (>(in_game_sound_block)) != $2c {
     !error "Assertion failed: >(in_game_sound_block) == $2c"
