@@ -130,7 +130,7 @@ l0056                                   = $56
 l0057                                   = $57
 l0058                                   = $58
 countdown_while_switching_palette       = $59
-l005a                                   = $5a
+tick_counter                            = $5a
 l005b                                   = $5b
 sub_second_ticks                        = $5c
 previous_direction_keys                 = $5d
@@ -154,19 +154,20 @@ map_rockford_current_position_addr_high = $71
 amount_to_increment_status_bar          = $72
 dissolve_to_solid_flag                  = $72
 l0072                                   = $72
+cell_above_left                         = $73
+grid_column_counter                     = $73
 grid_x                                  = $73
 neighbouring_cell_variable              = $73
-sprite_for_block_type_1                 = $73
-cell_up                                 = $74
-sprite_for_block_type_2                 = $74
-sprite_for_block_type_3                 = $75
+cell_above                              = $74
+cell_above_right                        = $75
 cell_left                               = $76
+cell_current                            = $77
 loop_counter                            = $77
-value_to_not_write_as_a_strip           = $77
 cell_right                              = $78
+cell_below_left                         = $79
 initial_cell_fill_value                 = $79
-cell_down                               = $7a
-l007b                                   = $7b
+cell_below                              = $7a
+cell_below_right                        = $7b
 lower_nybble_value                      = $7c
 real_keys_pressed                       = $7c
 x_loop_counter                          = $7c
@@ -223,8 +224,8 @@ lfff6                                   = $fff6
 ; $08 = rockford
 ; $09 = 4x4 earth square with firefly pacing inside
 ; $0a = animated player exploding
-; $0b = Vertical column?
-; $0c = Horizontal row?
+; $0b = Vertical strip (value above is filled down to the next $0b)
+; $0c = Horizontal strip
 ; $0d = wall??
 ; $0e = butterfly
 ; $0f = player?
@@ -1081,10 +1082,10 @@ cell_value_to_fill_vertically
     !byte   0,   0,   0,   0, $85, $84,   0,   0,   0,   0,   0,   0  ; 2120: 00 00 00... ...
     !byte   0,   0,   0,   0                                          ; 212c: 00 00 00... ...
 
-unused6
+some_array_of_cells
     !byte $84, $84, $84,   0, $84, $84, $84, $84,   0,   0,   0, $84  ; 2130: 84 84 84... ...
     !byte $84, $84, $84, $ff                                          ; 213c: 84 84 84... ...
-l2140
+another_array_of_cells
     !byte $b3, $b3, $b3,   0, $b3, $b3, $b3, $b3,   0,   0,   0, $b3  ; 2140: b3 b3 b3... ...
     !byte $b3, $b3, $b3, $ff                                          ; 214c: b3 b3 b3... ...
 index_to_cell_type
@@ -1102,16 +1103,33 @@ l2180
     !byte   1,   1,   1, $ff,   1,   1,   1, $ff, $ff, $ff,   0,   0  ; 21b0: 01 01 01... ...
     !byte $ff, $ff, $ff,   0                                          ; 21bc: ff ff ff... ...
 handler_table_low
-    !byte  <handler_0,  <handler_1,  <handler_2,  <handler_3          ; 21c0: a5 a5 a5... ...
-    !byte           0,           0,  <handler_6,  <handler_7          ; 21c4: 00 00 00... ...
-    !byte  <handler_8,  <handler_9, <handler_10, <handler_11          ; 21c8: e3 ca e3... ...
-    !byte <handler_12, <handler_13, <handler_14, <handler_15          ; 21cc: f0 ae 00... ...
+    !byte                 <handler_0123                               ; 21c0: a5          .
+    !byte                 <handler_0123                               ; 21c1: a5          .
+    !byte                 <handler_0123                               ; 21c2: a5          .
+    !byte                 <handler_0123                               ; 21c3: a5          .
+    !byte                             0                               ; 21c4: 00          .
+    !byte                             0                               ; 21c5: 00          .
+    !byte              <handler_firefly                               ; 21c6: 00          .
+    !byte                    <handler_7                               ; 21c7: 9e          .
+    !byte                   <handler_10                               ; 21c8: e3          .
+    !byte                    <handler_9                               ; 21c9: ca          .
+    !byte                   <handler_10                               ; 21ca: e3          .
+    !byte   <handler_for_vertical_strip                               ; 21cb: e0          .
+    !byte <handler_for_horizontal_strip                               ; 21cc: f0          .
+    !byte                   <handler_13                               ; 21cd: ae          .
+    !byte              <handler_firefly                               ; 21ce: 00          .
+    !byte                   <handler_15                               ; 21cf: 00          .
 handler_table_high
-    !byte  >handler_0,  >handler_1,  >handler_2,  >handler_3          ; 21d0: 22 22 22... """
-    !byte           0,           0,  >handler_6,  >handler_7          ; 21d4: 00 00 25... ..%
-    !byte  >handler_8,  >handler_9, >handler_10, >handler_11          ; 21d8: 26 2b 26... &+&
-l21dc
-    !byte >handler_12, >handler_13, >handler_14, >handler_15          ; 21dc: 23 26 25... #&%
+    !byte               >handler_0123,               >handler_0123    ; 21d0: 22 22       ""
+    !byte               >handler_0123,               >handler_0123    ; 21d2: 22 22       ""
+    !byte                           0,                           0    ; 21d4: 00 00       ..
+    !byte            >handler_firefly,                  >handler_7    ; 21d6: 25 25       %%
+    !byte                 >handler_10,                  >handler_9    ; 21d8: 26 2b       &+
+    !byte                 >handler_10, >handler_for_vertical_strip    ; 21da: 26 23       &#
+    !byte >handler_for_horizontal_strip                               ; 21dc: 23          #
+    !byte                   >handler_13                               ; 21dd: 26          &
+    !byte              >handler_firefly                               ; 21de: 25          %
+    !byte                   >handler_15                               ; 21df: 26          &
 l21e0
     !byte $8f, $8f, $84,   0, $f1, $d1, $b6, $b1, $8f, $8f, $d1, $f1  ; 21e0: 8f 8f 84... ...
     !byte $b1, $71,   0, $71                                          ; 21ec: b1 71 00... .q.
@@ -1121,8 +1139,8 @@ l21f0
 neighbouring_cell_variable_from_direction_index
     !byte cell_right                                                  ; 2200: 78          x
     !byte cell_left                                                   ; 2201: 76          v
-    !byte cell_up                                                     ; 2202: 74          t
-    !byte cell_down                                                   ; 2203: 7a          z
+    !byte cell_above                                                  ; 2202: 74          t
+    !byte cell_below                                                  ; 2203: 7a          z
 l2204
     !byte $43, $3f,   0, $c1                                          ; 2204: 43 3f 00... C?.
 l2208
@@ -1144,7 +1162,7 @@ inkey_keys_table
     !byte inkey_key_x                                                 ; 222f: bd          .
 
 
-unused7
+unused6
     lsr                                                               ; 2230: 4a          J
     lsr                                                               ; 2231: 4a          J
     lsr                                                               ; 2232: 4a          J
@@ -1202,7 +1220,7 @@ loop_c226b
     sbc cell_right                                                    ; 2270: e5 78       .x
     bne loop_c226b                                                    ; 2272: d0 f7       ..
 c2274
-    sta loop_counter                                                  ; 2274: 85 77       .w
+    sta cell_current                                                  ; 2274: 85 77       .w
 increment_ptr_using_40_bytes_out_of_every_64
     inc ptr_low                                                       ; 2276: e6 8c       ..
     lda ptr_low                                                       ; 2278: a5 8c       ..
@@ -1214,9 +1232,9 @@ increment_ptr_using_40_bytes_out_of_every_64
     dex                                                               ; 2285: ca          .
     beq return1                                                       ; 2286: f0 c1       ..
 c2288
-    dec loop_counter                                                  ; 2288: c6 77       .w
+    dec cell_current                                                  ; 2288: c6 77       .w
     bpl increment_ptr_using_40_bytes_out_of_every_64                  ; 228a: 10 ea       ..
-    lda initial_cell_fill_value                                       ; 228c: a5 79       .y
+    lda cell_below_left                                               ; 228c: a5 79       .y
     sta (ptr_low),y                                                   ; 228e: 91 8c       ..
     bpl c2264                                                         ; 2290: 10 d2       ..
 reset_grid_of_sprites
@@ -1233,18 +1251,16 @@ clear_backwards_status_bar_loop
     bne clear_backwards_status_bar_loop                               ; 22a2: d0 fa       ..
     rts                                                               ; 22a4: 60          `
 
-handler_0
-handler_1
-handler_2
-handler_3
+handler_0123
     txa                                                               ; 22a5: 8a          .
     sec                                                               ; 22a6: 38          8
     sbc #$90                                                          ; 22a7: e9 90       ..
     cmp #$10                                                          ; 22a9: c9 10       ..
-    bpl c22b1                                                         ; 22ab: 10 04       ..
+    bpl not_in_range_so_change_nothing                                ; 22ab: 10 04       ..
+    ; cell is in the range $90-$9f, so we look up the replacement in a table
     tax                                                               ; 22ad: aa          .
     lda l21e0,x                                                       ; 22ae: bd e0 21    ..!
-c22b1
+not_in_range_so_change_nothing
     tax                                                               ; 22b1: aa          .
     rts                                                               ; 22b2: 60          `
 
@@ -1263,7 +1279,7 @@ loop_over_rows
     lsr                                                               ; 22c8: 4a          J
     lsr                                                               ; 22c9: 4a          J
     lsr                                                               ; 22ca: 4a          J
-    cmp l005a                                                         ; 22cb: c5 5a       .Z
+    cmp tick_counter                                                  ; 22cb: c5 5a       .Z
     bne c22d7                                                         ; 22cd: d0 08       ..
     lda (ptr_low),y                                                   ; 22cf: b1 8c       ..
     and #$7f                                                          ; 22d1: 29 7f       ).
@@ -1291,14 +1307,14 @@ skip_to_next_row
     jsr play_sound_x_pitch_y                                          ; 22f5: 20 2c 2c     ,,
     rts                                                               ; 22f8: 60          `
 
-unused8
+unused7
     lda #$eb                                                          ; 22f9: a9 eb       ..
     ; sta $2c16
     !byte $8d, $16, $2c                                               ; 22fb: 8d 16 2c    ..,
 
     rts                                                               ; 22fe: 60          `
 
-unused9
+unused8
     rts                                                               ; 22ff: 60          `
 
 draw_grid_of_sprites
@@ -1308,13 +1324,13 @@ draw_grid_of_sprites
     sta screen_addr1_high                                             ; 2308: 85 8b       ..
     ldy #<screen_addr_row_6                                           ; 230a: a0 80       ..
     lda #opcode_lda_abs_y                                             ; 230c: a9 b9       ..
-    sta opcode_to_change                                              ; 230e: 8d 57 23    .W#
+    sta load_instruction                                              ; 230e: 8d 57 23    .W#
     lda #<grid_of_screen_sprites                                      ; 2311: a9 00       ..
-    sta grid_addr1_low                                                ; 2313: 8d 5c 23    .\#
-    sta grid_addr2_low                                                ; 2316: 8d 61 23    .a#
+    sta grid_compare_address_low                                      ; 2313: 8d 5c 23    .\#
+    sta grid_write_address_low                                        ; 2316: 8d 61 23    .a#
     lda #>grid_of_screen_sprites                                      ; 2319: a9 0c       ..
-    sta grid_addr1_high                                               ; 231b: 8d 5d 23    .]#
-    sta grid_addr2_high                                               ; 231e: 8d 62 23    .b#
+    sta grid_compare_address_high                                     ; 231b: 8d 5d 23    .]#
+    sta grid_write_address_high                                       ; 231e: 8d 62 23    .b#
     ldx #<zeroed_status_bar                                           ; 2321: a2 f0       ..
     bne c234a                                                         ; 2323: d0 25       .%             ; ALWAYS branch
 
@@ -1325,40 +1341,46 @@ draw_grid
     sta screen_addr1_high                                             ; 2329: 85 8b       ..
     lda #>backwards_status_bar                                        ; 232b: a9 50       .P
     ldx #<backwards_status_bar                                        ; 232d: a2 28       .(
-    stx grid_addr1_low                                                ; 232f: 8e 5c 23    .\#
-    stx grid_addr2_low                                                ; 2332: 8e 61 23    .a#
-    sta grid_addr1_high                                               ; 2335: 8d 5d 23    .]#
-    sta grid_addr2_high                                               ; 2338: 8d 62 23    .b#
+    stx grid_compare_address_low                                      ; 232f: 8e 5c 23    .\#
+    stx grid_write_address_low                                        ; 2332: 8e 61 23    .a#
+    sta grid_compare_address_high                                     ; 2335: 8d 5d 23    .]#
+    sta grid_write_address_high                                       ; 2338: 8d 62 23    .b#
 instruction_for_self_modification
 status_text_address_high = instruction_for_self_modification+1
     lda #>tile_map                                                    ; 233b: a9 32       .2
     sta tile_map_ptr_high                                             ; 233d: 85 86       ..
     lda #opcode_ldy_abs                                               ; 233f: a9 ac       ..
-    sta opcode_to_change                                              ; 2341: 8d 57 23    .W#
-    ldx #<players_and_men_status_bar                                  ; 2344: a2 14       ..
+    sta load_instruction                                              ; 2341: 8d 57 23    .W#
+    ; X is the column counter
+    ldx #20                                                           ; 2344: a2 14       ..
     lda status_text_address_low                                       ; 2346: a5 69       .i
     sta tile_map_ptr_low                                              ; 2348: 85 85       ..
 c234a
     sty screen_addr1_low                                              ; 234a: 84 8a       ..
 draw_grid_loop
     ldy #0                                                            ; 234c: a0 00       ..
-    sty sprite_for_block_type_1                                       ; 234e: 84 73       .s
+    sty grid_column_counter                                           ; 234e: 84 73       .s
 grid_draw_row_loop
     lda (tile_map_ptr_low),y                                          ; 2350: b1 85       ..
     tay                                                               ; 2352: a8          .
-    bpl opcode_to_change                                              ; 2353: 10 02       ..
+    bpl load_instruction                                              ; 2353: 10 02       ..
+    ; Y=9 indicates the titanium wall
     ldy #9                                                            ; 2355: a0 09       ..
-opcode_to_change
+    ; this next instruction is either:
+    ;     'ldy cell_type_to_sprite' [which in this context is a NOP] OR
+    ;     'lda cell_type_to_sprite,y'
+    ; as set by self-modifying code above
+load_instruction
     ldy cell_type_to_sprite                                           ; 2357: ac 80 1f    ...
     dex                                                               ; 235a: ca          .
-sub_c235b
-grid_addr1_low = sub_c235b+1
-grid_addr1_high = sub_c235b+2
+compare_instruction
+grid_compare_address_low = compare_instruction+1
+grid_compare_address_high = compare_instruction+2
     cmp backwards_status_bar,x                                        ; 235b: dd 28 50    .(P
     beq skip_draw_sprite                                              ; 235e: f0 49       .I
-sub_c2360
-grid_addr2_low = sub_c2360+1
-grid_addr2_high = sub_c2360+2
+write_instruction
+grid_write_address_low = write_instruction+1
+grid_write_address_high = write_instruction+2
     sta backwards_status_bar,x                                        ; 2360: 9d 28 50    .(P
     tay                                                               ; 2363: a8          .
     clc                                                               ; 2364: 18          .
@@ -1402,20 +1424,23 @@ draw_sprite_loop
     sta (screen_addr2_low),y                                          ; 23a4: 91 80       ..
     dey                                                               ; 23a6: 88          .
     bpl draw_sprite_loop                                              ; 23a7: 10 da       ..
+    ; move the screen pointer on 16 pixels to next column
 skip_draw_sprite
     clc                                                               ; 23a9: 18          .
     lda screen_addr1_low                                              ; 23aa: a5 8a       ..
     adc #$10                                                          ; 23ac: 69 10       i.
     sta screen_addr1_low                                              ; 23ae: 85 8a       ..
-    bcc c23b4                                                         ; 23b0: 90 02       ..
+    bcc skip_high_byte                                                ; 23b0: 90 02       ..
     inc screen_addr1_high                                             ; 23b2: e6 8b       ..
-c23b4
-    inc sprite_for_block_type_1                                       ; 23b4: e6 73       .s
-    ldy sprite_for_block_type_1                                       ; 23b6: a4 73       .s
+skip_high_byte
+    inc grid_column_counter                                           ; 23b4: e6 73       .s
+    ldy grid_column_counter                                           ; 23b6: a4 73       .s
     cpy #20                                                           ; 23b8: c0 14       ..
     bne grid_draw_row_loop                                            ; 23ba: d0 94       ..
+    ; return if we have drawn all the rows (X=0)
     txa                                                               ; 23bc: 8a          .
     beq return2                                                       ; 23bd: f0 1c       ..
+    ; move screen pointer on to next row of sprites (two character rows)
     clc                                                               ; 23bf: 18          .
     lda screen_addr1_low                                              ; 23c0: a5 8a       ..
     adc #$40                                                          ; 23c2: 69 40       i@
@@ -1423,6 +1448,7 @@ c23b4
     lda screen_addr1_high                                             ; 23c6: a5 8b       ..
     adc #1                                                            ; 23c8: 69 01       i.
     sta screen_addr1_high                                             ; 23ca: 85 8b       ..
+    ; move tile pointer on to next row (64 bytes)
     lda tile_map_ptr_low                                              ; 23cc: a5 85       ..
     adc #$40                                                          ; 23ce: 69 40       i@
     sta tile_map_ptr_low                                              ; 23d0: 85 85       ..
@@ -1434,22 +1460,25 @@ c23b4
 return2
     rts                                                               ; 23db: 60          `
 
-unused10
+unused9
     !byte $a0,   7, $9a, $a9                                          ; 23dc: a0 07 9a... ...
 
-handler_11
+    ; Handler for filling in a vertical strip. Set the cells between $0b's to the value
+    ; above the first $0b.
+handler_for_vertical_strip
     lda #$0b                                                          ; 23e0: a9 0b       ..
-    cmp cell_down                                                     ; 23e2: c5 7a       .z
-    bne c23e8                                                         ; 23e4: d0 02       ..
-    lda cell_up                                                       ; 23e6: a5 74       .t
-c23e8
-    sta cell_down                                                     ; 23e8: 85 7a       .z
-    lda cell_up                                                       ; 23ea: a5 74       .t
+    cmp cell_below                                                    ; 23e2: c5 7a       .z
+    bne replace_cell_below                                            ; 23e4: d0 02       ..
+    lda cell_above                                                    ; 23e6: a5 74       .t
+replace_cell_below
+    sta cell_below                                                    ; 23e8: 85 7a       .z
+    ; copy cell above to current cell, clearing top bit
+    lda cell_above                                                    ; 23ea: a5 74       .t
     and #$7f                                                          ; 23ec: 29 7f       ).
     tax                                                               ; 23ee: aa          .
     rts                                                               ; 23ef: 60          `
 
-handler_12
+handler_for_horizontal_strip
     txa                                                               ; 23f0: 8a          .
     and #$7f                                                          ; 23f1: 29 7f       ).
     cmp cell_right                                                    ; 23f3: c5 78       .x
@@ -1460,17 +1489,17 @@ c23f9
     ldx cell_left                                                     ; 23fb: a6 76       .v
     rts                                                               ; 23fd: 60          `
 
-unused11
+unused10
     !byte $76, $60                                                    ; 23fe: 76 60       v`
 
     ; set branch offset (self modifying code)
-sub_c2400
-    ldy #c249a - after_branch                                         ; 2400: a0 5f       ._
+update_map
+    ldy #update_map_space - after_branch                              ; 2400: a0 5f       ._
     bne set_branch_offset                                             ; 2402: d0 02       ..             ; ALWAYS branch
 
     ; set branch offset (self modifying code)
-sub_c2404
-    ldy #c2461 - after_branch                                         ; 2404: a0 26       .&
+preprocess_map
+    ldy #mark_cell_above_as_processed_and_move_to_next_cell - after_branch; 2404: a0 26       .&
 set_branch_offset
     sty branch_offset                                                 ; 2406: 8c 3a 24    .:$
     ; twenty rows
@@ -1483,69 +1512,81 @@ set_branch_offset
     ldy #$40                                                          ; 2415: a0 40       .@
     ; loop through the twenty rows of map
 tile_map_y_loop
-    lda #38                                                           ; 2417: a9 26       .&             ; 38 columns
+    lda #38                                                           ; 2417: a9 26       .&             ; 38 columns (cells per row)
     sta tile_x                                                        ; 2419: 85 86       ..
     lda (ptr_low),y                                                   ; 241b: b1 8c       ..
     sta cell_left                                                     ; 241d: 85 76       .v
+    ; move to the next cell
     iny                                                               ; 241f: c8          .
+    ; read current cell contents into X
     lda (ptr_low),y                                                   ; 2420: b1 8c       ..
     tax                                                               ; 2422: aa          .
-    ; loop through the 38 columns of map
+    ; loop through the 38 cells in a row of map
+    ; read next cell contents into cell_right
 tile_map_x_loop
     ldy #$42                                                          ; 2423: a0 42       .B
     lda (ptr_low),y                                                   ; 2425: b1 8c       ..
     sta cell_right                                                    ; 2427: 85 78       .x
     cpx #map_diamond                                                  ; 2429: e0 04       ..
-    bmi c2461                                                         ; 242b: 30 34       04
+    bmi mark_cell_above_as_processed_and_move_to_next_cell            ; 242b: 30 34       04
+    ; if current cell is already processed (top bit set), then skip to next cell
     txa                                                               ; 242d: 8a          .
-    bmi c2461                                                         ; 242e: 30 31       01
+    bmi mark_cell_above_as_processed_and_move_to_next_cell            ; 242e: 30 31       01
+    ; mark current cell as processed (set top bit)
     ora #$80                                                          ; 2430: 09 80       ..
     tax                                                               ; 2432: aa          .
+    ; the lower four bits are the type, each of which has a handler to process it
     and #$0f                                                          ; 2433: 29 0f       ).
     tay                                                               ; 2435: a8          .
     lda handler_table_high,y                                          ; 2436: b9 d0 21    ..!
+    ; if we have an empty cell, branch (destination was set depending on where we
+    ; entered this routine)
 branch_instruction
 branch_offset = branch_instruction+1
-    beq c249a                                                         ; 2439: f0 5f       ._
+    beq update_map_space                                              ; 2439: f0 5f       ._
 after_branch
     sta handler_high                                                  ; 243b: 8d 52 24    .R$
     lda handler_table_low,y                                           ; 243e: b9 c0 21    ..!
     sta handler_low                                                   ; 2441: 8d 51 24    .Q$
+    ; read cells into cell_above and cell_below variables
     ldy #1                                                            ; 2444: a0 01       ..
     lda (ptr_low),y                                                   ; 2446: b1 8c       ..
-    sta cell_up                                                       ; 2448: 85 74       .t
+    sta cell_above                                                    ; 2448: 85 74       .t
     ldy #$81                                                          ; 244a: a0 81       ..
     lda (ptr_low),y                                                   ; 244c: b1 8c       ..
-    sta cell_down                                                     ; 244e: 85 7a       .z
+    sta cell_below                                                    ; 244e: 85 7a       .z
+    ; call the handler for the cell based on the type (0-15)
 jsr_handler_instruction
 handler_low = jsr_handler_instruction+1
 handler_high = jsr_handler_instruction+2
-    jsr handler_6                                                     ; 2450: 20 00 25     .%
-    ; store the new next cell down
-    lda cell_down                                                     ; 2453: a5 7a       .z
+    jsr handler_firefly                                               ; 2450: 20 00 25     .%
+    ; the handler may have changed the surreounding cells. store the new cell down
+    lda cell_below                                                    ; 2453: a5 7a       .z
     ldy #$81                                                          ; 2455: a0 81       ..
     sta (ptr_low),y                                                   ; 2457: 91 8c       ..
-    lda cell_up                                                       ; 2459: a5 74       .t
+    ; store the new cell up
+    lda cell_above                                                    ; 2459: a5 74       .t
     and #$7f                                                          ; 245b: 29 7f       ).
     ldy #1                                                            ; 245d: a0 01       ..
-    bpl move_to_next_cell                                             ; 245f: 10 06       ..
-c2461
+    bpl move_to_next_cell                                             ; 245f: 10 06       ..             ; ALWAYS branch
+
+mark_cell_above_as_processed_and_move_to_next_cell
     ldy #1                                                            ; 2461: a0 01       ..
     lda (ptr_low),y                                                   ; 2463: b1 8c       ..
     and #$7f                                                          ; 2465: 29 7f       ).
 move_to_next_cell
     sta (ptr_low),y                                                   ; 2467: 91 8c       ..
-    ; store the previous cell value back into the map
+    ; store the new cell left back into the map
     lda cell_left                                                     ; 2469: a5 76       .v
     ldy #$40                                                          ; 246b: a0 40       .@
     sta (ptr_low),y                                                   ; 246d: 91 8c       ..
-    ; update the previous_cell variable with the current cell value from x
+    ; update cell_left with the current cell value (in X)
     stx cell_left                                                     ; 246f: 86 76       .v
-    ; update the current cell value x from the next_cell variable
+    ; update the current cell value x from the cell_right variable
     ldx cell_right                                                    ; 2471: a6 78       .x
     ; move ptr to next position
     inc ptr_low                                                       ; 2473: e6 8c       ..
-    ; loop back for the rest of the columns
+    ; loop back for the rest of the cells in the row
     dec tile_x                                                        ; 2475: c6 86       ..
     bne tile_map_x_loop                                               ; 2477: d0 aa       ..
     ; store the final previous_cell for the row
@@ -1558,6 +1599,7 @@ move_to_next_cell
     ; loop back for the rest of the rows
     dec tile_y                                                        ; 2482: c6 85       ..
     bne tile_map_y_loop                                               ; 2484: d0 91       ..
+    ; clear top bit in final row
     ldy #38                                                           ; 2486: a0 26       .&
 clear_top_bit_on_final_row_loop
     lda map_row_20,y                                                  ; 2488: b9 00 55    ..U
@@ -1571,20 +1613,22 @@ clear_top_bit_on_final_row_loop
     sta (map_rockford_end_position_addr_low),y                        ; 2497: 91 6a       .j
     rts                                                               ; 2499: 60          `
 
-c249a
+    ; get cell below
+update_map_space
     ldy #$81                                                          ; 249a: a0 81       ..
     lda (ptr_low),y                                                   ; 249c: b1 8c       ..
-    beq c24d4                                                         ; 249e: f0 34       .4
+    beq space_below_is_also_a_space                                   ; 249e: f0 34       .4
+    ; check current cell
     cpx #$c0                                                          ; 24a0: e0 c0       ..
-    bmi c24a7                                                         ; 24a2: 30 03       0.
-    jsr sub_c24db                                                     ; 24a4: 20 db 24     .$
-c24a7
+    bmi not_c0_or_above                                               ; 24a2: 30 03       0.
+    jsr process_c0_or_above                                           ; 24a4: 20 db 24     .$
+not_c0_or_above
     and #$4f                                                          ; 24a7: 29 4f       )O
     tay                                                               ; 24a9: a8          .
     asl                                                               ; 24aa: 0a          .
-    bmi c2461                                                         ; 24ab: 30 b4       0.
+    bmi mark_cell_above_as_processed_and_move_to_next_cell            ; 24ab: 30 b4       0.
     lda l2100,y                                                       ; 24ad: b9 00 21    ..!
-    beq c2461                                                         ; 24b0: f0 af       ..
+    beq mark_cell_above_as_processed_and_move_to_next_cell            ; 24b0: f0 af       ..
     lda cell_left                                                     ; 24b2: a5 76       .v
     bne c24bc                                                         ; 24b4: d0 06       ..
     ldy #$80                                                          ; 24b6: a0 80       ..
@@ -1592,54 +1636,60 @@ c24a7
     beq c24c6                                                         ; 24ba: f0 0a       ..
 c24bc
     lda cell_right                                                    ; 24bc: a5 78       .x
-    bne c2461                                                         ; 24be: d0 a1       ..
+    bne mark_cell_above_as_processed_and_move_to_next_cell            ; 24be: d0 a1       ..
     ldy #$82                                                          ; 24c0: a0 82       ..
     lda (ptr_low),y                                                   ; 24c2: b1 8c       ..
-    bne c2461                                                         ; 24c4: d0 9b       ..
+    bne mark_cell_above_as_processed_and_move_to_next_cell            ; 24c4: d0 9b       ..
 c24c6
     txa                                                               ; 24c6: 8a          .
     ora #$40                                                          ; 24c7: 09 40       .@
     sta lfff6,y                                                       ; 24c9: 99 f6 ff    ...
     lda #$80                                                          ; 24cc: a9 80       ..
     sta (ptr_low),y                                                   ; 24ce: 91 8c       ..
-loop_c24d0
+set_to_space
     ldx #$80                                                          ; 24d0: a2 80       ..
-    bne c2461                                                         ; 24d2: d0 8d       ..
-c24d4
+    bne mark_cell_above_as_processed_and_move_to_next_cell            ; 24d2: d0 8d       ..             ; ALWAYS branch
+
+; set bit six of the cell below to indicate cell above is also a space
+space_below_is_also_a_space
     txa                                                               ; 24d4: 8a          .
     ora #$40                                                          ; 24d5: 09 40       .@
     sta (ptr_low),y                                                   ; 24d7: 91 8c       ..
-    bne loop_c24d0                                                    ; 24d9: d0 f5       ..
-sub_c24db
+    bne set_to_space                                                  ; 24d9: d0 f5       ..             ; ALWAYS branch
+
+process_c0_or_above
     pha                                                               ; 24db: 48          H
+    ; look up table based on type
     and #$0f                                                          ; 24dc: 29 0f       ).
     tay                                                               ; 24de: a8          .
     lda l2180,y                                                       ; 24df: b9 80 21    ..!
-    beq c24e8                                                         ; 24e2: f0 04       ..
+    beq dont_store_below                                              ; 24e2: f0 04       ..
+    ; store in cell below
     ldy #$81                                                          ; 24e4: a0 81       ..
     sta (ptr_low),y                                                   ; 24e6: 91 8c       ..
-c24e8
+dont_store_below
     txa                                                               ; 24e8: 8a          .
     and #1                                                            ; 24e9: 29 01       ).
-    eor #$4b                                                          ; 24eb: 49 4b       IK
+    eor #l004b                                                        ; 24eb: 49 4b       IK
     tay                                                               ; 24ed: a8          .
+    ; store $4b or $4c in location $4b or $4c. Flashing animation?
     sta l0000,y                                                       ; 24ee: 99 00 00    ...
+    ; mask off the top two bits for the current cell value
     txa                                                               ; 24f1: 8a          .
     and #$bf                                                          ; 24f2: 29 bf       ).
     tax                                                               ; 24f4: aa          .
     pla                                                               ; 24f5: 68          h
     rts                                                               ; 24f6: 60          `
 
-unused12
+unused11
     !byte $60,   3, $d0,   2, $e6, $4a, $60,   1, $60                 ; 24f7: 60 03 d0... `..
 
-handler_6
-handler_14
+handler_firefly
     cpx #$c0                                                          ; 2500: e0 c0       ..
     bpl c2542                                                         ; 2502: 10 3e       .>
     ldy #8                                                            ; 2504: a0 08       ..
 loop_c2506
-    lda sprite_for_block_type_1-1,y                                   ; 2506: b9 72 00    .r.
+    lda cell_above_left-1,y                                           ; 2506: b9 72 00    .r.
     bne unnecessary_branch                                            ; 2509: d0 00       ..             ; redundant instruction
 unnecessary_branch
     and #7                                                            ; 250b: 29 07       ).
@@ -1679,57 +1729,68 @@ c253d
 
 c2542
     txa                                                               ; 2542: 8a          .
-    ldx #$40                                                          ; 2543: a2 40       .@
+    ldx #<another_array_of_cells                                      ; 2543: a2 40       .@
     and #8                                                            ; 2545: 29 08       ).
     beq c254b                                                         ; 2547: f0 02       ..
-    ldx #$30                                                          ; 2549: a2 30       .0
+    ldx #<some_array_of_cells                                         ; 2549: a2 30       .0
 c254b
     stx l2572                                                         ; 254b: 8e 72 25    .r%
     stx l004c                                                         ; 254e: 86 4c       .L
+    ; read above left cell
     ldy #0                                                            ; 2550: a0 00       ..
     lda (ptr_low),y                                                   ; 2552: b1 8c       ..
-    sta sprite_for_block_type_1                                       ; 2554: 85 73       .s
-    sty loop_counter                                                  ; 2556: 84 77       .w
+    sta cell_above_left                                               ; 2554: 85 73       .s
+    ; reset current cell to zero
+    sty cell_current                                                  ; 2556: 84 77       .w
+    ; read above right cell
     ldy #2                                                            ; 2558: a0 02       ..
     lda (ptr_low),y                                                   ; 255a: b1 8c       ..
-    sta sprite_for_block_type_3                                       ; 255c: 85 75       .u
+    sta cell_above_right                                              ; 255c: 85 75       .u
+    ; read below left cell
     ldy #$80                                                          ; 255e: a0 80       ..
     lda (ptr_low),y                                                   ; 2560: b1 8c       ..
-    sta initial_cell_fill_value                                       ; 2562: 85 79       .y
+    sta cell_below_left                                               ; 2562: 85 79       .y
+    ; read below right cell
     ldy #$82                                                          ; 2564: a0 82       ..
     lda (ptr_low),y                                                   ; 2566: b1 8c       ..
-    sta l007b                                                         ; 2568: 85 7b       .{
+    sta cell_below_right                                              ; 2568: 85 7b       .{
+    ; loop 9 times
     ldx #9                                                            ; 256a: a2 09       ..
 loop_c256c
-    lda sprite_for_block_type_1-1,x                                   ; 256c: b5 72       .r
+    lda cell_above_left-1,x                                           ; 256c: b5 72       .r
     and #$0f                                                          ; 256e: 29 0f       ).
     tay                                                               ; 2570: a8          .
 sub_c2571
 l2572 = sub_c2571+1
-    lda l2140,y                                                       ; 2571: b9 40 21    .@!
+    lda another_array_of_cells,y                                      ; 2571: b9 40 21    .@!
     beq c2578                                                         ; 2574: f0 02       ..
-    sta sprite_for_block_type_1-1,x                                   ; 2576: 95 72       .r
+    sta cell_above_left-1,x                                           ; 2576: 95 72       .r
 c2578
     dex                                                               ; 2578: ca          .
     bne loop_c256c                                                    ; 2579: d0 f1       ..
+    ; write to above left cell
     ldy #0                                                            ; 257b: a0 00       ..
-    lda sprite_for_block_type_1                                       ; 257d: a5 73       .s
+    lda cell_above_left                                               ; 257d: a5 73       .s
     and #$7f                                                          ; 257f: 29 7f       ).
     sta (ptr_low),y                                                   ; 2581: 91 8c       ..
+    ; write to above right cell
     ldy #2                                                            ; 2583: a0 02       ..
-    lda sprite_for_block_type_3                                       ; 2585: a5 75       .u
+    lda cell_above_right                                              ; 2585: a5 75       .u
     sta (ptr_low),y                                                   ; 2587: 91 8c       ..
+    ; write to below left cell
     ldy #$80                                                          ; 2589: a0 80       ..
-    lda initial_cell_fill_value                                       ; 258b: a5 79       .y
+    lda cell_below_left                                               ; 258b: a5 79       .y
     sta (ptr_low),y                                                   ; 258d: 91 8c       ..
+    ; write to below right cell
     ldy #$82                                                          ; 258f: a0 82       ..
-    lda l007b                                                         ; 2591: a5 7b       .{
+    lda cell_below_right                                              ; 2591: a5 7b       .{
     sta (ptr_low),y                                                   ; 2593: 91 8c       ..
-    ldx loop_counter                                                  ; 2595: a6 77       .w
+    ldx cell_current                                                  ; 2595: a6 77       .w
     rts                                                               ; 2597: 60          `
 
+unused12
     ldy #$82                                                          ; 2598: a0 82       ..
-    lda l007b                                                         ; 259a: a5 7b       .{
+    lda cell_below_right                                              ; 259a: a5 7b       .{
     sta (ptr_low),y                                                   ; 259c: 91 8c       ..
 handler_7
     lda l0054                                                         ; 259e: a5 54       .T
@@ -1741,13 +1802,13 @@ handler_7
 c25a6
     inc l0056                                                         ; 25a6: e6 56       .V
     lda #$0e                                                          ; 25a8: a9 0e       ..
-    bit cell_up                                                       ; 25aa: 24 74       $t
+    bit cell_above                                                    ; 25aa: 24 74       $t
     beq c25ba                                                         ; 25ac: f0 0c       ..
     bit cell_left                                                     ; 25ae: 24 76       $v
     beq c25ba                                                         ; 25b0: f0 08       ..
     bit cell_right                                                    ; 25b2: 24 78       $x
     beq c25ba                                                         ; 25b4: f0 04       ..
-    bit cell_down                                                     ; 25b6: 24 7a       $z
+    bit cell_below                                                    ; 25b6: 24 7a       $z
     bne return3                                                       ; 25b8: d0 3b       .;
 c25ba
     stx l0060                                                         ; 25ba: 86 60       .`
@@ -1766,7 +1827,7 @@ c25ba
     tay                                                               ; 25d0: a8          .
     cpx #$c0                                                          ; 25d1: e0 c0       ..
     bmi c25e2                                                         ; 25d3: 30 0d       0.
-    lda cell_up,y                                                     ; 25d5: b9 74 00    .t.
+    lda cell_above,y                                                  ; 25d5: b9 74 00    .t.
     beq c25e9                                                         ; 25d8: f0 0f       ..
 c25da
     txa                                                               ; 25da: 8a          .
@@ -1777,23 +1838,23 @@ c25da
     rts                                                               ; 25e1: 60          `
 
 c25e2
-    lda cell_up,y                                                     ; 25e2: b9 74 00    .t.
+    lda cell_above,y                                                  ; 25e2: b9 74 00    .t.
     and #$0e                                                          ; 25e5: 29 0e       ).
     bne c25da                                                         ; 25e7: d0 f1       ..
 c25e9
-    lda l005a                                                         ; 25e9: a5 5a       .Z
+    lda tick_counter                                                  ; 25e9: a5 5a       .Z
     lsr                                                               ; 25eb: 4a          J
     bcc c25f1                                                         ; 25ec: 90 03       ..
     jsr c25da                                                         ; 25ee: 20 da 25     .%
 c25f1
     txa                                                               ; 25f1: 8a          .
-    sta cell_up,y                                                     ; 25f2: 99 74 00    .t.
+    sta cell_above,y                                                  ; 25f2: 99 74 00    .t.
 return3
     rts                                                               ; 25f5: 60          `
 
 unused13
     sbc l0ba9,y                                                       ; 25f6: f9 a9 0b    ...
-    sta cell_down                                                     ; 25f9: 85 7a       .z
+    sta cell_below                                                    ; 25f9: 85 7a       .z
     rts                                                               ; 25fb: 60          `
 
 unused14
@@ -1888,11 +1949,11 @@ c2678
 
 read_keys
     ldx #7                                                            ; 2689: a2 07       ..
-    stx loop_counter                                                  ; 268b: 86 77       .w
+    stx cell_current                                                  ; 268b: 86 77       .w
     ldx #0                                                            ; 268d: a2 00       ..
     stx real_keys_pressed                                             ; 268f: 86 7c       .|
 read_keys_loop
-    ldx loop_counter                                                  ; 2691: a6 77       .w
+    ldx cell_current                                                  ; 2691: a6 77       .w
     lda inkey_keys_table,x                                            ; 2693: bd 28 22    .("
     tax                                                               ; 2696: aa          .
     tay                                                               ; 2697: a8          .
@@ -1900,7 +1961,7 @@ read_keys_loop
     jsr osbyte                                                        ; 269a: 20 f4 ff     ..            ; Read key within time limit, or read a specific key, or read machine type
     inx                                                               ; 269d: e8          .
     rol real_keys_pressed                                             ; 269e: 26 7c       &|
-    dec loop_counter                                                  ; 26a0: c6 77       .w
+    dec cell_current                                                  ; 26a0: c6 77       .w
     bpl read_keys_loop                                                ; 26a2: 10 ed       ..
     lda keys_to_process                                               ; 26a4: a5 62       .b
     ora real_keys_pressed                                             ; 26a6: 05 7c       .|
@@ -1915,19 +1976,19 @@ handler_13
     ldx l0050                                                         ; 26af: a6 50       .P
     cmp #$bd                                                          ; 26b1: c9 bd       ..
     bne c26da                                                         ; 26b3: d0 25       .%
-    lda cell_up                                                       ; 26b5: a5 74       .t
+    lda cell_above                                                    ; 26b5: a5 74       .t
     and #$0f                                                          ; 26b7: 29 0f       ).
     tay                                                               ; 26b9: a8          .
     lda cell_value_to_fill_vertically,y                               ; 26ba: b9 20 21    . !
     beq fill_with_a                                                   ; 26bd: f0 04       ..
     ldy #$80                                                          ; 26bf: a0 80       ..
-    sty cell_up                                                       ; 26c1: 84 74       .t
+    sty cell_above                                                    ; 26c1: 84 74       .t
 fill_with_a
     cpx #$2d                                                          ; 26c3: e0 2d       .-
     beq c26d7                                                         ; 26c5: f0 10       ..
-    ldy cell_down                                                     ; 26c7: a4 7a       .z
+    ldy cell_below                                                    ; 26c7: a4 7a       .z
     bne c26cd                                                         ; 26c9: d0 02       ..
-    sta cell_down                                                     ; 26cb: 85 7a       .z
+    sta cell_below                                                    ; 26cb: 85 7a       .z
 c26cd
     ldx #$1d                                                          ; 26cd: a2 1d       ..
     inc data_set_ptr_high                                             ; 26cf: e6 47       .G
@@ -1946,7 +2007,6 @@ c26da
 unused16
     !byte $29, $7f, $aa, $e0                                          ; 26df: 29 7f aa... )..
 
-handler_8
 handler_10
     txa                                                               ; 26e3: 8a          .
     and #$7f                                                          ; 26e4: 29 7f       ).
@@ -1955,7 +2015,7 @@ handler_10
     beq return4                                                       ; 26e9: f0 12       ..
     lda #0                                                            ; 26eb: a9 00       ..
     sta keys_to_process                                               ; 26ed: 85 62       .b
-    lda l005a                                                         ; 26ef: a5 5a       .Z
+    lda tick_counter                                                  ; 26ef: a5 5a       .Z
     cmp #$f0                                                          ; 26f1: c9 f0       ..
     bpl return4                                                       ; 26f3: 10 08       ..
     ldx #$21                                                          ; 26f5: a2 21       .!
@@ -2002,7 +2062,7 @@ c2727
 
 update_demo_mode
     ldy #<status_bar_sprite_numbers                                   ; 2735: a0 00       ..
-    lda l005a                                                         ; 2737: a5 5a       .Z
+    lda tick_counter                                                  ; 2737: a5 5a       .Z
     and #$10                                                          ; 2739: 29 10       ).
     beq c273f                                                         ; 273b: f0 02       ..
     ldy #<scrolling_pause_text                                        ; 273d: a0 a0       ..
@@ -2017,7 +2077,7 @@ c273f
     lda demonstration_key_durations,x                                 ; 274d: bd 60 31    .`1
     sta demo_key_duration                                             ; 2750: 85 67       .g
 c2752
-    jsr sub_c2400                                                     ; 2752: 20 00 24     .$
+    jsr update_map                                                    ; 2752: 20 00 24     .$
     lda neighbour_cell_contents                                       ; 2755: a5 64       .d
     and #$0f                                                          ; 2757: 29 0f       ).
     sta neighbour_cell_contents                                       ; 2759: 85 64       .d
@@ -2061,8 +2121,8 @@ c278f
     jsr sub_c2f00                                                     ; 27a1: 20 00 2f     ./
 c27a4
     jsr sub_c2c80                                                     ; 27a4: 20 80 2c     .,
-    dec l005a                                                         ; 27a7: c6 5a       .Z
-    lda l005a                                                         ; 27a9: a5 5a       .Z
+    dec tick_counter                                                  ; 27a7: c6 5a       .Z
+    lda tick_counter                                                  ; 27a9: a5 5a       .Z
     and #7                                                            ; 27ab: 29 07       ).
     bne c27b7                                                         ; 27ad: d0 08       ..
     lda l0050                                                         ; 27af: a5 50       .P
@@ -2111,16 +2171,16 @@ unused18
 
 sub_c2800
     ldx #$0e                                                          ; 2800: a2 0e       ..
-    stx loop_counter                                                  ; 2802: 86 77       .w
+    stx cell_current                                                  ; 2802: 86 77       .w
 loop_c2804
     ldy index_to_cell_type,x                                          ; 2804: bc 50 21    .P!
     ldx cell_type_to_sprite,y                                         ; 2807: be 80 1f    ...
     lda l1f00,x                                                       ; 280a: bd 00 1f    ...
     sta cell_type_to_sprite,y                                         ; 280d: 99 80 1f    ...
-    dec loop_counter                                                  ; 2810: c6 77       .w
-    ldx loop_counter                                                  ; 2812: a6 77       .w
+    dec cell_current                                                  ; 2810: c6 77       .w
+    ldx cell_current                                                  ; 2812: a6 77       .w
     bpl loop_c2804                                                    ; 2814: 10 ee       ..
-    lda l005a                                                         ; 2816: a5 5a       .Z
+    lda tick_counter                                                  ; 2816: a5 5a       .Z
     and #3                                                            ; 2818: 29 03       ).
     asl                                                               ; 281a: 0a          .
     asl                                                               ; 281b: 0a          .
@@ -2246,10 +2306,10 @@ prepare_level
     ldy cave_number                                                   ; 2904: a4 87       ..
     lda fill_cell_in_lower_nybble_strip_value_to_skip_in_upper_for_each_cave,y; 2906: b9 90 4c    ..L
     and #$0f                                                          ; 2909: 29 0f       ).
-    sta initial_cell_fill_value                                       ; 290b: 85 79       .y
+    sta cell_below_left                                               ; 290b: 85 79       .y
     jsr clear_map_and_grid                                            ; 290d: 20 56 22     V"
     ; high nybbles in the cave colour arrays store the sprite to use for three basic
-    ; block types. copy them into sprite_for_block_type_1/2/3
+    ; block types. copy them into cell_above_left/cell_above/cell_above_right
     ldy cave_number                                                   ; 2910: a4 87       ..
     ldx #1                                                            ; 2912: a2 01       ..
 loop_three_times
@@ -2258,7 +2318,7 @@ loop_three_times
     lsr                                                               ; 2918: 4a          J
     lsr                                                               ; 2919: 4a          J
     lsr                                                               ; 291a: 4a          J
-    sta sprite_for_block_type_1-1,x                                   ; 291b: 95 72       .r
+    sta cell_above_left-1,x                                           ; 291b: 95 72       .r
     ; add number of caves to Y, in order to get next block type
     tya                                                               ; 291d: 98          .
     clc                                                               ; 291e: 18          .
@@ -2342,7 +2402,7 @@ add_strips
     lsr                                                               ; 2990: 4a          J
     lsr                                                               ; 2991: 4a          J
     lsr                                                               ; 2992: 4a          J
-    sta value_to_not_write_as_a_strip                                 ; 2993: 85 77       .w
+    sta cell_current                                                  ; 2993: 85 77       .w
 find_strip_data_for_cave_loop
     dey                                                               ; 2995: 88          .
     bmi found_strip_data_for_cave                                     ; 2996: 30 09       0.
@@ -2391,7 +2451,7 @@ unused23
     bne c29db                                                         ; 29d7: d0 02       ..
     inc screen_addr1_high                                             ; 29d9: e6 8b       ..
 c29db
-    lda cell_down                                                     ; 29db: a5 7a       .z
+    lda cell_below                                                    ; 29db: a5 7a       .z
     ; bne $299a
     !byte $d0, $bb                                                    ; 29dd: d0 bb       ..
 
@@ -2595,13 +2655,13 @@ get_next_ptr_byte
 return9
     rts                                                               ; 2af3: 60          `
 
-unused26
+unused25
     !byte $f0, $e5, $a9,   0                                          ; 2af4: f0 e5 a9... ...
 
 rle_bytes_table
     !byte $85, $48, $10, $ec, $ff, $0f,   0                           ; 2af8: 85 48 10... .H.
 
-unused25
+unused26
     !byte $27                                                         ; 2aff: 27          '
 
 ; *************************************************************************************
@@ -2740,13 +2800,13 @@ c2bdf
     ldy #$80                                                          ; 2bdf: a0 80       ..
     sta (ptr_low),y                                                   ; 2be1: 91 8c       ..
     sta cell_left                                                     ; 2be3: 85 76       .v
-    sta cell_up                                                       ; 2be5: 85 74       .t
+    sta cell_above                                                    ; 2be5: 85 74       .t
     ldy #$83                                                          ; 2be7: a0 83       ..
     sta (ptr_low),y                                                   ; 2be9: 91 8c       ..
     lsr                                                               ; 2beb: 4a          J
     dey                                                               ; 2bec: 88          .
     sta (ptr_low),y                                                   ; 2bed: 91 8c       ..
-    sta cell_down                                                     ; 2bef: 85 7a       .z
+    sta cell_below                                                    ; 2bef: 85 7a       .z
     sta cell_right                                                    ; 2bf1: 85 78       .x
     ldx #6                                                            ; 2bf3: a2 06       ..
     lda cave_number                                                   ; 2bf5: a5 87       ..
@@ -2847,7 +2907,7 @@ c2ca0
     sta in_game_sound_data+2                                          ; 2ca5: 8d 02 2c    ..,
     ldx #5                                                            ; 2ca8: a2 05       ..
     jsr sub_c2ce8                                                     ; 2caa: 20 e8 2c     .,
-    lda l005a                                                         ; 2cad: a5 5a       .Z
+    lda tick_counter                                                  ; 2cad: a5 5a       .Z
     lsr                                                               ; 2caf: 4a          J
     bcc c2cb7                                                         ; 2cb0: 90 05       ..
     ldx #0                                                            ; 2cb2: a2 00       ..
@@ -2917,7 +2977,7 @@ write_strip_loop
     cmp #$0a                                                          ; 2d20: c9 0a       ..
     beq move_to_next_row                                              ; 2d22: f0 0e       ..
     ; if it's this cave's skip value, then don't write to the map
-    cmp value_to_not_write_as_a_strip                                 ; 2d24: c5 77       .w
+    cmp cell_current                                                  ; 2d24: c5 77       .w
     beq skip_write_to_map                                             ; 2d26: f0 02       ..
     sta (map_address_low),y                                           ; 2d28: 91 8c       ..
     ; move the map position one to the right, wrapping to the next row if needed
@@ -3010,7 +3070,7 @@ read_next_byte_loop
     inc next_ptr_high                                                 ; 2d9b: e6 83       ..
 skip_increment_high_byte1
     ldx #3                                                            ; 2d9d: a2 03       ..
-    stx loop_counter                                                  ; 2d9f: 86 77       .w
+    stx cell_current                                                  ; 2d9f: 86 77       .w
     ; Extract the top two bits of the stage byte. Each pair of bits holds a type to
     ; write into the cell. We shift down six times to get the index, and put the result
     ; in X.
@@ -3026,7 +3086,7 @@ loop_for_each_byte
     ; if the index is zero, don't write to the map.
     beq c2daf                                                         ; 2da9: f0 04       ..
     ; X=1,2 or 3. Look up the sprite to store in the cell (in the map).
-    lda sprite_for_block_type_1-1,x                                   ; 2dab: b5 72       .r
+    lda cell_above_left-1,x                                           ; 2dab: b5 72       .r
     sta (ptr_low),y                                                   ; 2dad: 91 8c       ..
 c2daf
     jsr increment_map_ptr                                             ; 2daf: 20 00 2a     .*
@@ -3035,7 +3095,7 @@ c2daf
     pla                                                               ; 2db4: 68          h
     asl                                                               ; 2db5: 0a          .
     asl                                                               ; 2db6: 0a          .
-    dec loop_counter                                                  ; 2db7: c6 77       .w
+    dec cell_current                                                  ; 2db7: c6 77       .w
     bpl loop_for_each_byte                                            ; 2db9: 10 e6       ..
     bmi read_next_byte_loop                                           ; 2dbb: 30 d6       0.             ; ALWAYS branch
 
@@ -3055,7 +3115,7 @@ unused34
     pla                                                               ; 2dca: 68          h
     asl                                                               ; 2dcb: 0a          .
     asl                                                               ; 2dcc: 0a          .
-    dec loop_counter                                                  ; 2dcd: c6 77       .w
+    dec cell_current                                                  ; 2dcd: c6 77       .w
     ; bpl $2da6
     ; bmi $2d98
     !byte $10, $d5                                                    ; 2dcf: 10 d5       ..
@@ -3094,13 +3154,15 @@ loop_c2e20
 c2e29
     dex                                                               ; 2e29: ca          .
     bpl loop_c2e20                                                    ; 2e2a: 10 f4       ..
+    ; don't process horizontal strips
     lda #0                                                            ; 2e2c: a9 00       ..
-    sta l21dc                                                         ; 2e2e: 8d dc 21    ..!
-    jsr sub_c2404                                                     ; 2e31: 20 04 24     .$
-    lda #$23                                                          ; 2e34: a9 23       .#
-    sta l21dc                                                         ; 2e36: 8d dc 21    ..!
-    jsr sub_c2404                                                     ; 2e39: 20 04 24     .$
-    ; draw titanium wall borders
+    sta handler_table_high+12                                         ; 2e2e: 8d dc 21    ..!
+    jsr preprocess_map                                                ; 2e31: 20 04 24     .$
+    ; process horizontal strips
+    lda #>handler_for_horizontal_strip                                ; 2e34: a9 23       .#
+    sta handler_table_high+12                                         ; 2e36: 8d dc 21    ..!
+    jsr preprocess_map                                                ; 2e39: 20 04 24     .$
+    ; map complete: draw titanium wall borders
     jsr set_ptr_to_start_of_map                                       ; 2e3c: 20 1a 2a     .*
     ; loop over all rows
     ldx #22                                                           ; 2e3f: a2 16       ..
@@ -3179,20 +3241,20 @@ play_scren_dissolve_to_solid
 play_screen_dissolve_effect
     sta dissolve_to_solid_flag                                        ; 2ebf: 85 72       .r
     lda #$21                                                          ; 2ec1: a9 21       .!
-    sta l005a                                                         ; 2ec3: 85 5a       .Z
+    sta tick_counter                                                  ; 2ec3: 85 5a       .Z
     lda cave_number                                                   ; 2ec5: a5 87       ..
-    sta loop_counter                                                  ; 2ec7: 85 77       .w
+    sta cell_current                                                  ; 2ec7: 85 77       .w
 screen_dissolve_loop
     jsr sub_c22b3                                                     ; 2ec9: 20 b3 22     ."
     jsr draw_grid_of_sprites                                          ; 2ecc: 20 00 23     .#
     jsr draw_grid_at_regular_screen_address                           ; 2ecf: 20 25 23     %#
-    lda l005a                                                         ; 2ed2: a5 5a       .Z
+    lda tick_counter                                                  ; 2ed2: a5 5a       .Z
     asl                                                               ; 2ed4: 0a          .
     and #$0f                                                          ; 2ed5: 29 0f       ).
     ora #$e0                                                          ; 2ed7: 09 e0       ..
     sta sprite_titanium_addressA                                      ; 2ed9: 8d 07 20    ..
     sta sprite_titanium_addressB                                      ; 2edc: 8d 60 20    .`
-    dec l005a                                                         ; 2edf: c6 5a       .Z
+    dec tick_counter                                                  ; 2edf: c6 5a       .Z
     bpl screen_dissolve_loop                                          ; 2ee1: 10 e6       ..
     rts                                                               ; 2ee3: 60          `
 
@@ -3393,13 +3455,13 @@ c306c
     cmp #8                                                            ; 306e: c9 08       ..
     beq c3084                                                         ; 3070: f0 12       ..
     lda #$0e                                                          ; 3072: a9 0e       ..
-    sta sprite_for_block_type_2                                       ; 3074: 85 74       .t
+    sta cell_above                                                    ; 3074: 85 74       .t
     lda #<out_of_time_message                                         ; 3076: a9 b4       ..
     sta status_text_address_low                                       ; 3078: 85 69       .i
 loop_c307a
     jsr sub_c30cf                                                     ; 307a: 20 cf 30     .0
     bne return14                                                      ; 307d: d0 5d       .]
-    dec sprite_for_block_type_2                                       ; 307f: c6 74       .t
+    dec cell_above                                                    ; 307f: c6 74       .t
     bne loop_c307a                                                    ; 3081: d0 f7       ..
     rts                                                               ; 3083: 60          `
 
@@ -5426,6 +5488,9 @@ pydis_end
 !if (<(sprite_addr_space)) != $00 {
     !error "Assertion failed: <(sprite_addr_space) == $00"
 }
+!if (<another_array_of_cells) != $40 {
+    !error "Assertion failed: <another_array_of_cells == $40"
+}
 !if (<backwards_status_bar) != $28 {
     !error "Assertion failed: <backwards_status_bar == $28"
 }
@@ -5444,47 +5509,32 @@ pydis_end
 !if (<grid_of_screen_sprites) != $00 {
     !error "Assertion failed: <grid_of_screen_sprites == $00"
 }
-!if (<handler_0) != $a5 {
-    !error "Assertion failed: <handler_0 == $a5"
-}
-!if (<handler_1) != $a5 {
-    !error "Assertion failed: <handler_1 == $a5"
+!if (<handler_0123) != $a5 {
+    !error "Assertion failed: <handler_0123 == $a5"
 }
 !if (<handler_10) != $e3 {
     !error "Assertion failed: <handler_10 == $e3"
 }
-!if (<handler_11) != $e0 {
-    !error "Assertion failed: <handler_11 == $e0"
-}
-!if (<handler_12) != $f0 {
-    !error "Assertion failed: <handler_12 == $f0"
-}
 !if (<handler_13) != $ae {
     !error "Assertion failed: <handler_13 == $ae"
-}
-!if (<handler_14) != $00 {
-    !error "Assertion failed: <handler_14 == $00"
 }
 !if (<handler_15) != $00 {
     !error "Assertion failed: <handler_15 == $00"
 }
-!if (<handler_2) != $a5 {
-    !error "Assertion failed: <handler_2 == $a5"
-}
-!if (<handler_3) != $a5 {
-    !error "Assertion failed: <handler_3 == $a5"
-}
-!if (<handler_6) != $00 {
-    !error "Assertion failed: <handler_6 == $00"
-}
 !if (<handler_7) != $9e {
     !error "Assertion failed: <handler_7 == $9e"
 }
-!if (<handler_8) != $e3 {
-    !error "Assertion failed: <handler_8 == $e3"
-}
 !if (<handler_9) != $ca {
     !error "Assertion failed: <handler_9 == $ca"
+}
+!if (<handler_firefly) != $00 {
+    !error "Assertion failed: <handler_firefly == $00"
+}
+!if (<handler_for_horizontal_strip) != $f0 {
+    !error "Assertion failed: <handler_for_horizontal_strip == $f0"
+}
+!if (<handler_for_vertical_strip) != $e0 {
+    !error "Assertion failed: <handler_for_vertical_strip == $e0"
 }
 !if (<highscore_high_status_bar) != $50 {
     !error "Assertion failed: <highscore_high_status_bar == $50"
@@ -5521,6 +5571,9 @@ pydis_end
 }
 !if (<scrolling_pause_text) != $a0 {
     !error "Assertion failed: <scrolling_pause_text == $a0"
+}
+!if (<some_array_of_cells) != $30 {
+    !error "Assertion failed: <some_array_of_cells == $30"
 }
 !if (<sound1) != $b8 {
     !error "Assertion failed: <sound1 == $b8"
@@ -5879,47 +5932,32 @@ pydis_end
 !if (>grid_of_screen_sprites) != $0c {
     !error "Assertion failed: >grid_of_screen_sprites == $0c"
 }
-!if (>handler_0) != $22 {
-    !error "Assertion failed: >handler_0 == $22"
-}
-!if (>handler_1) != $22 {
-    !error "Assertion failed: >handler_1 == $22"
+!if (>handler_0123) != $22 {
+    !error "Assertion failed: >handler_0123 == $22"
 }
 !if (>handler_10) != $26 {
     !error "Assertion failed: >handler_10 == $26"
 }
-!if (>handler_11) != $23 {
-    !error "Assertion failed: >handler_11 == $23"
-}
-!if (>handler_12) != $23 {
-    !error "Assertion failed: >handler_12 == $23"
-}
 !if (>handler_13) != $26 {
     !error "Assertion failed: >handler_13 == $26"
-}
-!if (>handler_14) != $25 {
-    !error "Assertion failed: >handler_14 == $25"
 }
 !if (>handler_15) != $26 {
     !error "Assertion failed: >handler_15 == $26"
 }
-!if (>handler_2) != $22 {
-    !error "Assertion failed: >handler_2 == $22"
-}
-!if (>handler_3) != $22 {
-    !error "Assertion failed: >handler_3 == $22"
-}
-!if (>handler_6) != $25 {
-    !error "Assertion failed: >handler_6 == $25"
-}
 !if (>handler_7) != $25 {
     !error "Assertion failed: >handler_7 == $25"
 }
-!if (>handler_8) != $26 {
-    !error "Assertion failed: >handler_8 == $26"
-}
 !if (>handler_9) != $2b {
     !error "Assertion failed: >handler_9 == $2b"
+}
+!if (>handler_firefly) != $25 {
+    !error "Assertion failed: >handler_firefly == $25"
+}
+!if (>handler_for_horizontal_strip) != $23 {
+    !error "Assertion failed: >handler_for_horizontal_strip == $23"
+}
+!if (>handler_for_vertical_strip) != $23 {
+    !error "Assertion failed: >handler_for_vertical_strip == $23"
 }
 !if (>map_row_0) != $50 {
     !error "Assertion failed: >map_row_0 == $50"
@@ -6263,23 +6301,20 @@ pydis_end
 !if (>tile_map) != $32 {
     !error "Assertion failed: >tile_map == $32"
 }
-!if (c2461 - after_branch) != $26 {
-    !error "Assertion failed: c2461 - after_branch == $26"
+!if (cell_above) != $74 {
+    !error "Assertion failed: cell_above == $74"
 }
-!if (c249a - after_branch) != $5f {
-    !error "Assertion failed: c249a - after_branch == $5f"
+!if (cell_above_left-1) != $72 {
+    !error "Assertion failed: cell_above_left-1 == $72"
 }
-!if (cell_down) != $7a {
-    !error "Assertion failed: cell_down == $7a"
+!if (cell_below) != $7a {
+    !error "Assertion failed: cell_below == $7a"
 }
 !if (cell_left) != $76 {
     !error "Assertion failed: cell_left == $76"
 }
 !if (cell_right) != $78 {
     !error "Assertion failed: cell_right == $78"
-}
-!if (cell_up) != $74 {
-    !error "Assertion failed: cell_up == $74"
 }
 !if (command_note_durations - 200) != $5614 {
     !error "Assertion failed: command_note_durations - 200 == $5614"
@@ -6289,6 +6324,9 @@ pydis_end
 }
 !if (command_pitch-200) != $560e {
     !error "Assertion failed: command_pitch-200 == $560e"
+}
+!if (handler_table_high+12) != $21dc {
+    !error "Assertion failed: handler_table_high+12 == $21dc"
 }
 !if (in_game_sound_data+1) != $2c01 {
     !error "Assertion failed: in_game_sound_data+1 == $2c01"
@@ -6323,8 +6361,14 @@ pydis_end
 !if (inkey_key_z) != $9e {
     !error "Assertion failed: inkey_key_z == $9e"
 }
+!if (l004b) != $4b {
+    !error "Assertion failed: l004b == $4b"
+}
 !if (map_diamond) != $04 {
     !error "Assertion failed: map_diamond == $04"
+}
+!if (mark_cell_above_as_processed_and_move_to_next_cell - after_branch) != $26 {
+    !error "Assertion failed: mark_cell_above_as_processed_and_move_to_next_cell - after_branch == $26"
 }
 !if (opcode_dex) != $ca {
     !error "Assertion failed: opcode_dex == $ca"
@@ -6431,9 +6475,6 @@ pydis_end
 !if (sprite_firefly4) != $1c {
     !error "Assertion failed: sprite_firefly4 == $1c"
 }
-!if (sprite_for_block_type_1-1) != $72 {
-    !error "Assertion failed: sprite_for_block_type_1-1 == $72"
-}
 !if (sprite_full_stop) != $40 {
     !error "Assertion failed: sprite_full_stop == $40"
 }
@@ -6493,4 +6534,7 @@ pydis_end
 }
 !if (total_caves) != $14 {
     !error "Assertion failed: total_caves == $14"
+}
+!if (update_map_space - after_branch) != $5f {
+    !error "Assertion failed: update_map_space - after_branch == $5f"
 }
