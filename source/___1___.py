@@ -180,6 +180,8 @@ load(0x1300, "original/___1___", "6502")
 
 label(0x0046, "data_set_ptr_low")
 label(0x0047, "data_set_ptr_high")
+label(0x004e, "pause_counter")
+label(0x0058, "ticks_since_last_direction_key_pressed")
 label(0x0059, "countdown_while_switching_palette")
 label(0x005a, "tick_counter")
 label(0x005c, "sub_second_ticks")
@@ -239,6 +241,14 @@ comment(0x1300, """
 Caves: 20 caves total (16 main caves A-P plus four bonus caves Q-T)
 Difficulty levels: 1-5
 
+Some definitions:
+* Together a cave letter and difficulty level define a *stage*. A1 is a stage, for example.
+* The *tile map* is the 40x23 map of the entire stage.
+* The *grid* is the visible area of sprites, showing a 20x12 section of the tile map.
+  An offscreen cache of what sprites are currently displayed is stored in the 'grid_of_currently_displayed_sprites' array.
+  This avoids redrawing a sprite if it's unchanged since the previous tick.
+* The *status bar* is single row at the top of the grid, showing useful status information.
+
 tile_map:
 
 $00 = empty
@@ -254,7 +264,7 @@ $09 = 4x4 earth square with firefly pacing inside
 $0a = animated player exploding
 $0b = Vertical strip (value above is filled down to the next $0b)
 $0c = Horizontal strip
-$0d = wall??
+$0d = magic wall?
 $0e = butterfly
 $0f = player?
 
@@ -521,9 +531,12 @@ constant(0x9, "map_earth_plus_firefly_4x4")
 constant(0xa, "map_explosion")
 constant(0xb, "map_vertical_strip")
 constant(0xc, "map_horizontal_strip")
-constant(0xd, "map_rock2")       # second type
+constant(0xd, "map_rock2")       # second type?
 constant(0xe, "map_butterfly")
 constant(0xf, "map_player2")     # second type?
+
+
+label(0x1e80, "idle_animation_data")    # put this before the "sprite_addr_" labels so it takes precedence.
 
 for r in ranges:
     for i in range(r[0], r[1]):
@@ -598,15 +611,30 @@ constant(0xb9, "opcode_lda_abs_y")
 constant(0xca, "opcode_dex")
 constant(0xe8, "opcode_inx")
 
-label(0x0c00, "grid_of_screen_sprites")
+label(0x0c00, "grid_of_currently_displayed_sprites")
 
 label(0x1300, "initial_clock_value")
 
 label(0x1e70, "set_clock_value")
+for i in range(64):
+    v = get_u8_binary(0x1e80+i)
+    t = v // 16
+    b = v & 15
+    t += 32
+    b += 32
+    expr(0x1e80+i, f"16*({sprites[t]}-0x20) + {sprites[b]}-0x20")
+comment(0x1e80, "Sprites to use for idle animation of rockford. They are encoded into the nybbles of each byte. First it cycles through the bottom nybbles until near the end of the idle animation, then cycles through through the top nybbles")
 unused(0x1ee0)
 blank(0x1ee0)
 
-byte(0x1f00, 15)
+label(0x1f00, "sprite_to_next_sprite")
+
+for i in range(15):
+    v = get_u8_binary(0x1f00+i)
+    if v in sprites:
+        expr(0x1f00+i, sprites)
+    byte(0x1f00+i)
+
 unused(0x1f0f)
 byte(0x1f0f, 35)
 blank(0x1f32)
@@ -615,8 +643,15 @@ blank(0x1f5a)
 byte(0x1f5a, 38)
 label(0x1f80, "cell_type_to_sprite")
 message(0x1f80, 0x2000)
-label(0x1f87, "two_state_animated_sprites1")
-label(0x1fc7, "two_state_animated_sprites2")
+label(0x1f87, "fungus_animated_sprites1a")
+label(0x1f8f, "rockford_sprite")
+label(0x1f87+16, "fungus_animated_sprites1b")
+label(0x1f87+16*2, "fungus_animated_sprites1c")
+label(0x1f87+16*3, "fungus_animated_sprites1d")
+label(0x1fc7, "fungus_animated_sprites2a")
+label(0x1fc7+16, "fungus_animated_sprites2b")
+label(0x1fc7+16*2, "fungus_animated_sprites2c")
+label(0x1fc7+16*3, "fungus_animated_sprites2d")
 for i in range(0x1f80, 0x2000, 16):
     blank(i)
 
@@ -633,6 +668,7 @@ blank(0x2130)
 label(0x2130, "some_array_of_cells")
 label(0x2140, "another_array_of_cells")
 label(0x2150, "index_to_cell_type")
+label(0x2156, "exit_cell_type")
 byte(0x2156, 9)
 byte(0x21c0, 16)
 label(0x21c0, "handler_table_low")
@@ -643,10 +679,9 @@ label(0x26c3, "fill_with_a")
 
 handlers = { 0x22a5: "handler_0123",
              0x2500: "handler_firefly",
-             0x259e: "handler_7",
-             0x26e3: "handler_8",
+             0x259e: "handler_fungus",
              0x2bca: "handler_9",
-             0x26e3: "handler_10",
+             0x26e3: "handler_rockford",
              0x23e0: "handler_for_vertical_strip",
              0x23f0: "handler_for_horizontal_strip",
              0x26ae: "handler_13",
@@ -695,11 +730,27 @@ label(0x229e, "clear_backwards_status_bar_loop")
 entry(0x22a5)
 comment(0x22ad, "cell is in the range $90-$9f, so we look up the replacement in a table", indent=1)
 label(0x22b1, "not_in_range_so_change_nothing")
+label(0x22b3, "reveal_or_hide_more_cells")
 expr(0x22b4, make_lo("map_row_0"))
 expr(0x22b8, make_hi("map_row_0"))
+comment(0x22bb, "loop over all the rows, X is the loop counter", indent=1)
 decimal(0x22bc)
+comment(0x22bf, "rows are stored in the first 40 bytes of every 64 bytes, so skip if we have exceeded the right range", indent=1)
+decimal(0x22c0)
+decimal(0x22c2)
+comment(0x22c5, "progress a counter in a non-obvious pattern", indent=1)
+comment(0x22c8, "if it's early in the process (tick counter is low), then branch more often so we reveal/hide the cells in a non-obvious pattern over time", indent=1)
+comment(0x22d1, "clear the top bit to reveal the cell...", indent=1)
+comment(0x22d3, "...or set the top bit to hide the cell", indent=1)
+label(0x22d7, "skip_reveal_or_hide")
+comment(0x22dc, "move forward to next row. Each row is stored at 64 byte intervals. We have moved on 40 so far so add the remainder to get to the next row", indent=1)
+expr(0x22dd, "64-40")
 label(0x22bd, "loop_over_rows")
 label(0x22dc, "skip_to_next_row")
+comment(0x22e4, "create some 'random' audio pitches to play while revealing/hiding the map. First multiply the data set pointer low byte by five and add one", indent=1)
+comment(0x22ed, "add the cave number", indent=1)
+comment(0x22ef, "just take some of the bits", indent=1)
+comment(0x22f1, "use as the pitch", indent=1)
 unused(0x22f9)
 entry(0x22f9)
 comment(0x22fb, "sta $2c16", indent=1)
@@ -708,20 +759,22 @@ entry(0x22fe)
 unused(0x22ff)
 entry(0x22ff)
 
+comment(0x2300, "draw a full grid of sprites, updating the current map position first")
 label(0x2300, "draw_grid_of_sprites")
 expr(0x2307, make_hi("screen_addr_row_6"))
 expr(0x230b, make_lo("screen_addr_row_6"))
 expr(0x230d, "opcode_lda_abs_y")
-expr(0x2312, make_lo("grid_of_screen_sprites"))
-expr(0x231a, make_hi("grid_of_screen_sprites"))
-comment(0x2321, "X = number of cells on screen (loop counter)", indent=1)
+expr(0x2312, make_lo("grid_of_currently_displayed_sprites"))
+expr(0x231a, make_hi("grid_of_currently_displayed_sprites"))
+comment(0x2321, "X = number of cells to draw: 12 rows of 20 cells each (a loop counter)", indent=1)
+expr(0x2322, "20*12")
 ab(0x2323, True)
 label(0x2325, "draw_status_bar")
 expr(0x2326, make_lo("start_of_grid_screen_address"))
 expr(0x2328, make_hi("start_of_grid_screen_address"))
 label(0x2329, "draw_single_row_of_sprites")
-expr(0x232c, make_hi("backwards_status_bar"))
-expr(0x232e, make_lo("backwards_status_bar"))
+expr(0x232c, make_hi("current_status_bar_sprites"))
+expr(0x232e, make_lo("current_status_bar_sprites"))
 label(0x233b, "instruction_for_self_modification")
 label(0x233c, "status_text_address_high")
 expr(0x233c, make_hi("tile_map"))
@@ -732,7 +785,7 @@ label(0x234a, "draw_grid")
 label(0x234c, "draw_grid_loop")
 label(0x2350, "grid_draw_row_loop")
 comment(0x2355, "Y=9 indicates the titanium wall (while revealing the grid)", indent=1)
-comment(0x2357, "this next instruction is either:\n    'ldy cell_type_to_sprite' [which in this context is a NOP] OR \n    'lda cell_type_to_sprite,y'\nas set by self-modifying code above", indent=1)
+comment(0x2357, "this next instruction is either:\n    'ldy cell_type_to_sprite' [which in this context is equivalent to a no-op] OR \n    'lda cell_type_to_sprite,y'\nas set by self-modifying code above", indent=1)
 label(0x2357, "load_instruction")
 label(0x235b, "compare_instruction")
 label(0x235c, "grid_compare_address_low")
@@ -853,8 +906,10 @@ label(0x260e, "check_for_direction_key_pressed")
 label(0x2626, "direction_key_pressed")
 label(0x262b, "get_direction_index_loop")
 comment(0x263b, "read cell contents from the given neighbouring cell variable y", indent=1)
+comment(0x26f5, "ready to start playing", indent=1)
 label(0x2667, "check_for_return_pressed")
 comment(0x266d, "return (and direction) is pressed", indent=1)
+comment(0x26e3, "mark rockford cell as visible", indent=1)
 ab(0x2687, True)
 label(0x2689, "read_keys")
 label(0x2691, "read_keys_loop")
@@ -865,16 +920,32 @@ ret(0x26fd)
 unused(0x26fe)
 
 label(0x2700, "start_gameplay")
+comment(0x2707, "Set A=0", indent=1)
+label(0x270e, "zero_eight_bytes_loop")
 label(0x2735, "update_demo_mode")
 expr(0x2736, make_lo("status_bar_sprite_numbers"))
-expr(0x273e, make_lo("scrolling_pause_text"))
+comment(0x2737, "flip between status bar and demo mode text every 16 ticks", indent=1)
+label(0x273f, "skip_demo_mode_text")
+expr(0x273e, make_lo("demonstration_mode_text"))
+label(0x2752, "got_key")
+label(0x2762, "not_rockford")
 comment(0x2777, "decrement time remaining", indent=1)
 expr(0x2781, make_lo("out_of_time_message"))
 ret(0x27ef)
 unused(0x27f0)
 byte(0x27f0,16)
 
-#label(0x2800, "update_rockford_animation")
+label(0x2800, "update_grid_animations")
+label(0x2804, "update_sprites_to_use_loop")
+comment(0x280a, "look up the next sprite in the animation sequence", indent=1)
+comment(0x2816, "use the tick counter (bottom two bits scaled up by 16) to update fungus animation", indent=1)
+comment(0x282f, "animate exit", indent=1)
+comment(0x2837, "update rockford idle animation", indent=1)
+comment(0x2840, "check for nearing the end of the idle animation (range $c0-$ff).\nUse the top nybbles of the data if so.", indent=1)
+comment(0x2844, "Near the end of the idle animation. Shift the upper nybble into the bottom nybble to get more idle sprites", indent=1)
+label(0x2848, "extract_lower_nybble")
+comment(0x284a, "set the rockford sprite", indent=1)
+expr(0x284b, "sprite_rockford_blinking1")
 unused(0x2852)
 byte(0x2852, 14)
 label(0x2860, "read_keys_and_resolve_direction_keys")
@@ -895,7 +966,7 @@ unused(0x28d4)
 byte(0x28d4, 44)
 label(0x28aa, "decrement_status_bar_number")
 
-label(0x2900, "prepare_level")
+label(0x2900, "prepare_stage")
 comment(0x2910, "high nybbles in the cave colour arrays store the sprite to use for three basic block types. copy them into cell_above_left/cell_above/cell_above_right", indent=1)
 label(0x2914, "loop_three_times")
 expr(0x291c, "cell_above_left-1")
@@ -1025,9 +1096,9 @@ decimal(0x2b41)
 label(0x2b45, "check_for_need_to_scroll_left")
 label(0x2b4e, "check_for_need_to_scroll_down")
 label(0x2b5e, "check_for_need_to_scroll_up")
-label(0x2b67, "check_for_bonus_levels")
-comment(0x2b6d, "bonus level is always situated in top left corner", indent=1)
-label(0x2b71, "skip_bonus_level")
+label(0x2b67, "check_for_bonus_stages")
+comment(0x2b6d, "bonus stage is always situated in top left corner", indent=1)
+label(0x2b71, "skip_bonus_stage")
 unused(0x2b85)
 label(0x2b90, "wait_for_13_centiseconds_and_read_keys")
 label(0x2b92, "wait_for_a_centiseconds_and_read_keys")
@@ -1060,6 +1131,7 @@ expr(0x2c63, "in_game_sound_data+3")
 unused(0x2c71)
 comment(0x2c92, "play rising pitch as time up is approaching", indent=1)
 expr(0x2ca6, "in_game_sound_data+2")
+label(0x2ce8, "play_sound_if_needed")
 ret(0x2cef)
 unused(0x2cf0)
 
@@ -1122,7 +1194,8 @@ byte(0x2de9, 3)
 
 expr(0x2e0b, make_lo("players_and_men_status_bar"))
 expr(0x2e13, make_lo("bonus_life_text"))
-expr(0x2e1b, make_lo("scrolling_pause_text"))
+label(0x2e14, "skip_bonus_life_text")
+expr(0x2e1b, make_lo("demonstration_mode_text"))
 comment(0x2e2c, "don't process horizontal strips", indent=1)
 expr(0x2e2f, "handler_table_high+12")
 comment(0x2e34, "process horizontal strips", indent=1)
@@ -1142,11 +1215,15 @@ label(0x2e61, "write_top_and_bottom_borders_loop")
 expr(0x2e80, "sprite_0")
 expr(0x2e8a, make_lo("game_over_text"))
 expr(0x2e93, "sprite_1")
+ab(0x2eb5, True)
+label(0x2eb7, "store_in_status_bar")
+label(0x2eb8, "which_status_bar_address2_low")
 label(0x2ebd, "play_scren_dissolve_to_solid")
 label(0x2ebf, "play_screen_dissolve_effect")
 label(0x2ec9, "screen_dissolve_loop")
 unused(0x2ee4)
 byte(0x2ee4, 28)
+label(0x2eaa, "which_status_bar_address1_low")
 
 expr(0x2f0a, "sprite_0")
 expr(0x2f15, "sprite_0")
@@ -1174,15 +1251,26 @@ comment(0x2fd5, "show time remaining on status bar", indent=1)
 comment(0x2fda, "return zero", indent=1)
 unused(0x2fdd)
 
-expr(0x301b, "sprite_0")
+decimal(0x301b)
+comment(0x3028, "Set A=0", indent=1)
 ret(0x302b)
 unused(0x302c)
+label(0x3040, "check_for_pause_key")
+comment(0x3046, "pause mode. show pause message.", indent=1)
+comment(0x3057, "toggle between showing pause message and regular status bar every 16 ticks", indent=1)
+label(0x305f, "skip_showing_players_and_men")
 expr(0x3047, make_lo("pause_message"))
+label(0x304e, "update_while_initially_pressing_pause_loop")
+label(0x3053, "pause_loop")
 expr(0x3056, make_lo("pause_message"))
 expr(0x305e, make_lo("players_and_men_status_bar"))
+label(0x03066, "update_while_finally_pressing_unpause_loop")
+label(0x306c, "no_pause")
 expr(0x3077, make_lo("out_of_time_message"))
 expr(0x30cc, make_lo("status_bar_sprite_numbers"))
 ret(0x30dc)
+label(0x30dd, "update_during_pause_mode")
+comment(0x30e7, "check for pause key", indent=1)
 unused(0x30ec)
 
 label(0x3100, "demonstration_keys")
@@ -1235,7 +1323,7 @@ label(0x328b, "number_of_players_status_bar_difficulty_level")
 blank(0x328c)
 label(0x328c, "game_over_text")
 label(0x329e, "player_number_on_game_over_text")
-label(0x32a0, "scrolling_pause_text")
+label(0x32a0, "demonstration_mode_text")
 label(0x32b4, "out_of_time_message")
 string(0x32b4, 1)
 string(0x32b6, 1)
@@ -1414,7 +1502,7 @@ blank(0x4e09)
 blank(0x4f41)
 unused(0x4f41)
 
-label(0x5028, "backwards_status_bar")
+label(0x5028, "current_status_bar_sprites")
 unused(0x503c)
 label(0x5068, "default_status_bar")
 string(0x5079, 1)

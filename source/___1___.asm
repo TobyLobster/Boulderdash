@@ -119,7 +119,7 @@ l004a                                   = $4a
 l004b                                   = $4b
 l004c                                   = $4c
 l004d                                   = $4d
-l004e                                   = $4e
+pause_counter                           = $4e
 l0050                                   = $50
 l0051                                   = $51
 l0052                                   = $52
@@ -128,7 +128,7 @@ l0054                                   = $54
 l0055                                   = $55
 l0056                                   = $56
 l0057                                   = $57
-l0058                                   = $58
+ticks_since_last_direction_key_pressed  = $58
 countdown_while_switching_palette       = $59
 tick_counter                            = $5a
 l005b                                   = $5b
@@ -196,7 +196,7 @@ ptr_high                                = $8d
 sound_channel                           = $8e
 offset_to_sound                         = $8f
 l0ba9                                   = $0ba9
-grid_of_screen_sprites                  = $0c00
+grid_of_currently_displayed_sprites     = $0c00
 start_of_grid_screen_address            = $5bc0
 screen_addr_row_6                       = $5f80
 screen_addr_row_28                      = $7b00
@@ -210,6 +210,17 @@ lfff6                                   = $fff6
 ; 
 ; Caves: 20 caves total (16 main caves A-P plus four bonus caves Q-T)
 ; Difficulty levels: 1-5
+; 
+; Some definitions:
+; * Together a cave letter and difficulty level define a *stage*. A1 is a stage, for
+; example.
+; * The *tile map* is the 40x23 map of the entire stage.
+; * The *grid* is the visible area of sprites, showing a 20x12 section of the tile map.
+;   An offscreen cache of what sprites are currently displayed is stored in the
+; 'grid_of_currently_displayed_sprites' array.
+;   This avoids redrawing a sprite if it's unchanged since the previous tick.
+; * The *status bar* is single row at the top of the grid, showing useful status
+; information.
 ; 
 ; tile_map:
 ; 
@@ -226,7 +237,7 @@ lfff6                                   = $fff6
 ; $0a = animated player exploding
 ; $0b = Vertical strip (value above is filled down to the next $0b)
 ; $0c = Horizontal strip
-; $0d = wall??
+; $0d = magic wall?
 ; $0e = butterfly
 ; $0f = player?
 ; 
@@ -622,14 +633,76 @@ set_clock_value = sprite_addr_91+16
     !byte $0d, $63, $9f,   4,   0, $63,   0,   1, $f0,   0, $1f,   0  ; 1e60: 0d 63 9f... .c.
     !byte $0c,   0,   0,   0,   5,   0,   0,   0,   0,   0,   0,   0  ; 1e6c: 0c 00 00... ...            ; Five byte clock value (low byte to high byte)
     !byte   0, $ee, $e0, $0c,   0,   0,   0,   0                      ; 1e78: 00 ee e0... ...
+; Sprites to use for idle animation of rockford. They are encoded into the nybbles of
+; each byte. First it cycles through the bottom nybbles until near the end of the idle
+; animation, then cycles through through the top nybbles
+idle_animation_data
 sprite_addr_92
-    !byte $80, $70, $60, $70, $81, $52, $61, $50, $70, $90, $92, $70  ; 1e80: 80 70 60... .p`
-    !byte $52,   0,   0,   0, $11, $22, $11,   0,   0,   1,   9, $27  ; 1e8c: 52 00 00... R..
-    !byte   5,   5, $25,   5, $55, $79, $95, $75                      ; 1e98: 05 05 25... ..%
+    !byte      16*(sprite_rockford_moving_up1-0x20) + sprite_rockford_blinking1-0x20; 1e80: 80          .
+    !byte    16*(sprite_rockford_moving_down3-0x20) + sprite_rockford_blinking1-0x20; 1e81: 70          p
+    !byte    16*(sprite_rockford_moving_down2-0x20) + sprite_rockford_blinking1-0x20; 1e82: 60          `
+    !byte    16*(sprite_rockford_moving_down3-0x20) + sprite_rockford_blinking1-0x20; 1e83: 70          p
+    !byte      16*(sprite_rockford_moving_up1-0x20) + sprite_rockford_blinking2-0x20; 1e84: 81          .
+    !byte    16*(sprite_rockford_moving_down1-0x20) + sprite_rockford_blinking3-0x20; 1e85: 52          R
+    !byte    16*(sprite_rockford_moving_down2-0x20) + sprite_rockford_blinking2-0x20; 1e86: 61          a
+    !byte    16*(sprite_rockford_moving_down1-0x20) + sprite_rockford_blinking1-0x20; 1e87: 50          P
+    !byte    16*(sprite_rockford_moving_down3-0x20) + sprite_rockford_blinking1-0x20; 1e88: 70          p
+    !byte      16*(sprite_rockford_moving_up2-0x20) + sprite_rockford_blinking1-0x20; 1e89: 90          .
+    !byte      16*(sprite_rockford_moving_up2-0x20) + sprite_rockford_blinking3-0x20; 1e8a: 92          .
+    !byte    16*(sprite_rockford_moving_down3-0x20) + sprite_rockford_blinking1-0x20; 1e8b: 70          p
+    !byte    16*(sprite_rockford_moving_down1-0x20) + sprite_rockford_blinking3-0x20; 1e8c: 52          R
+    !byte       16*(sprite_rockford_blinking1-0x20) + sprite_rockford_blinking1-0x20; 1e8d: 00          .
+    !byte       16*(sprite_rockford_blinking1-0x20) + sprite_rockford_blinking1-0x20; 1e8e: 00          .
+    !byte       16*(sprite_rockford_blinking1-0x20) + sprite_rockford_blinking1-0x20; 1e8f: 00          .
+    !byte       16*(sprite_rockford_blinking2-0x20) + sprite_rockford_blinking2-0x20; 1e90: 11          .
+    !byte       16*(sprite_rockford_blinking3-0x20) + sprite_rockford_blinking3-0x20; 1e91: 22          "
+    !byte       16*(sprite_rockford_blinking2-0x20) + sprite_rockford_blinking2-0x20; 1e92: 11          .
+    !byte       16*(sprite_rockford_blinking1-0x20) + sprite_rockford_blinking1-0x20; 1e93: 00          .
+    !byte       16*(sprite_rockford_blinking1-0x20) + sprite_rockford_blinking1-0x20; 1e94: 00          .
+    !byte       16*(sprite_rockford_blinking1-0x20) + sprite_rockford_blinking2-0x20; 1e95: 01          .
+    !byte      16*(sprite_rockford_blinking1-0x20) + sprite_rockford_moving_up2-0x20; 1e96: 09          .
+    !byte    16*(sprite_rockford_blinking3-0x20) + sprite_rockford_moving_down3-0x20; 1e97: 27          '
+    !byte    16*(sprite_rockford_blinking1-0x20) + sprite_rockford_moving_down1-0x20; 1e98: 05          .
+    !byte    16*(sprite_rockford_blinking1-0x20) + sprite_rockford_moving_down1-0x20; 1e99: 05          .
+    !byte    16*(sprite_rockford_blinking3-0x20) + sprite_rockford_moving_down1-0x20; 1e9a: 25          %
+    !byte    16*(sprite_rockford_blinking1-0x20) + sprite_rockford_moving_down1-0x20; 1e9b: 05          .
+    !byte 16*(sprite_rockford_moving_down1-0x20) + sprite_rockford_moving_down1-0x20; 1e9c: 55          U
+    !byte   16*(sprite_rockford_moving_down3-0x20) + sprite_rockford_moving_up2-0x20; 1e9d: 79          y
+    !byte   16*(sprite_rockford_moving_up2-0x20) + sprite_rockford_moving_down1-0x20; 1e9e: 95          .
+    !byte 16*(sprite_rockford_moving_down3-0x20) + sprite_rockford_moving_down1-0x20; 1e9f: 75          u
 sprite_addr_93
-    !byte $55, $28,   5,   6, $27,   5, $25, $55, $55, $59, $55, $65  ; 1ea0: 55 28 05... U(.
-    !byte $91, $62, $91, $60, $70, $25, $16, $19,   8,   9,   6,   5  ; 1eac: 91 62 91... .b.
-    !byte   6,   5, $36, $45, $48, $47, $36, $35                      ; 1eb8: 06 05 36... ..6
+    !byte 16*(sprite_rockford_moving_down1-0x20) + sprite_rockford_moving_down1-0x20; 1ea0: 55          U
+    !byte      16*(sprite_rockford_blinking3-0x20) + sprite_rockford_moving_up1-0x20; 1ea1: 28          (
+    !byte    16*(sprite_rockford_blinking1-0x20) + sprite_rockford_moving_down1-0x20; 1ea2: 05          .
+    !byte    16*(sprite_rockford_blinking1-0x20) + sprite_rockford_moving_down2-0x20; 1ea3: 06          .
+    !byte    16*(sprite_rockford_blinking3-0x20) + sprite_rockford_moving_down3-0x20; 1ea4: 27          '
+    !byte    16*(sprite_rockford_blinking1-0x20) + sprite_rockford_moving_down1-0x20; 1ea5: 05          .
+    !byte    16*(sprite_rockford_blinking3-0x20) + sprite_rockford_moving_down1-0x20; 1ea6: 25          %
+    !byte 16*(sprite_rockford_moving_down1-0x20) + sprite_rockford_moving_down1-0x20; 1ea7: 55          U
+    !byte 16*(sprite_rockford_moving_down1-0x20) + sprite_rockford_moving_down1-0x20; 1ea8: 55          U
+    !byte   16*(sprite_rockford_moving_down1-0x20) + sprite_rockford_moving_up2-0x20; 1ea9: 59          Y
+    !byte 16*(sprite_rockford_moving_down1-0x20) + sprite_rockford_moving_down1-0x20; 1eaa: 55          U
+    !byte 16*(sprite_rockford_moving_down2-0x20) + sprite_rockford_moving_down1-0x20; 1eab: 65          e
+    !byte      16*(sprite_rockford_moving_up2-0x20) + sprite_rockford_blinking2-0x20; 1eac: 91          .
+    !byte    16*(sprite_rockford_moving_down2-0x20) + sprite_rockford_blinking3-0x20; 1ead: 62          b
+    !byte      16*(sprite_rockford_moving_up2-0x20) + sprite_rockford_blinking2-0x20; 1eae: 91          .
+    !byte    16*(sprite_rockford_moving_down2-0x20) + sprite_rockford_blinking1-0x20; 1eaf: 60          `
+    !byte    16*(sprite_rockford_moving_down3-0x20) + sprite_rockford_blinking1-0x20; 1eb0: 70          p
+    !byte    16*(sprite_rockford_blinking3-0x20) + sprite_rockford_moving_down1-0x20; 1eb1: 25          %
+    !byte    16*(sprite_rockford_blinking2-0x20) + sprite_rockford_moving_down2-0x20; 1eb2: 16          .
+    !byte      16*(sprite_rockford_blinking2-0x20) + sprite_rockford_moving_up2-0x20; 1eb3: 19          .
+    !byte      16*(sprite_rockford_blinking1-0x20) + sprite_rockford_moving_up1-0x20; 1eb4: 08          .
+    !byte      16*(sprite_rockford_blinking1-0x20) + sprite_rockford_moving_up2-0x20; 1eb5: 09          .
+    !byte    16*(sprite_rockford_blinking1-0x20) + sprite_rockford_moving_down2-0x20; 1eb6: 06          .
+    !byte    16*(sprite_rockford_blinking1-0x20) + sprite_rockford_moving_down1-0x20; 1eb7: 05          .
+    !byte    16*(sprite_rockford_blinking1-0x20) + sprite_rockford_moving_down2-0x20; 1eb8: 06          .
+    !byte    16*(sprite_rockford_blinking1-0x20) + sprite_rockford_moving_down1-0x20; 1eb9: 05          .
+    !byte     16*(sprite_rockford_winking1-0x20) + sprite_rockford_moving_down2-0x20; 1eba: 36          6
+    !byte     16*(sprite_rockford_winking2-0x20) + sprite_rockford_moving_down1-0x20; 1ebb: 45          E
+    !byte       16*(sprite_rockford_winking2-0x20) + sprite_rockford_moving_up1-0x20; 1ebc: 48          H
+    !byte     16*(sprite_rockford_winking2-0x20) + sprite_rockford_moving_down3-0x20; 1ebd: 47          G
+    !byte     16*(sprite_rockford_winking1-0x20) + sprite_rockford_moving_down2-0x20; 1ebe: 36          6
+    !byte     16*(sprite_rockford_winking1-0x20) + sprite_rockford_moving_down1-0x20; 1ebf: 35          5
 sprite_addr_94
     !byte $35, $ff, $fb, $f7, $fd, $fe, $7f, $ff, $b7, $af, $bf, $bf  ; 1ec0: 35 ff fb... 5..
     !byte $bf, $bf, $bf, $9f,   8,   8,   4,   8,   4,   8,   4,   1  ; 1ecc: bf bf bf... ...
@@ -667,9 +740,22 @@ unused3
     !byte sprite_space                                                ; 1efd: 00          .
     !byte sprite_space                                                ; 1efe: 00          .
     !byte sprite_0                                                    ; 1eff: 32          2
-l1f00
-    !byte   0,   1,   2,   4,   5,   6,   3, $60,   8, $67, $61, $0b  ; 1f00: 00 01 02... ...
-    !byte $0c, $0d, $0e                                               ; 1f0c: 0c 0d 0e    ...
+sprite_to_next_sprite
+    !byte sprite_space                                                ; 1f00: 00          .
+    !byte sprite_boulder1                                             ; 1f01: 01          .
+    !byte sprite_boulder2                                             ; 1f02: 02          .
+    !byte sprite_diamond2                                             ; 1f03: 04          .
+    !byte sprite_diamond3                                             ; 1f04: 05          .
+    !byte sprite_diamond4                                             ; 1f05: 06          .
+    !byte sprite_diamond1                                             ; 1f06: 03          .
+    !byte $60                                                         ; 1f07: 60          `
+    !byte sprite_titanium_wall2                                       ; 1f08: 08          .
+    !byte $67                                                         ; 1f09: 67          g
+    !byte $61                                                         ; 1f0a: 61          a
+    !byte sprite_wall2                                                ; 1f0b: 0b          .
+    !byte sprite_explosion1                                           ; 1f0c: 0c          .
+    !byte sprite_explosion2                                           ; 1f0d: 0d          .
+    !byte sprite_explosion3                                           ; 1f0e: 0e          .
 unused4
     !byte $0f, $11, $12, $13, $10, $14, $15, $17, $18, $62, $1a, $1b  ; 1f0f: 0f 11 12... ...
     !byte $1c, $1a, $1d, $68, $1f, $20, $21, $22, $23, $24, $25, $26  ; 1f1b: 1c 1a 1d... ...
@@ -722,14 +808,14 @@ cell_type_to_sprite
     !byte sprite_diamond1                                             ; 1f84: 03          .
     !byte sprite_boulder1                                             ; 1f85: 01          .
     !byte sprite_firefly4                                             ; 1f86: 1c          .
-two_state_animated_sprites1
+fungus_animated_sprites1a
     !byte sprite_fungus1                                              ; 1f87: 14          .
     !byte sprite_earth2                                               ; 1f88: 1e          .
     !byte sprite_titanium_wall1                                       ; 1f89: 07          .
     !text "LDA"                                                       ; 1f8a: 4c 44 41    LDA
     !byte sprite_wall2                                                ; 1f8d: 0b          .
     !byte sprite_butterfly1                                           ; 1f8e: 16          .
-l1f8f
+rockford_sprite
     !byte sprite_rockford_moving_down1                                ; 1f8f: 25          %
 
     !byte sprite_explosion4                                           ; 1f90: 0f          .
@@ -739,6 +825,7 @@ l1f8f
     !byte sprite_rockford_winking2                                    ; 1f94: 24          $
     !byte sprite_rockford_moving_right4                               ; 1f95: 31          1
     !byte sprite_firefly4                                             ; 1f96: 1c          .
+fungus_animated_sprites1b
     !byte sprite_fungus1                                              ; 1f97: 14          .
     !byte sprite_box                                                  ; 1f98: 09          .
     !byte sprite_slash                                                ; 1f99: 3e          >
@@ -756,6 +843,7 @@ l1f8f
     !byte sprite_diamond2                                             ; 1fa4: 04          .
     !byte sprite_rockford_moving_right4                               ; 1fa5: 31          1
     !byte sprite_firefly4                                             ; 1fa6: 1c          .
+fungus_animated_sprites1c
     !byte sprite_fungus2                                              ; 1fa7: 15          .
     !byte sprite_firefly2                                             ; 1fa8: 1a          .
     !byte $61                                                         ; 1fa9: 61          a
@@ -773,6 +861,7 @@ l1f8f
     !byte sprite_diamond2                                             ; 1fb4: 04          .
     !byte sprite_rockford_moving_right4                               ; 1fb5: 31          1
     !byte sprite_firefly4                                             ; 1fb6: 1c          .
+fungus_animated_sprites1d
     !byte sprite_fungus2                                              ; 1fb7: 15          .
     !byte sprite_firefly2                                             ; 1fb8: 1a          .
     !byte sprite_wall2                                                ; 1fb9: 0b          .
@@ -790,7 +879,7 @@ l1f8f
     !byte sprite_diamond1                                             ; 1fc4: 03          .
     !byte sprite_boulder1                                             ; 1fc5: 01          .
     !byte sprite_explosion1                                           ; 1fc6: 0c          .
-two_state_animated_sprites2
+fungus_animated_sprites2a
     !byte sprite_fungus2                                              ; 1fc7: 15          .
     !byte sprite_rockford_moving_right4                               ; 1fc8: 31          1
     !byte sprite_rockford_blinking1                                   ; 1fc9: 20
@@ -807,6 +896,7 @@ two_state_animated_sprites2
     !byte sprite_rockford_winking2                                    ; 1fd4: 24          $
     !byte sprite_rockford_moving_right4                               ; 1fd5: 31          1
     !byte sprite_firefly2                                             ; 1fd6: 1a          .
+fungus_animated_sprites2b
     !byte sprite_fungus1                                              ; 1fd7: 14          .
     !byte sprite_rockford_moving_right4                               ; 1fd8: 31          1
     !byte sprite_slash                                                ; 1fd9: 3e          >
@@ -824,6 +914,7 @@ two_state_animated_sprites2
     !byte sprite_diamond1                                             ; 1fe4: 03          .
     !byte sprite_rockford_moving_right4                               ; 1fe5: 31          1
     !byte sprite_firefly2                                             ; 1fe6: 1a          .
+fungus_animated_sprites2c
     !byte sprite_fungus1                                              ; 1fe7: 14          .
     !byte sprite_rockford_moving_right4                               ; 1fe8: 31          1
     !byte $61                                                         ; 1fe9: 61          a
@@ -841,6 +932,7 @@ two_state_animated_sprites2
     !byte sprite_diamond1                                             ; 1ff4: 03          .
     !byte sprite_rockford_moving_right4                               ; 1ff5: 31          1
     !byte sprite_firefly2                                             ; 1ff6: 1a          .
+fungus_animated_sprites2d
     !byte sprite_fungus2                                              ; 1ff7: 15          .
     !byte sprite_rockford_moving_right4                               ; 1ff8: 31          1
     !byte sprite_wall2                                                ; 1ff9: 0b          .
@@ -1090,7 +1182,7 @@ another_array_of_cells
     !byte $b3, $b3, $b3, $ff                                          ; 214c: b3 b3 b3... ...
 index_to_cell_type
     !byte   4, $44,   6, $16, $26, $36                                ; 2150: 04 44 06... .D.
-l2156
+exit_cell_type
     !byte $18, $1d, $0e, $1e, $2e, $3e, $2f, $1f,   9                 ; 2156: 18 1d 0e... ...
     !byte   9, $0a,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0  ; 215f: 09 0a 00... ...
     !byte   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0  ; 216b: 00 00 00... ...
@@ -1110,10 +1202,10 @@ handler_table_low
     !byte                             0                               ; 21c4: 00          .
     !byte                             0                               ; 21c5: 00          .
     !byte              <handler_firefly                               ; 21c6: 00          .
-    !byte                    <handler_7                               ; 21c7: 9e          .
-    !byte                   <handler_10                               ; 21c8: e3          .
+    !byte               <handler_fungus                               ; 21c7: 9e          .
+    !byte             <handler_rockford                               ; 21c8: e3          .
     !byte                    <handler_9                               ; 21c9: ca          .
-    !byte                   <handler_10                               ; 21ca: e3          .
+    !byte             <handler_rockford                               ; 21ca: e3          .
     !byte   <handler_for_vertical_strip                               ; 21cb: e0          .
     !byte <handler_for_horizontal_strip                               ; 21cc: f0          .
     !byte                   <handler_13                               ; 21cd: ae          .
@@ -1123,9 +1215,9 @@ handler_table_high
     !byte               >handler_0123,               >handler_0123    ; 21d0: 22 22       ""
     !byte               >handler_0123,               >handler_0123    ; 21d2: 22 22       ""
     !byte                           0,                           0    ; 21d4: 00 00       ..
-    !byte            >handler_firefly,                  >handler_7    ; 21d6: 25 25       %%
-    !byte                 >handler_10,                  >handler_9    ; 21d8: 26 2b       &+
-    !byte                 >handler_10, >handler_for_vertical_strip    ; 21da: 26 23       &#
+    !byte            >handler_firefly,             >handler_fungus    ; 21d6: 25 25       %%
+    !byte           >handler_rockford,                  >handler_9    ; 21d8: 26 2b       &+
+    !byte           >handler_rockford, >handler_for_vertical_strip    ; 21da: 26 23       &#
     !byte >handler_for_horizontal_strip                               ; 21dc: 23          #
     !byte                   >handler_13                               ; 21dd: 26          &
     !byte              >handler_firefly                               ; 21de: 25          %
@@ -1242,12 +1334,12 @@ reset_grid_of_sprites
     lda #$ff                                                          ; 2294: a9 ff       ..
 reset_grid_of_sprites_loop
     dex                                                               ; 2296: ca          .
-    sta grid_of_screen_sprites,x                                      ; 2297: 9d 00 0c    ...
+    sta grid_of_currently_displayed_sprites,x                         ; 2297: 9d 00 0c    ...
     bne reset_grid_of_sprites_loop                                    ; 229a: d0 fa       ..
     ldx #$14                                                          ; 229c: a2 14       ..
 clear_backwards_status_bar_loop
     dex                                                               ; 229e: ca          .
-    sta backwards_status_bar,x                                        ; 229f: 9d 28 50    .(P
+    sta current_status_bar_sprites,x                                  ; 229f: 9d 28 50    .(P
     bne clear_backwards_status_bar_loop                               ; 22a2: d0 fa       ..
     rts                                                               ; 22a4: 60          `
 
@@ -1264,43 +1356,58 @@ not_in_range_so_change_nothing
     tax                                                               ; 22b1: aa          .
     rts                                                               ; 22b2: 60          `
 
-sub_c22b3
+reveal_or_hide_more_cells
     ldy #<map_row_0                                                   ; 22b3: a0 00       ..
     sty ptr_low                                                       ; 22b5: 84 8c       ..
     lda #>map_row_0                                                   ; 22b7: a9 50       .P
     sta ptr_high                                                      ; 22b9: 85 8d       ..
+    ; loop over all the rows, X is the loop counter
     ldx #22                                                           ; 22bb: a2 16       ..
 loop_over_rows
     lda ptr_low                                                       ; 22bd: a5 8c       ..
-    and #$3f                                                          ; 22bf: 29 3f       )?
-    cmp #$28                                                          ; 22c1: c9 28       .(
+    ; rows are stored in the first 40 bytes of every 64 bytes, so skip if we have
+    ; exceeded the right range
+    and #63                                                           ; 22bf: 29 3f       )?
+    cmp #40                                                           ; 22c1: c9 28       .(
     bpl skip_to_next_row                                              ; 22c3: 10 17       ..
+    ; progress a counter in a non-obvious pattern
     jsr reverse_nybbles_and_add_one                                   ; 22c5: 20 4a 22     J"
+    ; if it's early in the process (tick counter is low), then branch more often so we
+    ; reveal/hide the cells in a non-obvious pattern over time
     lsr                                                               ; 22c8: 4a          J
     lsr                                                               ; 22c9: 4a          J
     lsr                                                               ; 22ca: 4a          J
     cmp tick_counter                                                  ; 22cb: c5 5a       .Z
-    bne c22d7                                                         ; 22cd: d0 08       ..
+    bne skip_reveal_or_hide                                           ; 22cd: d0 08       ..
     lda (ptr_low),y                                                   ; 22cf: b1 8c       ..
+    ; clear the top bit to reveal the cell...
     and #$7f                                                          ; 22d1: 29 7f       ).
+    ; ...or set the top bit to hide the cell
     ora dissolve_to_solid_flag                                        ; 22d3: 05 72       .r
     sta (ptr_low),y                                                   ; 22d5: 91 8c       ..
-c22d7
+skip_reveal_or_hide
     jsr increment_ptr_and_clear_carry                                 ; 22d7: 20 38 22     8"
     bcc loop_over_rows                                                ; 22da: 90 e1       ..
+    ; move forward to next row. Each row is stored at 64 byte intervals. We have moved
+    ; on 40 so far so add the remainder to get to the next row
 skip_to_next_row
-    lda #$18                                                          ; 22dc: a9 18       ..
+    lda #64-40                                                        ; 22dc: a9 18       ..
     jsr add_a_to_ptr                                                  ; 22de: 20 40 22     @"
     dex                                                               ; 22e1: ca          .
     bne loop_over_rows                                                ; 22e2: d0 d9       ..
+    ; create some 'random' audio pitches to play while revealing/hiding the map. First
+    ; multiply the data set pointer low byte by five and add one
     lda data_set_ptr_low                                              ; 22e4: a5 46       .F
     asl                                                               ; 22e6: 0a          .
     asl                                                               ; 22e7: 0a          .
     sec                                                               ; 22e8: 38          8
     adc data_set_ptr_low                                              ; 22e9: 65 46       eF
     sta data_set_ptr_low                                              ; 22eb: 85 46       .F
+    ; add the cave number
     ora cave_number                                                   ; 22ed: 05 87       ..
+    ; just take some of the bits
     and #$9e                                                          ; 22ef: 29 9e       ).
+    ; use as the pitch
     tay                                                               ; 22f1: a8          .
     iny                                                               ; 22f2: c8          .
     ldx #$85                                                          ; 22f3: a2 85       ..
@@ -1317,22 +1424,23 @@ unused7
 unused8
     rts                                                               ; 22ff: 60          `
 
+; draw a full grid of sprites, updating the current map position first
 draw_grid_of_sprites
     jsr update_map_scroll_position                                    ; 2300: 20 2c 2b     ,+
-    jsr sub_c2800                                                     ; 2303: 20 00 28     .(
+    jsr update_grid_animations                                        ; 2303: 20 00 28     .(
     lda #>screen_addr_row_6                                           ; 2306: a9 5f       ._
     sta screen_addr1_high                                             ; 2308: 85 8b       ..
     ldy #<screen_addr_row_6                                           ; 230a: a0 80       ..
     lda #opcode_lda_abs_y                                             ; 230c: a9 b9       ..
     sta load_instruction                                              ; 230e: 8d 57 23    .W#
-    lda #<grid_of_screen_sprites                                      ; 2311: a9 00       ..
+    lda #<grid_of_currently_displayed_sprites                         ; 2311: a9 00       ..
     sta grid_compare_address_low                                      ; 2313: 8d 5c 23    .\#
     sta grid_write_address_low                                        ; 2316: 8d 61 23    .a#
-    lda #>grid_of_screen_sprites                                      ; 2319: a9 0c       ..
+    lda #>grid_of_currently_displayed_sprites                         ; 2319: a9 0c       ..
     sta grid_compare_address_high                                     ; 231b: 8d 5d 23    .]#
     sta grid_write_address_high                                       ; 231e: 8d 62 23    .b#
-    ; X = number of cells on screen (loop counter)
-    ldx #$f0                                                          ; 2321: a2 f0       ..
+    ; X = number of cells to draw: 12 rows of 20 cells each (a loop counter)
+    ldx #20*12                                                        ; 2321: a2 f0       ..
     bne draw_grid                                                     ; 2323: d0 25       .%             ; ALWAYS branch
 
 draw_status_bar
@@ -1340,8 +1448,8 @@ draw_status_bar
     lda #>start_of_grid_screen_address                                ; 2327: a9 5b       .[
 draw_single_row_of_sprites
     sta screen_addr1_high                                             ; 2329: 85 8b       ..
-    lda #>backwards_status_bar                                        ; 232b: a9 50       .P
-    ldx #<backwards_status_bar                                        ; 232d: a2 28       .(
+    lda #>current_status_bar_sprites                                  ; 232b: a9 50       .P
+    ldx #<current_status_bar_sprites                                  ; 232d: a2 28       .(
     stx grid_compare_address_low                                      ; 232f: 8e 5c 23    .\#
     stx grid_write_address_low                                        ; 2332: 8e 61 23    .a#
     sta grid_compare_address_high                                     ; 2335: 8d 5d 23    .]#
@@ -1368,7 +1476,7 @@ grid_draw_row_loop
     ; Y=9 indicates the titanium wall (while revealing the grid)
     ldy #9                                                            ; 2355: a0 09       ..
     ; this next instruction is either:
-    ;     'ldy cell_type_to_sprite' [which in this context is a NOP] OR
+    ;     'ldy cell_type_to_sprite' [which in this context is equivalent to a no-op] OR
     ;     'lda cell_type_to_sprite,y'
     ; as set by self-modifying code above
 load_instruction
@@ -1377,12 +1485,12 @@ load_instruction
 compare_instruction
 grid_compare_address_low = compare_instruction+1
 grid_compare_address_high = compare_instruction+2
-    cmp backwards_status_bar,x                                        ; 235b: dd 28 50    .(P
+    cmp current_status_bar_sprites,x                                  ; 235b: dd 28 50    .(P
     beq skip_draw_sprite                                              ; 235e: f0 49       .I
 write_instruction
 grid_write_address_low = write_instruction+1
 grid_write_address_high = write_instruction+2
-    sta backwards_status_bar,x                                        ; 2360: 9d 28 50    .(P
+    sta current_status_bar_sprites,x                                  ; 2360: 9d 28 50    .(P
     tay                                                               ; 2363: a8          .
     clc                                                               ; 2364: 18          .
     lda sprite_addresses_low,y                                        ; 2365: b9 00 20    ..
@@ -1793,7 +1901,7 @@ unused12
     ldy #$82                                                          ; 2598: a0 82       ..
     lda cell_below_right                                              ; 259a: a5 7b       .{
     sta (ptr_low),y                                                   ; 259c: 91 8c       ..
-handler_7
+handler_fungus
     lda l0054                                                         ; 259e: a5 54       .T
     beq c25a6                                                         ; 25a0: f0 04       ..
     tax                                                               ; 25a2: aa          .
@@ -1893,7 +2001,7 @@ c2618
 
 direction_key_pressed
     ldx #0                                                            ; 2626: a2 00       ..
-    stx l0058                                                         ; 2628: 86 58       .X
+    stx ticks_since_last_direction_key_pressed                        ; 2628: 86 58       .X
     dex                                                               ; 262a: ca          .
 get_direction_index_loop
     inx                                                               ; 262b: e8          .
@@ -2008,7 +2116,8 @@ c26da
 unused16
     !byte $29, $7f, $aa, $e0                                          ; 26df: 29 7f aa... )..
 
-handler_10
+    ; mark rockford cell as visible
+handler_rockford
     txa                                                               ; 26e3: 8a          .
     and #$7f                                                          ; 26e4: 29 7f       ).
     tax                                                               ; 26e6: aa          .
@@ -2019,6 +2128,7 @@ handler_10
     lda tick_counter                                                  ; 26ef: a5 5a       .Z
     cmp #$f0                                                          ; 26f1: c9 f0       ..
     bpl return4                                                       ; 26f3: 10 08       ..
+    ; ready to start playing
     ldx #$21                                                          ; 26f5: a2 21       .!
     inc l004a                                                         ; 26f7: e6 4a       .J
     lda #<status_bar_sprite_numbers                                   ; 26f9: a9 00       ..
@@ -2033,15 +2143,16 @@ start_gameplay
     jsr reset_clock                                                   ; 2700: 20 4d 2a     M*
     lda #1                                                            ; 2703: a9 01       ..
     sta demo_key_duration                                             ; 2705: 85 67       .g
+    ; Set A=0
     lsr                                                               ; 2707: 4a          J
     sta l0066                                                         ; 2708: 85 66       .f
 c270a
     lda #0                                                            ; 270a: a9 00       ..
     ldx #7                                                            ; 270c: a2 07       ..
-loop_c270e
+zero_eight_bytes_loop
     sta data_set_ptr_low,x                                            ; 270e: 95 46       .F
     dex                                                               ; 2710: ca          .
-    bpl loop_c270e                                                    ; 2711: 10 fb       ..
+    bpl zero_eight_bytes_loop                                         ; 2711: 10 fb       ..
     sta status_text_address_low                                       ; 2713: 85 69       .i
     sta l0060                                                         ; 2715: 85 60       .`
     sta neighbour_cell_contents                                       ; 2717: 85 64       .d
@@ -2056,37 +2167,38 @@ c2727
     stx l0060                                                         ; 2727: 86 60       .`
     jsr wait_for_13_centiseconds_and_read_keys                        ; 2729: 20 90 2b     .+
     ldx demo_mode_tick_count                                          ; 272c: a6 65       .e
-    bmi c2752                                                         ; 272e: 30 22       0"
+    bmi got_key                                                       ; 272e: 30 22       0"
     lda keys_to_process                                               ; 2730: a5 62       .b
     beq update_demo_mode                                              ; 2732: f0 01       ..
     rts                                                               ; 2734: 60          `
 
 update_demo_mode
     ldy #<status_bar_sprite_numbers                                   ; 2735: a0 00       ..
+    ; flip between status bar and demo mode text every 16 ticks
     lda tick_counter                                                  ; 2737: a5 5a       .Z
     and #$10                                                          ; 2739: 29 10       ).
-    beq c273f                                                         ; 273b: f0 02       ..
-    ldy #<scrolling_pause_text                                        ; 273d: a0 a0       ..
-c273f
+    beq skip_demo_mode_text                                           ; 273b: f0 02       ..
+    ldy #<demonstration_mode_text                                     ; 273d: a0 a0       ..
+skip_demo_mode_text
     sty status_text_address_low                                       ; 273f: 84 69       .i
     lda demonstration_keys,x                                          ; 2741: bd 00 31    ..1
     sta keys_to_process                                               ; 2744: 85 62       .b
     dec demo_key_duration                                             ; 2746: c6 67       .g
-    bne c2752                                                         ; 2748: d0 08       ..
+    bne got_key                                                       ; 2748: d0 08       ..
     inc demo_mode_tick_count                                          ; 274a: e6 65       .e
     inx                                                               ; 274c: e8          .
     lda demonstration_key_durations,x                                 ; 274d: bd 60 31    .`1
     sta demo_key_duration                                             ; 2750: 85 67       .g
-c2752
+got_key
     jsr update_map                                                    ; 2752: 20 00 24     .$
     lda neighbour_cell_contents                                       ; 2755: a5 64       .d
     and #$0f                                                          ; 2757: 29 0f       ).
     sta neighbour_cell_contents                                       ; 2759: 85 64       .d
     cmp #8                                                            ; 275b: c9 08       ..
-    bne c2762                                                         ; 275d: d0 03       ..
-    jmp c3040                                                         ; 275f: 4c 40 30    L@0
+    bne not_rockford                                                  ; 275d: d0 03       ..
+    jmp check_for_pause_key                                           ; 275f: 4c 40 30    L@0
 
-c2762
+not_rockford
     jsr draw_grid_of_sprites                                          ; 2762: 20 00 23     .#
     jsr draw_status_bar                                               ; 2765: 20 25 23     %#
     jsr sub_c3000                                                     ; 2768: 20 00 30     .0
@@ -2103,7 +2215,7 @@ c2762
     bne c2787                                                         ; 277e: d0 07       ..
     lda #<out_of_time_message                                         ; 2780: a9 b4       ..
     sta status_text_address_low                                       ; 2782: 85 69       .i
-    jmp c3040                                                         ; 2784: 4c 40 30    L@0
+    jmp check_for_pause_key                                           ; 2784: 4c 40 30    L@0
 
 c2787
     lda neighbour_cell_contents                                       ; 2787: a5 64       .d
@@ -2159,7 +2271,7 @@ c27d5
     lda keys_to_process                                               ; 27e3: a5 62       .b
     and #2                                                            ; 27e5: 29 02       ).
     beq c27ec                                                         ; 27e7: f0 03       ..
-    jsr c3040                                                         ; 27e9: 20 40 30     @0
+    jsr check_for_pause_key                                           ; 27e9: 20 40 30     @0
 c27ec
     jmp c270a                                                         ; 27ec: 4c 0a 27    L.'
 
@@ -2170,17 +2282,19 @@ unused18
     !byte $27, $60, $f0,   6, $d0, $e9, $29, $23,   2, $40, $60, $29  ; 27f0: 27 60 f0... '`.
     !byte   8, $f0, $e5, $60                                          ; 27fc: 08 f0 e5... ...
 
-sub_c2800
+update_grid_animations
     ldx #$0e                                                          ; 2800: a2 0e       ..
     stx cell_current                                                  ; 2802: 86 77       .w
-loop_c2804
+update_sprites_to_use_loop
     ldy index_to_cell_type,x                                          ; 2804: bc 50 21    .P!
     ldx cell_type_to_sprite,y                                         ; 2807: be 80 1f    ...
-    lda l1f00,x                                                       ; 280a: bd 00 1f    ...
+    ; look up the next sprite in the animation sequence
+    lda sprite_to_next_sprite,x                                       ; 280a: bd 00 1f    ...
     sta cell_type_to_sprite,y                                         ; 280d: 99 80 1f    ...
     dec cell_current                                                  ; 2810: c6 77       .w
     ldx cell_current                                                  ; 2812: a6 77       .w
-    bpl loop_c2804                                                    ; 2814: 10 ee       ..
+    bpl update_sprites_to_use_loop                                    ; 2814: 10 ee       ..
+    ; use the tick counter (bottom two bits scaled up by 16) to update fungus animation
     lda tick_counter                                                  ; 2816: a5 5a       .Z
     and #3                                                            ; 2818: 29 03       ).
     asl                                                               ; 281a: 0a          .
@@ -2188,31 +2302,38 @@ loop_c2804
     asl                                                               ; 281c: 0a          .
     asl                                                               ; 281d: 0a          .
     tax                                                               ; 281e: aa          .
-    lda two_state_animated_sprites1,x                                 ; 281f: bd 87 1f    ...
+    lda fungus_animated_sprites1a,x                                   ; 281f: bd 87 1f    ...
     eor #1                                                            ; 2822: 49 01       I.
-    sta two_state_animated_sprites1,x                                 ; 2824: 9d 87 1f    ...
-    lda two_state_animated_sprites2,x                                 ; 2827: bd c7 1f    ...
+    sta fungus_animated_sprites1a,x                                   ; 2824: 9d 87 1f    ...
+    lda fungus_animated_sprites2a,x                                   ; 2827: bd c7 1f    ...
     eor #1                                                            ; 282a: 49 01       I.
-    sta two_state_animated_sprites2,x                                 ; 282c: 9d c7 1f    ...
-    lda l2156                                                         ; 282f: ad 56 21    .V!
+    sta fungus_animated_sprites2a,x                                   ; 282c: 9d c7 1f    ...
+    ; animate exit
+    lda exit_cell_type                                                ; 282f: ad 56 21    .V!
     eor #$10                                                          ; 2832: 49 10       I.
-    sta l2156                                                         ; 2834: 8d 56 21    .V!
-    lda l0058                                                         ; 2837: a5 58       .X
+    sta exit_cell_type                                                ; 2834: 8d 56 21    .V!
+    ; update rockford idle animation
+    lda ticks_since_last_direction_key_pressed                        ; 2837: a5 58       .X
     tay                                                               ; 2839: a8          .
     and #$3f                                                          ; 283a: 29 3f       )?
     tax                                                               ; 283c: aa          .
-    lda sprite_addr_92,x                                              ; 283d: bd 80 1e    ...
+    lda idle_animation_data,x                                         ; 283d: bd 80 1e    ...
+    ; check for nearing the end of the idle animation (range $c0-$ff).
+    ; Use the top nybbles of the data if so.
     cpy #$c0                                                          ; 2840: c0 c0       ..
-    bcc c2848                                                         ; 2842: 90 04       ..
+    bcc extract_lower_nybble                                          ; 2842: 90 04       ..
+    ; Near the end of the idle animation. Shift the upper nybble into the bottom nybble
+    ; to get more idle sprites
     lsr                                                               ; 2844: 4a          J
     lsr                                                               ; 2845: 4a          J
     lsr                                                               ; 2846: 4a          J
     lsr                                                               ; 2847: 4a          J
-c2848
+extract_lower_nybble
     and #$0f                                                          ; 2848: 29 0f       ).
-    ora #$20                                                          ; 284a: 09 20       .
-    sta l1f8f                                                         ; 284c: 8d 8f 1f    ...
-    inc l0058                                                         ; 284f: e6 58       .X
+    ; set the rockford sprite
+    ora #sprite_rockford_blinking1                                    ; 284a: 09 20       .
+    sta rockford_sprite                                               ; 284c: 8d 8f 1f    ...
+    inc ticks_since_last_direction_key_pressed                        ; 284f: e6 58       .X
     rts                                                               ; 2851: 60          `
 
 unused19
@@ -2301,7 +2422,7 @@ unused21
     !byte $10,   4, $aa, $bd, $f7, $28,   9, $80, $85, $77, $60,   0  ; 28ec: 10 04 aa... ...
     !byte   0, $84,   1, $55, $28, $a5, $98, $0a                      ; 28f8: 00 84 01... ...
 
-prepare_level
+prepare_stage
     lda #0                                                            ; 2900: a9 00       ..
     sta cell_right                                                    ; 2902: 85 78       .x
     ldy cave_number                                                   ; 2904: a4 87       ..
@@ -2724,23 +2845,23 @@ check_for_need_to_scroll_down
     cmp #9                                                            ; 2b55: c9 09       ..
     bmi check_for_need_to_scroll_up                                   ; 2b57: 30 05       0.
     cpy #$0a                                                          ; 2b59: c0 0a       ..
-    bpl check_for_bonus_levels                                        ; 2b5b: 10 0a       ..
+    bpl check_for_bonus_stages                                        ; 2b5b: 10 0a       ..
     iny                                                               ; 2b5d: c8          .
 check_for_need_to_scroll_up
     cmp #3                                                            ; 2b5e: c9 03       ..
-    bpl check_for_bonus_levels                                        ; 2b60: 10 05       ..
+    bpl check_for_bonus_stages                                        ; 2b60: 10 05       ..
     cpy #1                                                            ; 2b62: c0 01       ..
-    bmi check_for_bonus_levels                                        ; 2b64: 30 01       0.
+    bmi check_for_bonus_stages                                        ; 2b64: 30 01       0.
     dey                                                               ; 2b66: 88          .
-check_for_bonus_levels
+check_for_bonus_stages
     lda cave_number                                                   ; 2b67: a5 87       ..
     cmp #$10                                                          ; 2b69: c9 10       ..
-    bmi skip_bonus_level                                              ; 2b6b: 30 04       0.
-    ; bonus level is always situated in top left corner
+    bmi skip_bonus_stage                                              ; 2b6b: 30 04       0.
+    ; bonus stage is always situated in top left corner
     lda #0                                                            ; 2b6d: a9 00       ..
     tax                                                               ; 2b6f: aa          .
     tay                                                               ; 2b70: a8          .
-skip_bonus_level
+skip_bonus_stage
     stx visible_top_left_map_x                                        ; 2b71: 86 7e       .~
     stx map_x                                                         ; 2b73: 86 8a       ..
     sty visible_top_left_map_y                                        ; 2b75: 84 7f       ..
@@ -2907,21 +3028,21 @@ c2ca0
     and #$0c                                                          ; 2ca3: 29 0c       ).
     sta in_game_sound_data+2                                          ; 2ca5: 8d 02 2c    ..,
     ldx #5                                                            ; 2ca8: a2 05       ..
-    jsr sub_c2ce8                                                     ; 2caa: 20 e8 2c     .,
+    jsr play_sound_if_needed                                          ; 2caa: 20 e8 2c     .,
     lda tick_counter                                                  ; 2cad: a5 5a       .Z
     lsr                                                               ; 2caf: 4a          J
     bcc c2cb7                                                         ; 2cb0: 90 05       ..
     ldx #0                                                            ; 2cb2: a2 00       ..
-    jsr sub_c2ce8                                                     ; 2cb4: 20 e8 2c     .,
+    jsr play_sound_if_needed                                          ; 2cb4: 20 e8 2c     .,
 c2cb7
     ldx #1                                                            ; 2cb7: a2 01       ..
-    jsr sub_c2ce8                                                     ; 2cb9: 20 e8 2c     .,
+    jsr play_sound_if_needed                                          ; 2cb9: 20 e8 2c     .,
     ldx #6                                                            ; 2cbc: a2 06       ..
-    jsr sub_c2ce8                                                     ; 2cbe: 20 e8 2c     .,
+    jsr play_sound_if_needed                                          ; 2cbe: 20 e8 2c     .,
     lda l004c                                                         ; 2cc1: a5 4c       .L
     bne return10                                                      ; 2cc3: d0 2a       .*
     ldx #4                                                            ; 2cc5: a2 04       ..
-    jsr sub_c2ce8                                                     ; 2cc7: 20 e8 2c     .,
+    jsr play_sound_if_needed                                          ; 2cc7: 20 e8 2c     .,
     lda l004a                                                         ; 2cca: a5 4a       .J
     bne return10                                                      ; 2ccc: d0 21       .!
     ldy #$19                                                          ; 2cce: a0 19       ..
@@ -2934,9 +3055,9 @@ c2cb7
     ora l004c                                                         ; 2cdd: 05 4c       .L
     bne return10                                                      ; 2cdf: d0 0e       ..
     ldx #2                                                            ; 2ce1: a2 02       ..
-    jsr sub_c2ce8                                                     ; 2ce3: 20 e8 2c     .,
+    jsr play_sound_if_needed                                          ; 2ce3: 20 e8 2c     .,
     ldx #3                                                            ; 2ce6: a2 03       ..
-sub_c2ce8
+play_sound_if_needed
     lda data_set_ptr_low,x                                            ; 2ce8: b5 46       .F
     beq return10                                                      ; 2cea: f0 03       ..
     jmp play_sound_x_pitch_y                                          ; 2cec: 4c 2c 2c    L,,
@@ -3130,20 +3251,20 @@ unused35
     !byte $51, $15, $11, $25, $16, $25, $11, $15                      ; 2df8: 51 15 11... Q..
 
 sub_c2e00
-    jsr prepare_level                                                 ; 2e00: 20 00 29     .)
+    jsr prepare_stage                                                 ; 2e00: 20 00 29     .)
     lda #0                                                            ; 2e03: a9 00       ..
     sta bonus_life_available                                          ; 2e05: 85 6f       .o
     sta cell_type_to_sprite                                           ; 2e07: 8d 80 1f    ...
     ldx #<players_and_men_status_bar                                  ; 2e0a: a2 14       ..
     lda cave_number                                                   ; 2e0c: a5 87       ..
     cmp #$10                                                          ; 2e0e: c9 10       ..
-    bmi c2e14                                                         ; 2e10: 30 02       0.
+    bmi skip_bonus_life_text                                          ; 2e10: 30 02       0.
     ldx #<bonus_life_text                                             ; 2e12: a2 64       .d
-c2e14
+skip_bonus_life_text
     stx status_text_address_low                                       ; 2e14: 86 69       .i
     lda demo_mode_tick_count                                          ; 2e16: a5 65       .e
     bmi c2e1e                                                         ; 2e18: 30 04       0.
-    lda #<scrolling_pause_text                                        ; 2e1a: a9 a0       ..
+    lda #<demonstration_mode_text                                     ; 2e1a: a9 a0       ..
     sta status_text_address_low                                       ; 2e1c: 85 69       .i
 c2e1e
     ldx #$0f                                                          ; 2e1e: a2 0f       ..
@@ -3214,26 +3335,27 @@ write_top_and_bottom_borders_loop
     beq c2e98                                                         ; 2e94: f0 02       ..
     ldx #$5e                                                          ; 2e96: a2 5e       .^
 c2e98
-    stx l2eaa                                                         ; 2e98: 8e aa 2e    ...
-    stx l2eb8                                                         ; 2e9b: 8e b8 2e    ...
+    stx which_status_bar_address1_low                                 ; 2e98: 8e aa 2e    ...
+    stx which_status_bar_address2_low                                 ; 2e9b: 8e b8 2e    ...
     ldx #0                                                            ; 2e9e: a2 00       ..
     ldy #0                                                            ; 2ea0: a0 00       ..
 loop_c2ea2
     lda score_on_status_bar,x                                         ; 2ea2: bd 0e 32    ..2
     cpy #0                                                            ; 2ea5: c0 00       ..
-    bne c2eb7                                                         ; 2ea7: d0 0e       ..
+    bne store_in_status_bar                                           ; 2ea7: d0 0e       ..
 sub_c2ea9
-l2eaa = sub_c2ea9+1
+which_status_bar_address1_low = sub_c2ea9+1
     cmp highscore_high_status_bar,x                                   ; 2ea9: dd 50 32    .P2
     bmi play_scren_dissolve_to_solid                                  ; 2eac: 30 0f       0.
-    bne c2eb7                                                         ; 2eae: d0 07       ..
+    bne store_in_status_bar                                           ; 2eae: d0 07       ..
 loop_c2eb0
     inx                                                               ; 2eb0: e8          .
     cpx #6                                                            ; 2eb1: e0 06       ..
     bne loop_c2ea2                                                    ; 2eb3: d0 ed       ..
-    beq play_scren_dissolve_to_solid                                  ; 2eb5: f0 06       ..
-c2eb7
-l2eb8 = c2eb7+1
+    beq play_scren_dissolve_to_solid                                  ; 2eb5: f0 06       ..             ; ALWAYS branch
+
+store_in_status_bar
+which_status_bar_address2_low = store_in_status_bar+1
     sta highscore_high_status_bar,x                                   ; 2eb7: 9d 50 32    .P2
     iny                                                               ; 2eba: c8          .
     bne loop_c2eb0                                                    ; 2ebb: d0 f3       ..
@@ -3246,7 +3368,7 @@ play_screen_dissolve_effect
     lda cave_number                                                   ; 2ec5: a5 87       ..
     sta cell_current                                                  ; 2ec7: 85 77       .w
 screen_dissolve_loop
-    jsr sub_c22b3                                                     ; 2ec9: 20 b3 22     ."
+    jsr reveal_or_hide_more_cells                                     ; 2ec9: 20 b3 22     ."
     jsr draw_grid_of_sprites                                          ; 2ecc: 20 00 23     .#
     jsr draw_status_bar                                               ; 2ecf: 20 25 23     %#
     lda tick_counter                                                  ; 2ed2: a5 5a       .Z
@@ -3408,13 +3530,14 @@ c3016
     stx l0054                                                         ; 3016: 86 54       .T
 c3018
     lda time_remaining                                                ; 3018: a5 6d       .m
-    cmp #sprite_0                                                     ; 301a: c9 32       .2
+    cmp #50                                                           ; 301a: c9 32       .2
     bne return13                                                      ; 301c: d0 0d       ..
     lda sub_second_ticks                                              ; 301e: a5 5c       .\
     cmp #7                                                            ; 3020: c9 07       ..
     bne return13                                                      ; 3022: d0 07       ..
     lda #1                                                            ; 3024: a9 01       ..
     sta l0055                                                         ; 3026: 85 55       .U
+    ; Set A=0
     lsr                                                               ; 3028: 4a          J
     sta l0057                                                         ; 3029: 85 57       .W
 return13
@@ -3424,34 +3547,36 @@ unused39
     !byte $85, $57, $60, $1c, $1f, $1f, $1f, $1f, $1f, $1f, $1f, $1f  ; 302c: 85 57 60... .W`
     !byte $1f, $1f, $1f, $1f, $1f, $1f, $1f, $1f                      ; 3038: 1f 1f 1f... ...
 
-c3040
+check_for_pause_key
     lda keys_to_process                                               ; 3040: a5 62       .b
     and #2                                                            ; 3042: 29 02       ).
-    beq c306c                                                         ; 3044: f0 26       .&
+    beq no_pause                                                      ; 3044: f0 26       .&
+    ; pause mode. show pause message.
     lda #<pause_message                                               ; 3046: a9 c8       ..
     sta status_text_address_low                                       ; 3048: 85 69       .i
     lda #0                                                            ; 304a: a9 00       ..
-    sta l004e                                                         ; 304c: 85 4e       .N
-loop_c304e
-    jsr sub_c30dd                                                     ; 304e: 20 dd 30     .0
-    bne loop_c304e                                                    ; 3051: d0 fb       ..
-loop_c3053
-    inc l004e                                                         ; 3053: e6 4e       .N
+    sta pause_counter                                                 ; 304c: 85 4e       .N
+update_while_initially_pressing_pause_loop
+    jsr update_during_pause_mode                                      ; 304e: 20 dd 30     .0
+    bne update_while_initially_pressing_pause_loop                    ; 3051: d0 fb       ..
+pause_loop
+    inc pause_counter                                                 ; 3053: e6 4e       .N
     ldx #<pause_message                                               ; 3055: a2 c8       ..
-    lda l004e                                                         ; 3057: a5 4e       .N
+    ; toggle between showing pause message and regular status bar every 16 ticks
+    lda pause_counter                                                 ; 3057: a5 4e       .N
     and #$10                                                          ; 3059: 29 10       ).
-    beq c305f                                                         ; 305b: f0 02       ..
+    beq skip_showing_players_and_men                                  ; 305b: f0 02       ..
     ldx #<players_and_men_status_bar                                  ; 305d: a2 14       ..
-c305f
+skip_showing_players_and_men
     stx status_text_address_low                                       ; 305f: 86 69       .i
     jsr sub_c30cf                                                     ; 3061: 20 cf 30     .0
-    beq loop_c3053                                                    ; 3064: f0 ed       ..
-loop_c3066
-    jsr sub_c30dd                                                     ; 3066: 20 dd 30     .0
-    bne loop_c3066                                                    ; 3069: d0 fb       ..
+    beq pause_loop                                                    ; 3064: f0 ed       ..
+update_while_finally_pressing_unpause_loop
+    jsr update_during_pause_mode                                      ; 3066: 20 dd 30     .0
+    bne update_while_finally_pressing_unpause_loop                    ; 3069: d0 fb       ..
     rts                                                               ; 306b: 60          `
 
-c306c
+no_pause
     lda neighbour_cell_contents                                       ; 306c: a5 64       .d
     cmp #8                                                            ; 306e: c9 08       ..
     beq c3084                                                         ; 3070: f0 12       ..
@@ -3514,11 +3639,12 @@ sub_c30cf
 return14
     rts                                                               ; 30dc: 60          `
 
-sub_c30dd
+update_during_pause_mode
     jsr draw_status_bar                                               ; 30dd: 20 25 23     %#
     lda #0                                                            ; 30e0: a9 00       ..
     sta wait_delay_centiseconds                                       ; 30e2: 85 84       ..
     jsr wait_for_centiseconds_and_read_keys                           ; 30e4: 20 94 2b     .+
+    ; check for pause key
     lda keys_to_process                                               ; 30e7: a5 62       .b
     and #2                                                            ; 30e9: 29 02       ).
     rts                                                               ; 30eb: 60          `
@@ -3729,7 +3855,7 @@ game_over_text
 player_number_on_game_over_text
     !byte sprite_1                                                    ; 329e: 33          3
     !byte sprite_space                                                ; 329f: 00          .
-scrolling_pause_text
+demonstration_mode_text
     !byte sprite_space                                                ; 32a0: 00          .
     !text "DEMONSTRATION"                                             ; 32a1: 44 45 4d... DEM
     !byte sprite_space                                                ; 32ae: 00          .
@@ -4975,7 +5101,7 @@ map_row_0
     !byte $83, $83, $83, $83, $83, $83, $83, $83, $83, $83            ; 5014: 83 83 83... ...
     !byte $83, $83, $83, $83, $83, $83, $83, $83, $83, $83            ; 501e: 83 83 83... ...
 
-backwards_status_bar
+current_status_bar_sprites
     !byte sprite_1                                                    ; 5028: 33          3
     !byte sprite_slash                                                ; 5029: 3e          >
     !text "A=EVAC"                                                    ; 502a: 41 3d 45... A=E
@@ -5474,6 +5600,117 @@ pydis_end
 !if ('S') != $53 {
     !error "Assertion failed: 'S' == $53"
 }
+!if (16*(sprite_rockford_blinking1-0x20) + sprite_rockford_blinking1-0x20) != $00 {
+    !error "Assertion failed: 16*(sprite_rockford_blinking1-0x20) + sprite_rockford_blinking1-0x20 == $00"
+}
+!if (16*(sprite_rockford_blinking1-0x20) + sprite_rockford_blinking2-0x20) != $01 {
+    !error "Assertion failed: 16*(sprite_rockford_blinking1-0x20) + sprite_rockford_blinking2-0x20 == $01"
+}
+!if (16*(sprite_rockford_blinking1-0x20) + sprite_rockford_moving_down1-0x20) != $05 {
+    !error "Assertion failed: 16*(sprite_rockford_blinking1-0x20) + sprite_rockford_moving_down1-0x20 == $05"
+}
+!if (16*(sprite_rockford_blinking1-0x20) + sprite_rockford_moving_down2-0x20) != $06 {
+    !error "Assertion failed: 16*(sprite_rockford_blinking1-0x20) + sprite_rockford_moving_down2-0x20 == $06"
+}
+!if (16*(sprite_rockford_blinking1-0x20) + sprite_rockford_moving_up1-0x20) != $08 {
+    !error "Assertion failed: 16*(sprite_rockford_blinking1-0x20) + sprite_rockford_moving_up1-0x20 == $08"
+}
+!if (16*(sprite_rockford_blinking1-0x20) + sprite_rockford_moving_up2-0x20) != $09 {
+    !error "Assertion failed: 16*(sprite_rockford_blinking1-0x20) + sprite_rockford_moving_up2-0x20 == $09"
+}
+!if (16*(sprite_rockford_blinking2-0x20) + sprite_rockford_blinking2-0x20) != $11 {
+    !error "Assertion failed: 16*(sprite_rockford_blinking2-0x20) + sprite_rockford_blinking2-0x20 == $11"
+}
+!if (16*(sprite_rockford_blinking2-0x20) + sprite_rockford_moving_down2-0x20) != $16 {
+    !error "Assertion failed: 16*(sprite_rockford_blinking2-0x20) + sprite_rockford_moving_down2-0x20 == $16"
+}
+!if (16*(sprite_rockford_blinking2-0x20) + sprite_rockford_moving_up2-0x20) != $19 {
+    !error "Assertion failed: 16*(sprite_rockford_blinking2-0x20) + sprite_rockford_moving_up2-0x20 == $19"
+}
+!if (16*(sprite_rockford_blinking3-0x20) + sprite_rockford_blinking3-0x20) != $22 {
+    !error "Assertion failed: 16*(sprite_rockford_blinking3-0x20) + sprite_rockford_blinking3-0x20 == $22"
+}
+!if (16*(sprite_rockford_blinking3-0x20) + sprite_rockford_moving_down1-0x20) != $25 {
+    !error "Assertion failed: 16*(sprite_rockford_blinking3-0x20) + sprite_rockford_moving_down1-0x20 == $25"
+}
+!if (16*(sprite_rockford_blinking3-0x20) + sprite_rockford_moving_down3-0x20) != $27 {
+    !error "Assertion failed: 16*(sprite_rockford_blinking3-0x20) + sprite_rockford_moving_down3-0x20 == $27"
+}
+!if (16*(sprite_rockford_blinking3-0x20) + sprite_rockford_moving_up1-0x20) != $28 {
+    !error "Assertion failed: 16*(sprite_rockford_blinking3-0x20) + sprite_rockford_moving_up1-0x20 == $28"
+}
+!if (16*(sprite_rockford_moving_down1-0x20) + sprite_rockford_blinking1-0x20) != $50 {
+    !error "Assertion failed: 16*(sprite_rockford_moving_down1-0x20) + sprite_rockford_blinking1-0x20 == $50"
+}
+!if (16*(sprite_rockford_moving_down1-0x20) + sprite_rockford_blinking3-0x20) != $52 {
+    !error "Assertion failed: 16*(sprite_rockford_moving_down1-0x20) + sprite_rockford_blinking3-0x20 == $52"
+}
+!if (16*(sprite_rockford_moving_down1-0x20) + sprite_rockford_moving_down1-0x20) != $55 {
+    !error "Assertion failed: 16*(sprite_rockford_moving_down1-0x20) + sprite_rockford_moving_down1-0x20 == $55"
+}
+!if (16*(sprite_rockford_moving_down1-0x20) + sprite_rockford_moving_up2-0x20) != $59 {
+    !error "Assertion failed: 16*(sprite_rockford_moving_down1-0x20) + sprite_rockford_moving_up2-0x20 == $59"
+}
+!if (16*(sprite_rockford_moving_down2-0x20) + sprite_rockford_blinking1-0x20) != $60 {
+    !error "Assertion failed: 16*(sprite_rockford_moving_down2-0x20) + sprite_rockford_blinking1-0x20 == $60"
+}
+!if (16*(sprite_rockford_moving_down2-0x20) + sprite_rockford_blinking2-0x20) != $61 {
+    !error "Assertion failed: 16*(sprite_rockford_moving_down2-0x20) + sprite_rockford_blinking2-0x20 == $61"
+}
+!if (16*(sprite_rockford_moving_down2-0x20) + sprite_rockford_blinking3-0x20) != $62 {
+    !error "Assertion failed: 16*(sprite_rockford_moving_down2-0x20) + sprite_rockford_blinking3-0x20 == $62"
+}
+!if (16*(sprite_rockford_moving_down2-0x20) + sprite_rockford_moving_down1-0x20) != $65 {
+    !error "Assertion failed: 16*(sprite_rockford_moving_down2-0x20) + sprite_rockford_moving_down1-0x20 == $65"
+}
+!if (16*(sprite_rockford_moving_down3-0x20) + sprite_rockford_blinking1-0x20) != $70 {
+    !error "Assertion failed: 16*(sprite_rockford_moving_down3-0x20) + sprite_rockford_blinking1-0x20 == $70"
+}
+!if (16*(sprite_rockford_moving_down3-0x20) + sprite_rockford_moving_down1-0x20) != $75 {
+    !error "Assertion failed: 16*(sprite_rockford_moving_down3-0x20) + sprite_rockford_moving_down1-0x20 == $75"
+}
+!if (16*(sprite_rockford_moving_down3-0x20) + sprite_rockford_moving_up2-0x20) != $79 {
+    !error "Assertion failed: 16*(sprite_rockford_moving_down3-0x20) + sprite_rockford_moving_up2-0x20 == $79"
+}
+!if (16*(sprite_rockford_moving_up1-0x20) + sprite_rockford_blinking1-0x20) != $80 {
+    !error "Assertion failed: 16*(sprite_rockford_moving_up1-0x20) + sprite_rockford_blinking1-0x20 == $80"
+}
+!if (16*(sprite_rockford_moving_up1-0x20) + sprite_rockford_blinking2-0x20) != $81 {
+    !error "Assertion failed: 16*(sprite_rockford_moving_up1-0x20) + sprite_rockford_blinking2-0x20 == $81"
+}
+!if (16*(sprite_rockford_moving_up2-0x20) + sprite_rockford_blinking1-0x20) != $90 {
+    !error "Assertion failed: 16*(sprite_rockford_moving_up2-0x20) + sprite_rockford_blinking1-0x20 == $90"
+}
+!if (16*(sprite_rockford_moving_up2-0x20) + sprite_rockford_blinking2-0x20) != $91 {
+    !error "Assertion failed: 16*(sprite_rockford_moving_up2-0x20) + sprite_rockford_blinking2-0x20 == $91"
+}
+!if (16*(sprite_rockford_moving_up2-0x20) + sprite_rockford_blinking3-0x20) != $92 {
+    !error "Assertion failed: 16*(sprite_rockford_moving_up2-0x20) + sprite_rockford_blinking3-0x20 == $92"
+}
+!if (16*(sprite_rockford_moving_up2-0x20) + sprite_rockford_moving_down1-0x20) != $95 {
+    !error "Assertion failed: 16*(sprite_rockford_moving_up2-0x20) + sprite_rockford_moving_down1-0x20 == $95"
+}
+!if (16*(sprite_rockford_winking1-0x20) + sprite_rockford_moving_down1-0x20) != $35 {
+    !error "Assertion failed: 16*(sprite_rockford_winking1-0x20) + sprite_rockford_moving_down1-0x20 == $35"
+}
+!if (16*(sprite_rockford_winking1-0x20) + sprite_rockford_moving_down2-0x20) != $36 {
+    !error "Assertion failed: 16*(sprite_rockford_winking1-0x20) + sprite_rockford_moving_down2-0x20 == $36"
+}
+!if (16*(sprite_rockford_winking2-0x20) + sprite_rockford_moving_down1-0x20) != $45 {
+    !error "Assertion failed: 16*(sprite_rockford_winking2-0x20) + sprite_rockford_moving_down1-0x20 == $45"
+}
+!if (16*(sprite_rockford_winking2-0x20) + sprite_rockford_moving_down3-0x20) != $47 {
+    !error "Assertion failed: 16*(sprite_rockford_winking2-0x20) + sprite_rockford_moving_down3-0x20 == $47"
+}
+!if (16*(sprite_rockford_winking2-0x20) + sprite_rockford_moving_up1-0x20) != $48 {
+    !error "Assertion failed: 16*(sprite_rockford_winking2-0x20) + sprite_rockford_moving_up1-0x20 == $48"
+}
+!if (20*12) != $f0 {
+    !error "Assertion failed: 20*12 == $f0"
+}
+!if (64-40) != $18 {
+    !error "Assertion failed: 64-40 == $18"
+}
 !if (<(in_game_sound_block)) != $24 {
     !error "Assertion failed: <(in_game_sound_block) == $24"
 }
@@ -5492,38 +5729,35 @@ pydis_end
 !if (<another_array_of_cells) != $40 {
     !error "Assertion failed: <another_array_of_cells == $40"
 }
-!if (<backwards_status_bar) != $28 {
-    !error "Assertion failed: <backwards_status_bar == $28"
-}
 !if (<big_rockford_destination_screen_address) != $00 {
     !error "Assertion failed: <big_rockford_destination_screen_address == $00"
 }
 !if (<bonus_life_text) != $64 {
     !error "Assertion failed: <bonus_life_text == $64"
 }
+!if (<current_status_bar_sprites) != $28 {
+    !error "Assertion failed: <current_status_bar_sprites == $28"
+}
 !if (<data_sets) != $f4 {
     !error "Assertion failed: <data_sets == $f4"
+}
+!if (<demonstration_mode_text) != $a0 {
+    !error "Assertion failed: <demonstration_mode_text == $a0"
 }
 !if (<game_over_text) != $8c {
     !error "Assertion failed: <game_over_text == $8c"
 }
-!if (<grid_of_screen_sprites) != $00 {
-    !error "Assertion failed: <grid_of_screen_sprites == $00"
+!if (<grid_of_currently_displayed_sprites) != $00 {
+    !error "Assertion failed: <grid_of_currently_displayed_sprites == $00"
 }
 !if (<handler_0123) != $a5 {
     !error "Assertion failed: <handler_0123 == $a5"
-}
-!if (<handler_10) != $e3 {
-    !error "Assertion failed: <handler_10 == $e3"
 }
 !if (<handler_13) != $ae {
     !error "Assertion failed: <handler_13 == $ae"
 }
 !if (<handler_15) != $00 {
     !error "Assertion failed: <handler_15 == $00"
-}
-!if (<handler_7) != $9e {
-    !error "Assertion failed: <handler_7 == $9e"
 }
 !if (<handler_9) != $ca {
     !error "Assertion failed: <handler_9 == $ca"
@@ -5536,6 +5770,12 @@ pydis_end
 }
 !if (<handler_for_vertical_strip) != $e0 {
     !error "Assertion failed: <handler_for_vertical_strip == $e0"
+}
+!if (<handler_fungus) != $9e {
+    !error "Assertion failed: <handler_fungus == $9e"
+}
+!if (<handler_rockford) != $e3 {
+    !error "Assertion failed: <handler_rockford == $e3"
 }
 !if (<highscore_high_status_bar) != $50 {
     !error "Assertion failed: <highscore_high_status_bar == $50"
@@ -5569,9 +5809,6 @@ pydis_end
 }
 !if (<screen_addr_row_6) != $80 {
     !error "Assertion failed: <screen_addr_row_6 == $80"
-}
-!if (<scrolling_pause_text) != $a0 {
-    !error "Assertion failed: <scrolling_pause_text == $a0"
 }
 !if (<some_array_of_cells) != $30 {
     !error "Assertion failed: <some_array_of_cells == $30"
@@ -5915,35 +6152,29 @@ pydis_end
 !if (>(sprite_addr_space)) != $13 {
     !error "Assertion failed: >(sprite_addr_space) == $13"
 }
-!if (>backwards_status_bar) != $50 {
-    !error "Assertion failed: >backwards_status_bar == $50"
-}
 !if (>big_rockford_destination_screen_address) != $58 {
     !error "Assertion failed: >big_rockford_destination_screen_address == $58"
 }
 !if (>big_rockford_sprite) != $34 {
     !error "Assertion failed: >big_rockford_sprite == $34"
 }
+!if (>current_status_bar_sprites) != $50 {
+    !error "Assertion failed: >current_status_bar_sprites == $50"
+}
 !if (>data_sets) != $4c {
     !error "Assertion failed: >data_sets == $4c"
 }
-!if (>grid_of_screen_sprites) != $0c {
-    !error "Assertion failed: >grid_of_screen_sprites == $0c"
+!if (>grid_of_currently_displayed_sprites) != $0c {
+    !error "Assertion failed: >grid_of_currently_displayed_sprites == $0c"
 }
 !if (>handler_0123) != $22 {
     !error "Assertion failed: >handler_0123 == $22"
-}
-!if (>handler_10) != $26 {
-    !error "Assertion failed: >handler_10 == $26"
 }
 !if (>handler_13) != $26 {
     !error "Assertion failed: >handler_13 == $26"
 }
 !if (>handler_15) != $26 {
     !error "Assertion failed: >handler_15 == $26"
-}
-!if (>handler_7) != $25 {
-    !error "Assertion failed: >handler_7 == $25"
 }
 !if (>handler_9) != $2b {
     !error "Assertion failed: >handler_9 == $2b"
@@ -5956,6 +6187,12 @@ pydis_end
 }
 !if (>handler_for_vertical_strip) != $23 {
     !error "Assertion failed: >handler_for_vertical_strip == $23"
+}
+!if (>handler_fungus) != $25 {
+    !error "Assertion failed: >handler_fungus == $25"
+}
+!if (>handler_rockford) != $26 {
+    !error "Assertion failed: >handler_rockford == $26"
 }
 !if (>map_row_0) != $50 {
     !error "Assertion failed: >map_row_0 == $50"
@@ -6434,6 +6671,9 @@ pydis_end
 !if (sprite_boulder1) != $01 {
     !error "Assertion failed: sprite_boulder1 == $01"
 }
+!if (sprite_boulder2) != $02 {
+    !error "Assertion failed: sprite_boulder2 == $02"
+}
 !if (sprite_box) != $09 {
     !error "Assertion failed: sprite_box == $09"
 }
@@ -6451,6 +6691,12 @@ pydis_end
 }
 !if (sprite_diamond2) != $04 {
     !error "Assertion failed: sprite_diamond2 == $04"
+}
+!if (sprite_diamond3) != $05 {
+    !error "Assertion failed: sprite_diamond3 == $05"
+}
+!if (sprite_diamond4) != $06 {
+    !error "Assertion failed: sprite_diamond4 == $06"
 }
 !if (sprite_earth2) != $1e {
     !error "Assertion failed: sprite_earth2 == $1e"
