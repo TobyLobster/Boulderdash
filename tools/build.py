@@ -57,7 +57,17 @@ def copy_files(files_to_copy):
         safe_copy("original/" + file + ".inf", "build/disk/" + file + ".inf")
 
 def disassemble_binary(python_filename, asm_filename):
+    # Acme version
     args = ["python3", python_filename, "-a"]
+    result_bytes = run(args, "disassemble failed")
+    with open(asm_filename, 'wb') as f:
+        f.write(result_bytes)
+
+    # Beebasm version
+    path, ext = os.path.splitext(asm_filename)
+    asm_filename = path + "_beebasm" + ext
+
+    args = ["python3", python_filename]
     result_bytes = run(args, "disassemble failed")
     with open(asm_filename, 'wb') as f:
         f.write(result_bytes)

@@ -23,6 +23,13 @@ config.set_show_all_labels(False)
 #   This is to make the addresses unique.
 #
 substitute_labels = {
+    (0x260e, 0x2800): {
+        "data_set_ptr_low": "sound_active_flag_table",
+        "data_set_ptr_high": "sound1_active_flag",
+    },
+    (0x2c80, 0x2cec): {
+        "data_set_ptr_low": "sound_active_flag_table",
+    },
     (0x2300, 0x23db): {
         "cell_above_left": "grid_column_counter",
     },
@@ -34,7 +41,7 @@ substitute_labels = {
         "cell_above_left": "neighbouring_cell_variable",
     },
     (0x295c, 0x2973): {
-        "l0048": "remember_y",
+        "sound2_active_flag": "remember_y",
     },
     (0x2a00, 0x2a28): {
         "real_keys_pressed": "x_loop_counter",
@@ -180,6 +187,13 @@ load(0x1300, "original/___1___", "6502")
 
 label(0x0046, "data_set_ptr_low")
 label(0x0047, "data_set_ptr_high")
+label(0x0048, "sound2_active_flag")
+label(0x0049, "sound3_active_flag")
+label(0x004a, "sound4_active_flag")
+label(0x004b, "sound5_active_flag")
+label(0x004c, "sound6_active_flag")
+label(0x004d, "sound7_active_flag")
+
 label(0x004e, "pause_counter")
 label(0x0058, "ticks_since_last_direction_key_pressed")
 label(0x0059, "countdown_while_switching_palette")
@@ -672,20 +686,19 @@ label(0x2156, "exit_cell_type")
 byte(0x2156, 9)
 byte(0x21c0, 16)
 label(0x21c0, "handler_table_low")
-byte(0x21d0, 12)
+byte(0x21d0, 16)
 label(0x21d0, "handler_table_high")
-byte(0x21dc, 4)
 label(0x26c3, "fill_with_a")
 
-handlers = { 0x22a5: "handler_0123",
+handlers = { 0x22a5: "handler_basics",
              0x2500: "handler_firefly",
              0x259e: "handler_fungus",
-             0x2bca: "handler_9",
-             0x26e3: "handler_rockford",
+             0x2bca: "handler_firefly_in_box",
+             0x26e3: "handler_flashing_rockford",
              0x23e0: "handler_for_vertical_strip",
              0x23f0: "handler_for_horizontal_strip",
-             0x26ae: "handler_13",
-             0x2600: "handler_15" }
+             0x26ae: "handler_magic_wall",
+             0x2600: "handler_rockford2" }
 
 for addr in handlers:
     label(addr, handlers[addr])
@@ -709,6 +722,8 @@ byte(0x2202)
 expr(0x2202, "cell_above")
 byte(0x2203)
 expr(0x2203, "cell_below")
+label(0x221c, "firefly_cell_values")
+byte(0x221c, 8)
 label(0x2224, "rockford_cell_value_for_direction")
 label(0x2228, "inkey_keys_table")
 blank(0x2230)
@@ -798,7 +813,7 @@ comment(0x2381, "This next loop draws a single sprite in the grid.\nIt draws two
 label(0x2383, "draw_sprite_loop")
 label(0x23a9, "skip_draw_sprite")
 comment(0x23a9, "move the screen pointer on 16 pixels to next column", indent=1)
-label(0x23b4, "skip_high_byte")
+label(0x23b4, "skip_high_byte2")
 decimal(0x23b9)
 comment(0x23bc, "return if we have drawn all the rows (X=0)", indent=1)
 comment(0x23bf, "move screen pointer on to next row of sprites (two character rows)", indent=1)
@@ -874,7 +889,7 @@ label(0x24db, "process_c0_or_above")
 comment(0x24dc, "look up table based on type", indent=1)
 comment(0x24e4, "store in cell below", indent=1)
 label(0x24e8, "dont_store_below")
-expr(0x24ec, "l004b")
+expr(0x24ec, "sound5_active_flag")
 comment(0x24ee, "store $4b or $4c in location $4b or $4c. Flashing animation?", indent=1)
 comment(0x24f1, "mask off the top two bits for the current cell value", indent=1)
 unused(0x24f7)
@@ -882,6 +897,7 @@ unused(0x24f7)
 expr(0x2507, "cell_above_left-1")
 ri(0x2509)
 label(0x250b, "unnecessary_branch")
+label(0x2542, "c0_or_above")
 expr(0x2544, make_lo("another_array_of_cells"))
 expr(0x254a, make_lo("some_array_of_cells"))
 comment(0x2550, "read above left cell", indent=1)
@@ -915,6 +931,8 @@ label(0x2689, "read_keys")
 label(0x2691, "read_keys_loop")
 unused(0x26ab)
 unused(0x26df)
+comment(0x26e7, "branch if on flashing exit")
+comment(0x26eb, "wait for flashing rockford animation to finish", indent=1)
 expr(0x26fa, make_lo("status_bar_sprite_numbers"))
 ret(0x26fd)
 unused(0x26fe)
@@ -931,6 +949,7 @@ label(0x2752, "got_key")
 label(0x2762, "not_rockford")
 comment(0x2777, "decrement time remaining", indent=1)
 expr(0x2781, make_lo("out_of_time_message"))
+label(0x2787, "time_still_going")
 ret(0x27ef)
 unused(0x27f0)
 byte(0x27f0,16)
@@ -1136,6 +1155,8 @@ ret(0x2cef)
 unused(0x2cf0)
 
 label(0x2d00, "write_strips")
+label(0x2d0a, "write_next_strip_loop")
+label(0x2d12, "skip_high_byte1")
 comment(0x2d12, "remember value", indent=1)
 comment(0x2d13, "get repeat count (from high nybble)", indent=1)
 label(0x2d1e, "write_strip_loop")

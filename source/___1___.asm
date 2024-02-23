@@ -111,14 +111,16 @@ total_caves                            = 20
 ; Memory locations
 l0000                                   = $00
 data_set_ptr_low                        = $46
+sound_active_flag_table                 = $46
 data_set_ptr_high                       = $47
-l0048                                   = $48
+sound1_active_flag                      = $47
 remember_y                              = $48
-l0049                                   = $49
-l004a                                   = $4a
-l004b                                   = $4b
-l004c                                   = $4c
-l004d                                   = $4d
+sound2_active_flag                      = $48
+sound3_active_flag                      = $49
+sound4_active_flag                      = $4a
+sound5_active_flag                      = $4b
+sound6_active_flag                      = $4c
+sound7_active_flag                      = $4d
 pause_counter                           = $4e
 l0050                                   = $50
 l0051                                   = $51
@@ -1195,33 +1197,39 @@ l2180
     !byte   1,   1,   1, $ff,   1,   1,   1, $ff, $ff, $ff,   0,   0  ; 21b0: 01 01 01... ...
     !byte $ff, $ff, $ff,   0                                          ; 21bc: ff ff ff... ...
 handler_table_low
-    !byte                 <handler_0123                               ; 21c0: a5          .
-    !byte                 <handler_0123                               ; 21c1: a5          .
-    !byte                 <handler_0123                               ; 21c2: a5          .
-    !byte                 <handler_0123                               ; 21c3: a5          .
+    !byte               <handler_basics                               ; 21c0: a5          .
+    !byte               <handler_basics                               ; 21c1: a5          .
+    !byte               <handler_basics                               ; 21c2: a5          .
+    !byte               <handler_basics                               ; 21c3: a5          .
     !byte                             0                               ; 21c4: 00          .
     !byte                             0                               ; 21c5: 00          .
     !byte              <handler_firefly                               ; 21c6: 00          .
     !byte               <handler_fungus                               ; 21c7: 9e          .
-    !byte             <handler_rockford                               ; 21c8: e3          .
-    !byte                    <handler_9                               ; 21c9: ca          .
-    !byte             <handler_rockford                               ; 21ca: e3          .
+    !byte    <handler_flashing_rockford                               ; 21c8: e3          .
+    !byte       <handler_firefly_in_box                               ; 21c9: ca          .
+    !byte    <handler_flashing_rockford                               ; 21ca: e3          .
     !byte   <handler_for_vertical_strip                               ; 21cb: e0          .
     !byte <handler_for_horizontal_strip                               ; 21cc: f0          .
-    !byte                   <handler_13                               ; 21cd: ae          .
+    !byte           <handler_magic_wall                               ; 21cd: ae          .
     !byte              <handler_firefly                               ; 21ce: 00          .
-    !byte                   <handler_15                               ; 21cf: 00          .
+    !byte            <handler_rockford2                               ; 21cf: 00          .
 handler_table_high
-    !byte               >handler_0123,               >handler_0123    ; 21d0: 22 22       ""
-    !byte               >handler_0123,               >handler_0123    ; 21d2: 22 22       ""
-    !byte                           0,                           0    ; 21d4: 00 00       ..
-    !byte            >handler_firefly,             >handler_fungus    ; 21d6: 25 25       %%
-    !byte           >handler_rockford,                  >handler_9    ; 21d8: 26 2b       &+
-    !byte           >handler_rockford, >handler_for_vertical_strip    ; 21da: 26 23       &#
+    !byte               >handler_basics                               ; 21d0: 22          "
+    !byte               >handler_basics                               ; 21d1: 22          "
+    !byte               >handler_basics                               ; 21d2: 22          "
+    !byte               >handler_basics                               ; 21d3: 22          "
+    !byte                             0                               ; 21d4: 00          .
+    !byte                             0                               ; 21d5: 00          .
+    !byte              >handler_firefly                               ; 21d6: 25          %
+    !byte               >handler_fungus                               ; 21d7: 25          %
+    !byte    >handler_flashing_rockford                               ; 21d8: 26          &
+    !byte       >handler_firefly_in_box                               ; 21d9: 2b          +
+    !byte    >handler_flashing_rockford                               ; 21da: 26          &
+    !byte   >handler_for_vertical_strip                               ; 21db: 23          #
     !byte >handler_for_horizontal_strip                               ; 21dc: 23          #
-    !byte                   >handler_13                               ; 21dd: 26          &
+    !byte           >handler_magic_wall                               ; 21dd: 26          &
     !byte              >handler_firefly                               ; 21de: 25          %
-    !byte                   >handler_15                               ; 21df: 26          &
+    !byte            >handler_rockford2                               ; 21df: 26          &
 l21e0
     !byte $8f, $8f, $84,   0, $f1, $d1, $b6, $b1, $8f, $8f, $d1, $f1  ; 21e0: 8f 8f 84... ...
     !byte $b1, $71,   0, $71                                          ; 21ec: b1 71 00... .q.
@@ -1239,8 +1247,8 @@ l2208
     !byte $42, $40,   1, $81,   0, $10                                ; 2208: 42 40 01... B@.
     !text " &@P`p"                                                    ; 220e: 20 26 40...  &@
     !byte $80, $90, $a0, $b0,   1, $d0, $e0, $f0                      ; 2214: 80 90 a0... ...
-l221c
-    !text "vxttxvzz"                                                  ; 221c: 76 78 74... vxt
+firefly_cell_values
+    !byte $76, $78, $74, $74, $78, $76, $7a, $7a                      ; 221c: 76 78 74... vxt
 rockford_cell_value_for_direction
     !byte $af, $9f,   0,   0                                          ; 2224: af 9f 00... ...
 inkey_keys_table
@@ -1343,7 +1351,7 @@ clear_backwards_status_bar_loop
     bne clear_backwards_status_bar_loop                               ; 22a2: d0 fa       ..
     rts                                                               ; 22a4: 60          `
 
-handler_0123
+handler_basics
     txa                                                               ; 22a5: 8a          .
     sec                                                               ; 22a6: 38          8
     sbc #$90                                                          ; 22a7: e9 90       ..
@@ -1539,9 +1547,9 @@ skip_draw_sprite
     lda screen_addr1_low                                              ; 23aa: a5 8a       ..
     adc #$10                                                          ; 23ac: 69 10       i.
     sta screen_addr1_low                                              ; 23ae: 85 8a       ..
-    bcc skip_high_byte                                                ; 23b0: 90 02       ..
+    bcc skip_high_byte2                                               ; 23b0: 90 02       ..
     inc screen_addr1_high                                             ; 23b2: e6 8b       ..
-skip_high_byte
+skip_high_byte2
     inc grid_column_counter                                           ; 23b4: e6 73       .s
     ldy grid_column_counter                                           ; 23b6: a4 73       .s
     cpy #20                                                           ; 23b8: c0 14       ..
@@ -1779,7 +1787,7 @@ process_c0_or_above
 dont_store_below
     txa                                                               ; 24e8: 8a          .
     and #1                                                            ; 24e9: 29 01       ).
-    eor #l004b                                                        ; 24eb: 49 4b       IK
+    eor #sound5_active_flag                                           ; 24eb: 49 4b       IK
     tay                                                               ; 24ed: a8          .
     ; store $4b or $4c in location $4b or $4c. Flashing animation?
     sta l0000,y                                                       ; 24ee: 99 00 00    ...
@@ -1795,7 +1803,7 @@ unused11
 
 handler_firefly
     cpx #$c0                                                          ; 2500: e0 c0       ..
-    bpl c2542                                                         ; 2502: 10 3e       .>
+    bpl c0_or_above                                                   ; 2502: 10 3e       .>
     ldy #8                                                            ; 2504: a0 08       ..
 loop_c2506
     lda cell_above_left-1,y                                           ; 2506: b9 72 00    .r.
@@ -1803,7 +1811,7 @@ loop_c2506
 unnecessary_branch
     and #7                                                            ; 250b: 29 07       ).
     eor #7                                                            ; 250d: 49 07       I.
-    beq c2542                                                         ; 250f: f0 31       .1
+    beq c0_or_above                                                   ; 250f: f0 31       .1
     dey                                                               ; 2511: 88          .
     dey                                                               ; 2512: 88          .
     bne loop_c2506                                                    ; 2513: d0 f1       ..
@@ -1813,12 +1821,12 @@ unnecessary_branch
     lsr                                                               ; 2518: 4a          J
     and #7                                                            ; 2519: 29 07       ).
     tay                                                               ; 251b: a8          .
-    ldx l221c,y                                                       ; 251c: be 1c 22    .."
+    ldx firefly_cell_values,y                                         ; 251c: be 1c 22    .."
     lda l0000,x                                                       ; 251f: b5 00       ..
     beq c2534                                                         ; 2521: f0 11       ..
     lda l2110,y                                                       ; 2523: b9 10 21    ..!
     tay                                                               ; 2526: a8          .
-    ldx l221c,y                                                       ; 2527: be 1c 22    .."
+    ldx firefly_cell_values,y                                         ; 2527: be 1c 22    .."
     lda l0000,x                                                       ; 252a: b5 00       ..
     beq c2534                                                         ; 252c: f0 06       ..
     ldx #0                                                            ; 252e: a2 00       ..
@@ -1836,7 +1844,7 @@ c253d
     ldx #0                                                            ; 253f: a2 00       ..
     rts                                                               ; 2541: 60          `
 
-c2542
+c0_or_above
     txa                                                               ; 2542: 8a          .
     ldx #<another_array_of_cells                                      ; 2543: a2 40       .@
     and #8                                                            ; 2545: 29 08       ).
@@ -1844,7 +1852,7 @@ c2542
     ldx #<some_array_of_cells                                         ; 2549: a2 30       .0
 c254b
     stx l2572                                                         ; 254b: 8e 72 25    .r%
-    stx l004c                                                         ; 254e: 86 4c       .L
+    stx sound6_active_flag                                            ; 254e: 86 4c       .L
     ; read above left cell
     ldy #0                                                            ; 2550: a0 00       ..
     lda (ptr_low),y                                                   ; 2552: b1 8c       ..
@@ -1905,7 +1913,7 @@ handler_fungus
     lda l0054                                                         ; 259e: a5 54       .T
     beq c25a6                                                         ; 25a0: f0 04       ..
     tax                                                               ; 25a2: aa          .
-    sta l004c                                                         ; 25a3: 85 4c       .L
+    sta sound6_active_flag                                            ; 25a3: 85 4c       .L
     rts                                                               ; 25a5: 60          `
 
 c25a6
@@ -1971,7 +1979,7 @@ unused14
 
     !byte   0, $60, $4a                                               ; 25fd: 00 60 4a    .`J
 
-handler_15
+handler_rockford2
     stx l005b                                                         ; 2600: 86 5b       .[
     lda l005f                                                         ; 2602: a5 5f       ._
     bne c2609                                                         ; 2604: d0 03       ..
@@ -1990,7 +1998,7 @@ check_for_direction_key_pressed
 c2616
     lda #$41                                                          ; 2616: a9 41       .A
 c2618
-    sta l0048                                                         ; 2618: 85 48       .H
+    sta sound2_active_flag                                            ; 2618: 85 48       .H
     clc                                                               ; 261a: 18          .
     adc ptr_low                                                       ; 261b: 65 8c       e.
     sta map_rockford_current_position_addr_low                        ; 261d: 85 70       .p
@@ -2034,7 +2042,7 @@ c2636
     sta (ptr_low),y                                                   ; 265f: 91 8c       ..
     lda #4                                                            ; 2661: a9 04       ..
     sta l0053                                                         ; 2663: 85 53       .S
-    inc l004a                                                         ; 2665: e6 4a       .J
+    inc sound4_active_flag                                            ; 2665: e6 4a       .J
 check_for_return_pressed
     lda keys_to_process                                               ; 2667: a5 62       .b
     and #8                                                            ; 2669: 29 08       ).
@@ -2080,7 +2088,7 @@ read_keys_loop
 unused15
     !byte $62, $60, $a6                                               ; 26ab: 62 60 a6    b`.
 
-handler_13
+handler_magic_wall
     txa                                                               ; 26ae: 8a          .
     ldx l0050                                                         ; 26af: a6 50       .P
     cmp #$bd                                                          ; 26b1: c9 bd       ..
@@ -2100,7 +2108,7 @@ fill_with_a
     sta cell_below                                                    ; 26cb: 85 7a       .z
 c26cd
     ldx #$1d                                                          ; 26cd: a2 1d       ..
-    inc data_set_ptr_high                                             ; 26cf: e6 47       .G
+    inc sound1_active_flag                                            ; 26cf: e6 47       .G
     ldy l0051                                                         ; 26d1: a4 51       .Q
     bne c26d7                                                         ; 26d3: d0 02       ..
     ldx #$2d                                                          ; 26d5: a2 2d       .-
@@ -2117,12 +2125,14 @@ unused16
     !byte $29, $7f, $aa, $e0                                          ; 26df: 29 7f aa... )..
 
     ; mark rockford cell as visible
-handler_rockford
+handler_flashing_rockford
     txa                                                               ; 26e3: 8a          .
     and #$7f                                                          ; 26e4: 29 7f       ).
     tax                                                               ; 26e6: aa          .
+; branch if on flashing exit
     cpx #$18                                                          ; 26e7: e0 18       ..
     beq return4                                                       ; 26e9: f0 12       ..
+    ; wait for flashing rockford animation to finish
     lda #0                                                            ; 26eb: a9 00       ..
     sta keys_to_process                                               ; 26ed: 85 62       .b
     lda tick_counter                                                  ; 26ef: a5 5a       .Z
@@ -2130,7 +2140,7 @@ handler_rockford
     bpl return4                                                       ; 26f3: 10 08       ..
     ; ready to start playing
     ldx #$21                                                          ; 26f5: a2 21       .!
-    inc l004a                                                         ; 26f7: e6 4a       .J
+    inc sound4_active_flag                                            ; 26f7: e6 4a       .J
     lda #<status_bar_sprite_numbers                                   ; 26f9: a9 00       ..
     sta status_text_address_low                                       ; 26fb: 85 69       .i
 return4
@@ -2150,14 +2160,14 @@ c270a
     lda #0                                                            ; 270a: a9 00       ..
     ldx #7                                                            ; 270c: a2 07       ..
 zero_eight_bytes_loop
-    sta data_set_ptr_low,x                                            ; 270e: 95 46       .F
+    sta sound_active_flag_table,x                                     ; 270e: 95 46       .F
     dex                                                               ; 2710: ca          .
     bpl zero_eight_bytes_loop                                         ; 2711: 10 fb       ..
     sta status_text_address_low                                       ; 2713: 85 69       .i
     sta l0060                                                         ; 2715: 85 60       .`
     sta neighbour_cell_contents                                       ; 2717: 85 64       .d
     lda #$41                                                          ; 2719: a9 41       .A
-    sta l0048                                                         ; 271b: 85 48       .H
+    sta sound2_active_flag                                            ; 271b: 85 48       .H
     ldx #0                                                            ; 271d: a2 00       ..
     lda l0056                                                         ; 271f: a5 56       .V
     stx l0056                                                         ; 2721: 86 56       .V
@@ -2203,25 +2213,25 @@ not_rockford
     jsr draw_status_bar                                               ; 2765: 20 25 23     %#
     jsr sub_c3000                                                     ; 2768: 20 00 30     .0
     lda l005b                                                         ; 276b: a5 5b       .[
-    beq c2787                                                         ; 276d: f0 18       ..
+    beq time_still_going                                              ; 276d: f0 18       ..
     dec sub_second_ticks                                              ; 276f: c6 5c       .\
-    bpl c2787                                                         ; 2771: 10 14       ..
+    bpl time_still_going                                              ; 2771: 10 14       ..
     ldx #$0b                                                          ; 2773: a2 0b       ..
     stx sub_second_ticks                                              ; 2775: 86 5c       .\
     ; decrement time remaining
     ldy #$0c                                                          ; 2777: a0 0c       ..
     jsr decrement_status_bar_number                                   ; 2779: 20 aa 28     .(
     dec time_remaining                                                ; 277c: c6 6d       .m
-    bne c2787                                                         ; 277e: d0 07       ..
+    bne time_still_going                                              ; 277e: d0 07       ..
     lda #<out_of_time_message                                         ; 2780: a9 b4       ..
     sta status_text_address_low                                       ; 2782: 85 69       .i
     jmp check_for_pause_key                                           ; 2784: 4c 40 30    L@0
 
-c2787
+time_still_going
     lda neighbour_cell_contents                                       ; 2787: a5 64       .d
     cmp #1                                                            ; 2789: c9 01       ..
     bne c278f                                                         ; 278b: d0 02       ..
-    inc l0049                                                         ; 278d: e6 49       .I
+    inc sound3_active_flag                                            ; 278d: e6 49       .I
 c278f
     cmp #4                                                            ; 278f: c9 04       ..
     bne c27a4                                                         ; 2791: d0 11       ..
@@ -2670,7 +2680,7 @@ reset_clock
 animate_flashing_spaces_and_check_for_bonus_life
     lda countdown_while_switching_palette                             ; 2a56: a5 59       .Y
     beq check_for_bonus_life                                          ; 2a58: f0 1f       ..
-    inc l004c                                                         ; 2a5a: e6 4c       .L
+    inc sound6_active_flag                                            ; 2a5a: e6 4c       .L
     ldx #3                                                            ; 2a5c: a2 03       ..
     lda countdown_while_switching_palette                             ; 2a5e: a5 59       .Y
     and #7                                                            ; 2a60: 29 07       ).
@@ -2905,7 +2915,7 @@ wait_loop
 unused28
     !byte $a9,   1, $a0, $43, $91, $8c, $a0, $c4, $88, $91            ; 2bc0: a9 01 a0... ...
 
-handler_9
+handler_firefly_in_box
     lda #1                                                            ; 2bca: a9 01       ..
     ldy #$43                                                          ; 2bcc: a0 43       .C
     sta (ptr_low),y                                                   ; 2bce: 91 8c       ..
@@ -3006,9 +3016,9 @@ unused29
     !byte 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0                 ; 2c71: 00 00 00... ...
 
 sub_c2c80
-    lda l0048                                                         ; 2c80: a5 48       .H
+    lda sound2_active_flag                                            ; 2c80: a5 48       .H
     eor #$41                                                          ; 2c82: 49 41       IA
-    sta l0048                                                         ; 2c84: 85 48       .H
+    sta sound2_active_flag                                            ; 2c84: 85 48       .H
     lda time_remaining                                                ; 2c86: a5 6d       .m
     cmp #$0b                                                          ; 2c88: c9 0b       ..
     bcs c2ca0                                                         ; 2c8a: b0 14       ..
@@ -3039,11 +3049,11 @@ c2cb7
     jsr play_sound_if_needed                                          ; 2cb9: 20 e8 2c     .,
     ldx #6                                                            ; 2cbc: a2 06       ..
     jsr play_sound_if_needed                                          ; 2cbe: 20 e8 2c     .,
-    lda l004c                                                         ; 2cc1: a5 4c       .L
+    lda sound6_active_flag                                            ; 2cc1: a5 4c       .L
     bne return10                                                      ; 2cc3: d0 2a       .*
     ldx #4                                                            ; 2cc5: a2 04       ..
     jsr play_sound_if_needed                                          ; 2cc7: 20 e8 2c     .,
-    lda l004a                                                         ; 2cca: a5 4a       .J
+    lda sound4_active_flag                                            ; 2cca: a5 4a       .J
     bne return10                                                      ; 2ccc: d0 21       .!
     ldy #$19                                                          ; 2cce: a0 19       ..
     ldx #$fb                                                          ; 2cd0: a2 fb       ..
@@ -3051,14 +3061,14 @@ c2cb7
     jsr osbyte                                                        ; 2cd4: 20 f4 ff     ..            ; Read number of spaces remaining in sound channel 0 (X=251)
     cpx #$0b                                                          ; 2cd7: e0 0b       ..             ; X is the number of spaces remaining in sound channel 0
     bmi return10                                                      ; 2cd9: 30 14       0.
-    lda l004a                                                         ; 2cdb: a5 4a       .J
-    ora l004c                                                         ; 2cdd: 05 4c       .L
+    lda sound4_active_flag                                            ; 2cdb: a5 4a       .J
+    ora sound6_active_flag                                            ; 2cdd: 05 4c       .L
     bne return10                                                      ; 2cdf: d0 0e       ..
     ldx #2                                                            ; 2ce1: a2 02       ..
     jsr play_sound_if_needed                                          ; 2ce3: 20 e8 2c     .,
     ldx #3                                                            ; 2ce6: a2 03       ..
 play_sound_if_needed
-    lda data_set_ptr_low,x                                            ; 2ce8: b5 46       .F
+    lda sound_active_flag_table,x                                     ; 2ce8: b5 46       .F
     beq return10                                                      ; 2cea: f0 03       ..
     jmp play_sound_x_pitch_y                                          ; 2cec: 4c 2c 2c    L,,
 
@@ -3075,13 +3085,13 @@ write_strips
     dey                                                               ; 2d04: 88          .
     sty map_x                                                         ; 2d05: 84 8a       ..
     jsr map_xy_position_to_map_address                                ; 2d07: 20 15 2b     .+
-c2d0a
+write_next_strip_loop
     lda (next_ptr_low),y                                              ; 2d0a: b1 82       ..
     inc next_ptr_low                                                  ; 2d0c: e6 82       ..
-    bne c2d12                                                         ; 2d0e: d0 02       ..
+    bne skip_high_byte1                                               ; 2d0e: d0 02       ..
     inc next_ptr_high                                                 ; 2d10: e6 83       ..
     ; remember value
-c2d12
+skip_high_byte1
     pha                                                               ; 2d12: 48          H
     ; get repeat count (from high nybble)
     lsr                                                               ; 2d13: 4a          J
@@ -3118,7 +3128,7 @@ get_map_address
     jsr map_xy_position_to_map_address                                ; 2d3c: 20 15 2b     .+
     dex                                                               ; 2d3f: ca          .
     bne write_strip_loop                                              ; 2d40: d0 dc       ..
-    beq c2d0a                                                         ; 2d42: f0 c6       ..             ; ALWAYS branch
+    beq write_next_strip_loop                                         ; 2d42: f0 c6       ..             ; ALWAYS branch
 
 return11
     rts                                                               ; 2d44: 60          `
@@ -3417,7 +3427,7 @@ sub_c2f00
     lda diamond_score_after_enough_obtained_for_each_cave,x           ; 2f3d: bd 14 4b    ..K
     ldy #4                                                            ; 2f40: a0 04       ..
     jsr add_a_to_status_bar_number_at_y                               ; 2f42: 20 c0 28     .(
-    inc l004c                                                         ; 2f45: e6 4c       .L
+    inc sound6_active_flag                                            ; 2f45: e6 4c       .L
 return12
     rts                                                               ; 2f47: 60          `
 
@@ -3519,7 +3529,7 @@ sub_c3000
     sta data_set_ptr_low                                              ; 3004: 85 46       .F
     ldy l0060                                                         ; 3006: a4 60       .`
     bne c3010                                                         ; 3008: d0 06       ..
-    inc l004d                                                         ; 300a: e6 4d       .M
+    inc sound7_active_flag                                            ; 300a: e6 4d       .M
     ldx #$92                                                          ; 300c: a2 92       ..
     bne c3016                                                         ; 300e: d0 06       ..
 c3010
@@ -3609,9 +3619,9 @@ c3098
     ldy #$0c                                                          ; 309d: a0 0c       ..
     jsr decrement_status_bar_number                                   ; 309f: 20 aa 28     .(
     ldx #5                                                            ; 30a2: a2 05       ..
-    stx l004b                                                         ; 30a4: 86 4b       .K
+    stx sound5_active_flag                                            ; 30a4: 86 4b       .K
     lda #0                                                            ; 30a6: a9 00       ..
-    sta l004c                                                         ; 30a8: 85 4c       .L
+    sta sound6_active_flag                                            ; 30a8: 85 4c       .L
     sta status_text_address_low                                       ; 30aa: 85 69       .i
     lda time_remaining                                                ; 30ac: a5 6d       .m
     and #$1c                                                          ; 30ae: 29 1c       ).
@@ -5750,20 +5760,17 @@ pydis_end
 !if (<grid_of_currently_displayed_sprites) != $00 {
     !error "Assertion failed: <grid_of_currently_displayed_sprites == $00"
 }
-!if (<handler_0123) != $a5 {
-    !error "Assertion failed: <handler_0123 == $a5"
-}
-!if (<handler_13) != $ae {
-    !error "Assertion failed: <handler_13 == $ae"
-}
-!if (<handler_15) != $00 {
-    !error "Assertion failed: <handler_15 == $00"
-}
-!if (<handler_9) != $ca {
-    !error "Assertion failed: <handler_9 == $ca"
+!if (<handler_basics) != $a5 {
+    !error "Assertion failed: <handler_basics == $a5"
 }
 !if (<handler_firefly) != $00 {
     !error "Assertion failed: <handler_firefly == $00"
+}
+!if (<handler_firefly_in_box) != $ca {
+    !error "Assertion failed: <handler_firefly_in_box == $ca"
+}
+!if (<handler_flashing_rockford) != $e3 {
+    !error "Assertion failed: <handler_flashing_rockford == $e3"
 }
 !if (<handler_for_horizontal_strip) != $f0 {
     !error "Assertion failed: <handler_for_horizontal_strip == $f0"
@@ -5774,8 +5781,11 @@ pydis_end
 !if (<handler_fungus) != $9e {
     !error "Assertion failed: <handler_fungus == $9e"
 }
-!if (<handler_rockford) != $e3 {
-    !error "Assertion failed: <handler_rockford == $e3"
+!if (<handler_magic_wall) != $ae {
+    !error "Assertion failed: <handler_magic_wall == $ae"
+}
+!if (<handler_rockford2) != $00 {
+    !error "Assertion failed: <handler_rockford2 == $00"
 }
 !if (<highscore_high_status_bar) != $50 {
     !error "Assertion failed: <highscore_high_status_bar == $50"
@@ -6167,20 +6177,17 @@ pydis_end
 !if (>grid_of_currently_displayed_sprites) != $0c {
     !error "Assertion failed: >grid_of_currently_displayed_sprites == $0c"
 }
-!if (>handler_0123) != $22 {
-    !error "Assertion failed: >handler_0123 == $22"
-}
-!if (>handler_13) != $26 {
-    !error "Assertion failed: >handler_13 == $26"
-}
-!if (>handler_15) != $26 {
-    !error "Assertion failed: >handler_15 == $26"
-}
-!if (>handler_9) != $2b {
-    !error "Assertion failed: >handler_9 == $2b"
+!if (>handler_basics) != $22 {
+    !error "Assertion failed: >handler_basics == $22"
 }
 !if (>handler_firefly) != $25 {
     !error "Assertion failed: >handler_firefly == $25"
+}
+!if (>handler_firefly_in_box) != $2b {
+    !error "Assertion failed: >handler_firefly_in_box == $2b"
+}
+!if (>handler_flashing_rockford) != $26 {
+    !error "Assertion failed: >handler_flashing_rockford == $26"
 }
 !if (>handler_for_horizontal_strip) != $23 {
     !error "Assertion failed: >handler_for_horizontal_strip == $23"
@@ -6191,8 +6198,11 @@ pydis_end
 !if (>handler_fungus) != $25 {
     !error "Assertion failed: >handler_fungus == $25"
 }
-!if (>handler_rockford) != $26 {
-    !error "Assertion failed: >handler_rockford == $26"
+!if (>handler_magic_wall) != $26 {
+    !error "Assertion failed: >handler_magic_wall == $26"
+}
+!if (>handler_rockford2) != $26 {
+    !error "Assertion failed: >handler_rockford2 == $26"
 }
 !if (>map_row_0) != $50 {
     !error "Assertion failed: >map_row_0 == $50"
@@ -6596,9 +6606,6 @@ pydis_end
 !if (inkey_key_z) != $9e {
     !error "Assertion failed: inkey_key_z == $9e"
 }
-!if (l004b) != $4b {
-    !error "Assertion failed: l004b == $4b"
-}
 !if (map_diamond) != $04 {
     !error "Assertion failed: map_diamond == $04"
 }
@@ -6637,6 +6644,9 @@ pydis_end
 }
 !if (osword_write_palette) != $0c {
     !error "Assertion failed: osword_write_palette == $0c"
+}
+!if (sound5_active_flag) != $4b {
+    !error "Assertion failed: sound5_active_flag == $4b"
 }
 !if (sprite_0) != $32 {
     !error "Assertion failed: sprite_0 == $32"
