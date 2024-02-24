@@ -185,7 +185,7 @@ tile_y                                  = &0085
 tile_map_ptr_high                       = &0086
 tile_x                                  = &0086
 cave_number                             = &0087
-row_counter                             = &0088
+random_seed                             = &0088
 difficulty_level                        = &0089
 map_x                                   = &008a
 screen_addr1_low                        = &008a
@@ -1272,15 +1272,16 @@ set_clock_value = sprite_addr_91+16
 .return1
     rts                                                               ; 2249: 60          `
 
-.reverse_nybbles_and_add_one
-    lda row_counter                                                   ; 224a: a5 88       ..
+; a small 'pseudo-random' number routine. Generates a sequence of 256 numbers.
+.get_next_random_byte
+    lda random_seed                                                   ; 224a: a5 88       ..
     asl a                                                             ; 224c: 0a          .
     asl a                                                             ; 224d: 0a          .
     asl a                                                             ; 224e: 0a          .
     asl a                                                             ; 224f: 0a          .
     sec                                                               ; 2250: 38          8
-    adc row_counter                                                   ; 2251: 65 88       e.
-    sta row_counter                                                   ; 2253: 85 88       ..
+    adc random_seed                                                   ; 2251: 65 88       e.
+    sta random_seed                                                   ; 2253: 85 88       ..
     rts                                                               ; 2255: 60          `
 
     ; Clears the entire map to initial_cell_fill_value.
@@ -1291,12 +1292,13 @@ set_clock_value = sprite_addr_91+16
     lda #>(map_row_1-1)                                               ; 225a: a9 50       .P
     sta ptr_high                                                      ; 225c: 85 8d       ..
     ldy #0                                                            ; 225e: a0 00       ..
-    ldx #&14                                                          ; 2260: a2 14       ..
-    stx row_counter                                                   ; 2262: 86 88       ..
-.c2264
+    ; initial random seed
+    ldx #20                                                           ; 2260: a2 14       ..
+    stx random_seed                                                   ; 2262: 86 88       ..
+.clear_map_loop
     lda cell_right                                                    ; 2264: a5 78       .x
     beq c2274                                                         ; 2266: f0 0c       ..
-    jsr reverse_nybbles_and_add_one                                   ; 2268: 20 4a 22     J"
+    jsr get_next_random_byte                                          ; 2268: 20 4a 22     J"
 .loop_c226b
     cmp cell_right                                                    ; 226b: c5 78       .x
     bcc c2274                                                         ; 226d: 90 05       ..
@@ -1320,7 +1322,7 @@ set_clock_value = sprite_addr_91+16
     bpl increment_ptr_using_40_bytes_out_of_every_64                  ; 228a: 10 ea       ..
     lda cell_below_left                                               ; 228c: a5 79       .y
     sta (ptr_low),y                                                   ; 228e: 91 8c       ..
-    bpl c2264                                                         ; 2290: 10 d2       ..
+    bpl clear_map_loop                                                ; 2290: 10 d2       ..
 .reset_grid_of_sprites
     ldx #&f0                                                          ; 2292: a2 f0       ..
     lda #&ff                                                          ; 2294: a9 ff       ..
@@ -1328,11 +1330,12 @@ set_clock_value = sprite_addr_91+16
     dex                                                               ; 2296: ca          .
     sta grid_of_currently_displayed_sprites,x                         ; 2297: 9d 00 0c    ...
     bne reset_grid_of_sprites_loop                                    ; 229a: d0 fa       ..
+    ; clear the current status bar
     ldx #&14                                                          ; 229c: a2 14       ..
-.clear_backwards_status_bar_loop
+.clear_status_bar_loop
     dex                                                               ; 229e: ca          .
     sta current_status_bar_sprites,x                                  ; 229f: 9d 28 50    .(P
-    bne clear_backwards_status_bar_loop                               ; 22a2: d0 fa       ..
+    bne clear_status_bar_loop                                         ; 22a2: d0 fa       ..
     rts                                                               ; 22a4: 60          `
 
 .handler_basics
@@ -1363,7 +1366,7 @@ set_clock_value = sprite_addr_91+16
     cmp #40                                                           ; 22c1: c9 28       .(
     bpl skip_to_next_row                                              ; 22c3: 10 17       ..
     ; progress a counter in a non-obvious pattern
-    jsr reverse_nybbles_and_add_one                                   ; 22c5: 20 4a 22     J"
+    jsr get_next_random_byte                                          ; 22c5: 20 4a 22     J"
     ; if it's early in the process (tick counter is low), then branch more often so we
     ; reveal/hide the cells in a non-obvious pattern over time
     lsr a                                                             ; 22c8: 4a          J
@@ -3018,7 +3021,7 @@ l2572 = sub_c2571+1
     ldx #&88                                                          ; 2c9b: a2 88       ..
     jsr play_sound_x_pitch_y                                          ; 2c9d: 20 2c 2c     ,,
 .c2ca0
-    jsr reverse_nybbles_and_add_one                                   ; 2ca0: 20 4a 22     J"
+    jsr get_next_random_byte                                          ; 2ca0: 20 4a 22     J"
     and #&0c                                                          ; 2ca3: 29 0c       ).
     sta in_game_sound_data+2                                          ; 2ca5: 8d 02 2c    ..,
     ldx #5                                                            ; 2ca8: a2 05       ..
