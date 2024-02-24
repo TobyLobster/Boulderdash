@@ -111,7 +111,7 @@ total_caves                            = 20
 ; Memory locations
 l0000                                   = $00
 data_set_ptr_low                        = $46
-sound_active_flag_table                 = $46
+sound0_active_flag                      = $46
 data_set_ptr_high                       = $47
 sound1_active_flag                      = $47
 remember_y                              = $48
@@ -123,13 +123,13 @@ sound6_active_flag                      = $4c
 sound7_active_flag                      = $4d
 pause_counter                           = $4e
 l0050                                   = $50
-l0051                                   = $51
+fungus_timer                            = $51
 l0052                                   = $52
 l0053                                   = $53
 l0054                                   = $54
-l0055                                   = $55
+fungus_growth_interval                  = $55
 l0056                                   = $56
-l0057                                   = $57
+fungus_counter                          = $57
 ticks_since_last_direction_key_pressed  = $58
 countdown_while_switching_palette       = $59
 tick_counter                            = $5a
@@ -1408,12 +1408,12 @@ skip_to_next_row
     bne loop_over_rows                                                ; 22e2: d0 d9       ..
     ; create some 'random' audio pitches to play while revealing/hiding the map. First
     ; multiply the data set pointer low byte by five and add one
-    lda data_set_ptr_low                                              ; 22e4: a5 46       .F
+    lda sound0_active_flag                                            ; 22e4: a5 46       .F
     asl                                                               ; 22e6: 0a          .
     asl                                                               ; 22e7: 0a          .
     sec                                                               ; 22e8: 38          8
-    adc data_set_ptr_low                                              ; 22e9: 65 46       eF
-    sta data_set_ptr_low                                              ; 22eb: 85 46       .F
+    adc sound0_active_flag                                            ; 22e9: 65 46       eF
+    sta sound0_active_flag                                            ; 22eb: 85 46       .F
     ; add the cave number
     ora cave_number                                                   ; 22ed: 05 87       ..
     ; just take some of the bits
@@ -1914,12 +1914,12 @@ unused12
     sta (ptr_low),y                                                   ; 259c: 91 8c       ..
 handler_fungus
     lda l0054                                                         ; 259e: a5 54       .T
-    beq c25a6                                                         ; 25a0: f0 04       ..
+    beq update_fungus                                                 ; 25a0: f0 04       ..
     tax                                                               ; 25a2: aa          .
     sta sound6_active_flag                                            ; 25a3: 85 4c       .L
     rts                                                               ; 25a5: 60          `
 
-c25a6
+update_fungus
     inc l0056                                                         ; 25a6: e6 56       .V
     lda #$0e                                                          ; 25a8: a9 0e       ..
     bit cell_above                                                    ; 25aa: 24 74       $t
@@ -1932,13 +1932,13 @@ c25a6
     bne return3                                                       ; 25b8: d0 3b       .;
 c25ba
     stx l0060                                                         ; 25ba: 86 60       .`
-    stx data_set_ptr_low                                              ; 25bc: 86 46       .F
-    inc l0057                                                         ; 25be: e6 57       .W
-    lda l0057                                                         ; 25c0: a5 57       .W
-    cmp l0055                                                         ; 25c2: c5 55       .U
+    stx sound0_active_flag                                            ; 25bc: 86 46       .F
+    inc fungus_counter                                                ; 25be: e6 57       .W
+    lda fungus_counter                                                ; 25c0: a5 57       .W
+    cmp fungus_growth_interval                                        ; 25c2: c5 55       .U
     bne return3                                                       ; 25c4: d0 2f       ./
     lda #0                                                            ; 25c6: a9 00       ..
-    sta l0057                                                         ; 25c8: 85 57       .W
+    sta fungus_counter                                                ; 25c8: 85 57       .W
     txa                                                               ; 25ca: 8a          .
     lsr                                                               ; 25cb: 4a          J
     lsr                                                               ; 25cc: 4a          J
@@ -2112,7 +2112,7 @@ fill_with_a
 c26cd
     ldx #$1d                                                          ; 26cd: a2 1d       ..
     inc sound1_active_flag                                            ; 26cf: e6 47       .G
-    ldy l0051                                                         ; 26d1: a4 51       .Q
+    ldy fungus_timer                                                  ; 26d1: a4 51       .Q
     bne c26d7                                                         ; 26d3: d0 02       ..
     ldx #$2d                                                          ; 26d5: a2 2d       .-
 c26d7
@@ -2161,11 +2161,13 @@ start_gameplay
     sta l0066                                                         ; 2708: 85 66       .f
 c270a
     lda #0                                                            ; 270a: a9 00       ..
+    ; clear sound
     ldx #7                                                            ; 270c: a2 07       ..
 zero_eight_bytes_loop
-    sta sound_active_flag_table,x                                     ; 270e: 95 46       .F
+    sta sound0_active_flag,x                                          ; 270e: 95 46       .F
     dex                                                               ; 2710: ca          .
     bpl zero_eight_bytes_loop                                         ; 2711: 10 fb       ..
+    ; zero variables
     sta status_text_address_low                                       ; 2713: 85 69       .i
     sta l0060                                                         ; 2715: 85 60       .`
     sta neighbour_cell_contents                                       ; 2717: 85 64       .d
@@ -2226,6 +2228,7 @@ not_rockford
     jsr decrement_status_bar_number                                   ; 2779: 20 aa 28     .(
     dec time_remaining                                                ; 277c: c6 6d       .m
     bne time_still_going                                              ; 277e: d0 07       ..
+    ; out of time
     lda #<out_of_time_message                                         ; 2780: a9 b4       ..
     sta status_text_address_low                                       ; 2782: 85 69       .i
     jmp check_for_pause_key                                           ; 2784: 4c 40 30    L@0
@@ -2233,20 +2236,23 @@ not_rockford
 time_still_going
     lda neighbour_cell_contents                                       ; 2787: a5 64       .d
     cmp #1                                                            ; 2789: c9 01       ..
-    bne c278f                                                         ; 278b: d0 02       ..
+    bne skip_earth                                                    ; 278b: d0 02       ..
+    ; got earth. play sound 3
     inc sound3_active_flag                                            ; 278d: e6 49       .I
-c278f
+skip_earth
     cmp #4                                                            ; 278f: c9 04       ..
-    bne c27a4                                                         ; 2791: d0 11       ..
+    bne skip_got_diamond                                              ; 2791: d0 11       ..
+    ; got diamond. play sounds
     ldx #$85                                                          ; 2793: a2 85       ..
     ldy #$f0                                                          ; 2795: a0 f0       ..
     jsr play_sound_x_pitch_y                                          ; 2797: 20 2c 2c     ,,
     ldx #$85                                                          ; 279a: a2 85       ..
     ldy #$d2                                                          ; 279c: a0 d2       ..
     jsr play_sound_x_pitch_y                                          ; 279e: 20 2c 2c     ,,
-    jsr sub_c2f00                                                     ; 27a1: 20 00 2f     ./
-c27a4
-    jsr sub_c2c80                                                     ; 27a4: 20 80 2c     .,
+    jsr got_diamond_so_update_status_bar                              ; 27a1: 20 00 2f     ./
+skip_got_diamond
+    jsr update_sounds                                                 ; 27a4: 20 80 2c     .,
+    ; update tick
     dec tick_counter                                                  ; 27a7: c6 5a       .Z
     lda tick_counter                                                  ; 27a9: a5 5a       .Z
     and #7                                                            ; 27ab: 29 07       ).
@@ -2254,7 +2260,7 @@ c27a4
     lda l0050                                                         ; 27af: a5 50       .P
     cmp #$1d                                                          ; 27b1: c9 1d       ..
     bne c27b7                                                         ; 27b3: d0 02       ..
-    dec l0051                                                         ; 27b5: c6 51       .Q
+    dec fungus_timer                                                  ; 27b5: c6 51       .Q
 c27b7
     ldx l005f                                                         ; 27b7: a6 5f       ._
     beq c27c8                                                         ; 27b9: f0 0d       ..
@@ -2396,7 +2402,7 @@ increment_status_bar_number
     clc                                                               ; 289b: 18          .
     adc #1                                                            ; 289c: 69 01       i.
     cmp #$3c                                                          ; 289e: c9 3c       .<
-    bmi c28bc                                                         ; 28a0: 30 1a       0.
+    bmi finished_change                                               ; 28a0: 30 1a       0.
     lda #sprite_0                                                     ; 28a2: a9 32       .2
     sta tile_map,y                                                    ; 28a4: 99 00 32    ..2
     dey                                                               ; 28a7: 88          .
@@ -2406,12 +2412,12 @@ decrement_status_bar_number
     sec                                                               ; 28ad: 38          8
     sbc #1                                                            ; 28ae: e9 01       ..
     cmp #sprite_0                                                     ; 28b0: c9 32       .2
-    bpl c28bc                                                         ; 28b2: 10 08       ..
+    bpl finished_change                                               ; 28b2: 10 08       ..
     lda #$3b                                                          ; 28b4: a9 3b       .;
     sta tile_map,y                                                    ; 28b6: 99 00 32    ..2
     dey                                                               ; 28b9: 88          .
     bpl decrement_status_bar_number                                   ; 28ba: 10 ee       ..
-c28bc
+finished_change
     sta tile_map,y                                                    ; 28bc: 99 00 32    ..2
     rts                                                               ; 28bf: 60          `
 
@@ -2419,13 +2425,13 @@ add_a_to_status_bar_number_at_y
     sty real_keys_pressed                                             ; 28c0: 84 7c       .|
     sta amount_to_increment_status_bar                                ; 28c2: 85 72       .r
     cmp #0                                                            ; 28c4: c9 00       ..
-    beq c28d1                                                         ; 28c6: f0 09       ..
-loop_c28c8
+    beq finished_add                                                  ; 28c6: f0 09       ..
+increment_number_loop
     jsr increment_status_bar_number                                   ; 28c8: 20 98 28     .(
     ldy real_keys_pressed                                             ; 28cb: a4 7c       .|
     dec amount_to_increment_status_bar                                ; 28cd: c6 72       .r
-    bne loop_c28c8                                                    ; 28cf: d0 f7       ..
-c28d1
+    bne increment_number_loop                                         ; 28cf: d0 f7       ..
+finished_add
     ldy real_keys_pressed                                             ; 28d1: a4 7c       .|
     rts                                                               ; 28d3: 60          `
 
@@ -2484,7 +2490,7 @@ add_twenty_times_x_loop
     bne add_twenty_times_x_loop                                       ; 2940: d0 f8       ..
 got_data_set_X_address
     lda ptr_low                                                       ; 2942: a5 8c       ..
-    sta data_set_ptr_low                                              ; 2944: 85 46       .F
+    sta sound0_active_flag                                            ; 2944: 85 46       .F
     ; set offset in Y = 4*(difficulty level-1)
     ldx difficulty_level                                              ; 2946: a6 89       ..
     dex                                                               ; 2948: ca          .
@@ -2511,7 +2517,7 @@ store_ptr_low_and_fill_with_basics
     sta ptr_low                                                       ; 2964: 85 8c       ..
     jsr fill_with_basics                                              ; 2966: 20 90 2d     .-
     ; reset ptr to the start of the data_set_X
-    lda data_set_ptr_low                                              ; 2969: a5 46       .F
+    lda sound0_active_flag                                            ; 2969: a5 46       .F
     sta ptr_low                                                       ; 296b: 85 8c       ..
     lda data_set_ptr_high                                             ; 296d: a5 47       .G
     sta ptr_high                                                      ; 296f: 85 8d       ..
@@ -3018,16 +3024,16 @@ skip_using_default_pitch2
 unused29
     !byte 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0                 ; 2c71: 00 00 00... ...
 
-sub_c2c80
+update_sounds
     lda sound2_active_flag                                            ; 2c80: a5 48       .H
     eor #$41                                                          ; 2c82: 49 41       IA
     sta sound2_active_flag                                            ; 2c84: 85 48       .H
     lda time_remaining                                                ; 2c86: a5 6d       .m
     cmp #$0b                                                          ; 2c88: c9 0b       ..
-    bcs c2ca0                                                         ; 2c8a: b0 14       ..
+    bcs skip_playing_countdown_sounds                                 ; 2c8a: b0 14       ..
     lda sub_second_ticks                                              ; 2c8c: a5 5c       .\
     cmp #$0b                                                          ; 2c8e: c9 0b       ..
-    bne c2ca0                                                         ; 2c90: d0 0e       ..
+    bne skip_playing_countdown_sounds                                 ; 2c90: d0 0e       ..
     ; play rising pitch as time up is approaching
     lda #$dc                                                          ; 2c92: a9 dc       ..
     sbc time_remaining                                                ; 2c94: e5 6d       .m
@@ -3036,7 +3042,7 @@ sub_c2c80
     tay                                                               ; 2c9a: a8          .
     ldx #$88                                                          ; 2c9b: a2 88       ..
     jsr play_sound_x_pitch_y                                          ; 2c9d: 20 2c 2c     ,,
-c2ca0
+skip_playing_countdown_sounds
     jsr get_next_random_byte                                          ; 2ca0: 20 4a 22     J"
     and #$0c                                                          ; 2ca3: 29 0c       ).
     sta in_game_sound_data+2                                          ; 2ca5: 8d 02 2c    ..,
@@ -3044,10 +3050,10 @@ c2ca0
     jsr play_sound_if_needed                                          ; 2caa: 20 e8 2c     .,
     lda tick_counter                                                  ; 2cad: a5 5a       .Z
     lsr                                                               ; 2caf: 4a          J
-    bcc c2cb7                                                         ; 2cb0: 90 05       ..
+    bcc skip_sound_0                                                  ; 2cb0: 90 05       ..
     ldx #0                                                            ; 2cb2: a2 00       ..
     jsr play_sound_if_needed                                          ; 2cb4: 20 e8 2c     .,
-c2cb7
+skip_sound_0
     ldx #1                                                            ; 2cb7: a2 01       ..
     jsr play_sound_if_needed                                          ; 2cb9: 20 e8 2c     .,
     ldx #6                                                            ; 2cbc: a2 06       ..
@@ -3071,7 +3077,7 @@ c2cb7
     jsr play_sound_if_needed                                          ; 2ce3: 20 e8 2c     .,
     ldx #3                                                            ; 2ce6: a2 03       ..
 play_sound_if_needed
-    lda sound_active_flag_table,x                                     ; 2ce8: b5 46       .F
+    lda sound0_active_flag,x                                          ; 2ce8: b5 46       .F
     beq return10                                                      ; 2cea: f0 03       ..
     jmp play_sound_x_pitch_y                                          ; 2cec: 4c 2c 2c    L,,
 
@@ -3399,7 +3405,7 @@ unused36
     !byte $25, $26, $27, $28, $25, $25, $25, $26, $20, $20, $23, $24  ; 2ef0: 25 26 27... %&'
     !byte $24, $24, $23, $20                                          ; 2efc: 24 24 23... $$#
 
-sub_c2f00
+got_diamond_so_update_status_bar
     ldy #8                                                            ; 2f00: a0 08       ..
     jsr increment_status_bar_number                                   ; 2f02: 20 98 28     .(
     lda total_diamonds_on_status_bar_high_digit                       ; 2f05: ad 03 32    ..2
@@ -3420,16 +3426,20 @@ sub_c2f00
     lda #3                                                            ; 2f25: a9 03       ..
     sta tile_map                                                      ; 2f27: 8d 00 32    ..2
     sta required_diamonds_on_status_bar                               ; 2f2a: 8d 01 32    ..2
+    ; open the exit
     ldy #0                                                            ; 2f2d: a0 00       ..
     lda #$18                                                          ; 2f2f: a9 18       ..
     sta (map_rockford_end_position_addr_low),y                        ; 2f31: 91 6a       .j
+    ; set total diamonds to zero
     lda #sprite_0                                                     ; 2f33: a9 32       .2
     sta total_diamonds_on_status_bar_high_digit                       ; 2f35: 8d 03 32    ..2
     sta total_diamonds_on_status_bar_low_digit                        ; 2f38: 8d 04 32    ..2
+    ; show score per diamond on status bar
     ldx cave_number                                                   ; 2f3b: a6 87       ..
     lda diamond_score_after_enough_obtained_for_each_cave,x           ; 2f3d: bd 14 4b    ..K
     ldy #4                                                            ; 2f40: a0 04       ..
     jsr add_a_to_status_bar_number_at_y                               ; 2f42: 20 c0 28     .(
+    ; play sound 6
     inc sound6_active_flag                                            ; 2f45: e6 4c       .L
 return12
     rts                                                               ; 2f47: 60          `
@@ -3463,10 +3473,10 @@ empty_status_bar_loop
     clc                                                               ; 2f75: 18          .
     adc #sprite_0                                                     ; 2f76: 69 32       i2
     sta difficulty_level_on_status_bar                                ; 2f78: 8d 27 32    .'2
-    ; TODO: what is this?
-    lda l4c54,x                                                       ; 2f7b: bd 54 4c    .TL
-    sta l0055                                                         ; 2f7e: 85 55       .U
-    sta l0051                                                         ; 2f80: 85 51       .Q
+    ; set the delay between fungus growth
+    lda fungus_growth_intervals,x                                     ; 2f7b: bd 54 4c    .TL
+    sta fungus_growth_interval                                        ; 2f7e: 85 55       .U
+    sta fungus_timer                                                  ; 2f80: 85 51       .Q
     ; put the end tile on the map
     lda end_y,x                                                       ; 2f82: bd 18 4c    ..L
     sta map_y                                                         ; 2f85: 85 8b       ..
@@ -3529,12 +3539,13 @@ unused38
 sub_c3000
     lda l0056                                                         ; 3000: a5 56       .V
     beq c3018                                                         ; 3002: f0 14       ..
-    sta data_set_ptr_low                                              ; 3004: 85 46       .F
+    sta sound0_active_flag                                            ; 3004: 85 46       .F
     ldy l0060                                                         ; 3006: a4 60       .`
     bne c3010                                                         ; 3008: d0 06       ..
     inc sound7_active_flag                                            ; 300a: e6 4d       .M
     ldx #$92                                                          ; 300c: a2 92       ..
-    bne c3016                                                         ; 300e: d0 06       ..
+    bne c3016                                                         ; 300e: d0 06       ..             ; ALWAYS branch
+
 c3010
     adc #$38                                                          ; 3010: 69 38       i8
     bcc c3018                                                         ; 3012: 90 04       ..
@@ -3549,10 +3560,10 @@ c3018
     cmp #7                                                            ; 3020: c9 07       ..
     bne return13                                                      ; 3022: d0 07       ..
     lda #1                                                            ; 3024: a9 01       ..
-    sta l0055                                                         ; 3026: 85 55       .U
+    sta fungus_growth_interval                                        ; 3026: 85 55       .U
     ; Set A=0
     lsr                                                               ; 3028: 4a          J
-    sta l0057                                                         ; 3029: 85 57       .W
+    sta fungus_counter                                                ; 3029: 85 57       .W
 return13
     rts                                                               ; 302b: 60          `
 
@@ -4885,7 +4896,7 @@ end_x
 cave_play_order
     !byte  1,  2,  3, 16,  5,  6,  7, 17,  9, 10                      ; 4c40: 01 02 03... ...
     !byte 11, 18, 13, 14, 15, 19,  4,  8, 12,  0                      ; 4c4a: 0b 12 0d... ...
-l4c54
+fungus_growth_intervals
     !byte  0,  0,  0,  0,  0,  0, 40, 25,  0,  0                      ; 4c54: 00 00 00... ...
     !byte  0,  0, 32,  0, 10, 20,  0,  0,  0,  4                      ; 4c5e: 00 00 20... ..
 number_of_difficuly_levels_available_in_menu_for_each_cave
@@ -6647,6 +6658,9 @@ pydis_end
 }
 !if (osword_write_palette) != $0c {
     !error "Assertion failed: osword_write_palette == $0c"
+}
+!if (sound0_active_flag) != $46 {
+    !error "Assertion failed: sound0_active_flag == $46"
 }
 !if (sound5_active_flag) != $4b {
     !error "Assertion failed: sound5_active_flag == $4b"
