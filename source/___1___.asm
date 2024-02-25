@@ -1480,7 +1480,7 @@ draw_single_row_of_sprites
     sta grid_write_address_high                                       ; 2338: 8d 62 23    .b#
 instruction_for_self_modification
 status_text_address_high = instruction_for_self_modification+1
-    lda #>tile_map                                                    ; 233b: a9 32       .2
+    lda #>regular_status_bar                                          ; 233b: a9 32       .2
     sta tile_map_ptr_high                                             ; 233d: 85 86       ..
     lda #opcode_ldy_abs                                               ; 233f: a9 ac       ..
     sta load_instruction                                              ; 2341: 8d 57 23    .W#
@@ -2167,7 +2167,7 @@ handler_flashing_rockford
     ; ready to start playing
     ldx #$21                                                          ; 26f5: a2 21       .!
     inc sound4_active_flag                                            ; 26f7: e6 4a       .J
-    lda #<status_bar_sprite_numbers                                   ; 26f9: a9 00       ..
+    lda #<regular_status_bar                                          ; 26f9: a9 00       ..
     sta status_text_address_low                                       ; 26fb: 85 69       .i
 return4
     rts                                                               ; 26fd: 60          `
@@ -2212,7 +2212,7 @@ c2727
     rts                                                               ; 2734: 60          `
 
 update_demo_mode
-    ldy #<status_bar_sprite_numbers                                   ; 2735: a0 00       ..
+    ldy #<regular_status_bar                                          ; 2735: a0 00       ..
     ; flip between status bar and demo mode text every 16 ticks
     lda tick_counter                                                  ; 2737: a5 5a       .Z
     and #$10                                                          ; 2739: 29 10       ).
@@ -2426,27 +2426,27 @@ unused19
 
 ; *************************************************************************************
 increment_status_bar_number
-    lda tile_map,y                                                    ; 2898: b9 00 32    ..2
+    lda regular_status_bar,y                                          ; 2898: b9 00 32    ..2
     clc                                                               ; 289b: 18          .
     adc #1                                                            ; 289c: 69 01       i.
     cmp #$3c                                                          ; 289e: c9 3c       .<
     bmi finished_change                                               ; 28a0: 30 1a       0.
     lda #sprite_0                                                     ; 28a2: a9 32       .2
-    sta tile_map,y                                                    ; 28a4: 99 00 32    ..2
+    sta regular_status_bar,y                                          ; 28a4: 99 00 32    ..2
     dey                                                               ; 28a7: 88          .
     bpl increment_status_bar_number                                   ; 28a8: 10 ee       ..
 decrement_status_bar_number
-    lda tile_map,y                                                    ; 28aa: b9 00 32    ..2
+    lda regular_status_bar,y                                          ; 28aa: b9 00 32    ..2
     sec                                                               ; 28ad: 38          8
     sbc #1                                                            ; 28ae: e9 01       ..
     cmp #sprite_0                                                     ; 28b0: c9 32       .2
     bpl finished_change                                               ; 28b2: 10 08       ..
     lda #$3b                                                          ; 28b4: a9 3b       .;
-    sta tile_map,y                                                    ; 28b6: 99 00 32    ..2
+    sta regular_status_bar,y                                          ; 28b6: 99 00 32    ..2
     dey                                                               ; 28b9: 88          .
     bpl decrement_status_bar_number                                   ; 28ba: 10 ee       ..
 finished_change
-    sta tile_map,y                                                    ; 28bc: 99 00 32    ..2
+    sta regular_status_bar,y                                          ; 28bc: 99 00 32    ..2
     rts                                                               ; 28bf: 60          `
 
 ; *************************************************************************************
@@ -2757,7 +2757,7 @@ check_for_bonus_life
 zero_or_five_in_hundreds_column
     ldy #$11                                                          ; 2a89: a0 11       ..
 check_for_non_zero_in_top_digits
-    lda tile_map,y                                                    ; 2a8b: b9 00 32    ..2
+    lda regular_status_bar,y                                          ; 2a8b: b9 00 32    ..2
     cmp #sprite_0                                                     ; 2a8e: c9 32       .2
     bne non_zero_digit_found_in_hundreds_column_or_above              ; 2a90: d0 0a       ..
     dey                                                               ; 2a92: 88          .
@@ -2780,7 +2780,7 @@ non_zero_digit_found_in_hundreds_column_or_above
     lda #7                                                            ; 2aa9: a9 07       ..
     sta countdown_while_switching_palette                             ; 2aab: 85 59       .Y
     ; add one to the MEN count
-    inc men_number_on_status_bar                                      ; 2aad: ee 1e 32    ..2
+    inc men_number_on_regular_status_bar                              ; 2aad: ee 1e 32    ..2
     ; show bonus life text (very briefly)
     lda #<bonus_life_text                                             ; 2ab0: a9 64       .d
     sta status_text_address_low                                       ; 2ab2: 85 69       .i
@@ -3397,16 +3397,16 @@ write_top_and_bottom_borders_loop
     lda neighbour_cell_contents                                       ; 2e73: a5 64       .d
     cmp #8                                                            ; 2e75: c9 08       ..
     beq play_scren_dissolve_to_solid                                  ; 2e77: f0 44       .D
-    dec men_number_on_status_bar                                      ; 2e79: ce 1e 32    ..2
-    lda men_number_on_status_bar                                      ; 2e7c: ad 1e 32    ..2
+    dec men_number_on_regular_status_bar                              ; 2e79: ce 1e 32    ..2
+    lda men_number_on_regular_status_bar                              ; 2e7c: ad 1e 32    ..2
     cmp #sprite_0                                                     ; 2e7f: c9 32       .2
     bne play_scren_dissolve_to_solid                                  ; 2e81: d0 3a       .:
-    lda player_number_on_status_bar                                   ; 2e83: ad 1b 32    ..2
+    lda player_number_on_regular_status_bar                           ; 2e83: ad 1b 32    ..2
     sta player_number_on_game_over_text                               ; 2e86: 8d 9e 32    ..2
     lda #<game_over_text                                              ; 2e89: a9 8c       ..
     sta status_text_address_low                                       ; 2e8b: 85 69       .i
     ldx #$50                                                          ; 2e8d: a2 50       .P
-    lda player_number_on_status_bar                                   ; 2e8f: ad 1b 32    ..2
+    lda player_number_on_regular_status_bar                           ; 2e8f: ad 1b 32    ..2
     cmp #sprite_1                                                     ; 2e92: c9 33       .3
     beq c2e98                                                         ; 2e94: f0 02       ..
     ldx #$5e                                                          ; 2e96: a2 5e       .^
@@ -3416,7 +3416,7 @@ c2e98
     ldx #0                                                            ; 2e9e: a2 00       ..
     ldy #0                                                            ; 2ea0: a0 00       ..
 loop_c2ea2
-    lda score_on_status_bar,x                                         ; 2ea2: bd 0e 32    ..2
+    lda score_on_regular_status_bar,x                                 ; 2ea2: bd 0e 32    ..2
     cpy #0                                                            ; 2ea5: c0 00       ..
     bne store_in_status_bar                                           ; 2ea7: d0 0e       ..
 sub_c2ea9
@@ -3482,7 +3482,7 @@ got_diamond_so_update_status_bar
     ldx #0                                                            ; 2f20: a2 00       ..
     jsr set_palette_colour_ax                                         ; 2f22: 20 35 2a     5*
     lda #3                                                            ; 2f25: a9 03       ..
-    sta tile_map                                                      ; 2f27: 8d 00 32    ..2
+    sta regular_status_bar                                            ; 2f27: 8d 00 32    ..2
     sta required_diamonds_on_status_bar                               ; 2f2a: 8d 01 32    ..2
     ; open the exit
     ldy #0                                                            ; 2f2d: a0 00       ..
@@ -3514,7 +3514,7 @@ initialise_stage
     ldy #$0d                                                          ; 2f57: a0 0d       ..
 empty_status_bar_loop
     lda zeroed_status_bar,y                                           ; 2f59: b9 f0 32    ..2
-    sta tile_map,y                                                    ; 2f5c: 99 00 32    ..2
+    sta regular_status_bar,y                                          ; 2f5c: 99 00 32    ..2
     dey                                                               ; 2f5f: 88          .
     bpl empty_status_bar_loop                                         ; 2f60: 10 f7       ..
     ldx cave_number                                                   ; 2f62: a6 87       ..
@@ -3526,14 +3526,14 @@ empty_status_bar_loop
     txa                                                               ; 2f6c: 8a          .
     clc                                                               ; 2f6d: 18          .
     adc #$41                                                          ; 2f6e: 69 41       iA
-    sta cave_letter_on_status_bar                                     ; 2f70: 8d 25 32    .%2
+    sta cave_letter_on_regular_status_bar                             ; 2f70: 8d 25 32    .%2
     ; show difficulty level on status bar
     lda difficulty_level                                              ; 2f73: a5 89       ..
     clc                                                               ; 2f75: 18          .
     adc #sprite_0                                                     ; 2f76: 69 32       i2
-    sta difficulty_level_on_status_bar                                ; 2f78: 8d 27 32    .'2
+    sta difficulty_level_on_regular_status_bar                        ; 2f78: 8d 27 32    .'2
     ; set the delay between fungus growth
-    lda fungus_growth_intervals,x                                     ; 2f7b: bd 54 4c    .TL
+    lda fungus_growth_intervals_for_cave,x                            ; 2f7b: bd 54 4c    .TL
     sta fungus_growth_interval                                        ; 2f7e: 85 55       .U
     sta fungus_timer                                                  ; 2f80: 85 51       .Q
     ; put the end tile on the map
@@ -3713,7 +3713,7 @@ c3098
     dec time_remaining                                                ; 30c7: c6 6d       .m
     bne c3098                                                         ; 30c9: d0 cd       ..
 c30cb
-    lda #<status_bar_sprite_numbers                                   ; 30cb: a9 00       ..
+    lda #<regular_status_bar                                          ; 30cb: a9 00       ..
     sta status_text_address_low                                       ; 30cd: 85 69       .i
 sub_c30cf
     jsr draw_grid_of_sprites                                          ; 30cf: 20 00 23     .#
@@ -3768,12 +3768,12 @@ loop_c31c2
     dex                                                               ; 31c8: ca          .
     bne loop_c31c2                                                    ; 31c9: d0 f7       ..
 loop_c31cb
-    lda #>status_bar_sprite_numbers                                   ; 31cb: a9 32       .2
+    lda #>regular_status_bar                                          ; 31cb: a9 32       .2
     sta status_text_address_high                                      ; 31cd: 8d 3c 23    .<#
     jsr show_menu                                                     ; 31d0: 20 00 3a     .:
     ; increment to point to credits text at $3300
     inc status_text_address_high                                      ; 31d3: ee 3c 23    .<#
-    lda #<status_bar_sprite_numbers                                   ; 31d6: a9 00       ..
+    lda #<regular_status_bar                                          ; 31d6: a9 00       ..
     sta status_text_address_low                                       ; 31d8: 85 69       .i
 show_credits_loop
     jsr draw_status_bar                                               ; 31da: 20 25 23     %#
@@ -3788,8 +3788,7 @@ unused41
     !byte $ff                                                         ; 31ff: ff          .
 
 ; *************************************************************************************
-tile_map
-status_bar_sprite_numbers
+regular_status_bar
     !byte sprite_4                                                    ; 3200: 36          6
 required_diamonds_on_status_bar
     !byte sprite_2                                                    ; 3201: 34          4
@@ -3807,7 +3806,7 @@ total_diamonds_on_status_bar_low_digit
     !byte sprite_3                                                    ; 320b: 35          5
     !byte sprite_3                                                    ; 320c: 35          5
     !byte sprite_space                                                ; 320d: 00          .
-score_on_status_bar
+score_on_regular_status_bar
     !byte sprite_0                                                    ; 320e: 32          2
     !byte sprite_0                                                    ; 320f: 32          2
     !byte sprite_7                                                    ; 3210: 39          9
@@ -3820,24 +3819,24 @@ hundreds_digit_of_score_on_status_bar
 players_and_men_status_bar
     !text "PLAYER"                                                    ; 3214: 50 4c 41... PLA
     !byte sprite_space                                                ; 321a: 00          .
-player_number_on_status_bar
+player_number_on_regular_status_bar
     !byte sprite_1                                                    ; 321b: 33          3
     !byte sprite_comma                                                ; 321c: 3f          ?
     !byte sprite_space                                                ; 321d: 00          .
-men_number_on_status_bar
+men_number_on_regular_status_bar
     !byte sprite_0                                                    ; 321e: 32          2
     !byte sprite_space                                                ; 321f: 00          .
     !text "MEN"                                                       ; 3220: 4d 45 4e    MEN
     !byte sprite_space                                                ; 3223: 00          .
     !byte sprite_space                                                ; 3224: 00          .
-cave_letter_on_status_bar
+cave_letter_on_regular_status_bar
     !text "N"                                                         ; 3225: 4e          N
     !byte sprite_slash                                                ; 3226: 3e          >
-difficulty_level_on_status_bar
+difficulty_level_on_regular_status_bar
     !byte sprite_4                                                    ; 3227: 36          6
 
 ; *************************************************************************************
-l3228
+cached_regular_status_bar
     !byte sprite_6                                                    ; 3228: 38          8
     !byte sprite_0                                                    ; 3229: 32          2
     !byte sprite_diamond1                                             ; 322a: 03          .
@@ -3852,7 +3851,7 @@ l3228
     !byte sprite_5                                                    ; 3233: 37          7
     !byte sprite_0                                                    ; 3234: 32          2
     !byte sprite_space                                                ; 3235: 00          .
-l3236
+score_on_cached_regular_status_bar
     !byte sprite_0                                                    ; 3236: 32          2
     !byte sprite_0                                                    ; 3237: 32          2
     !byte sprite_0                                                    ; 3238: 32          2
@@ -3861,23 +3860,23 @@ l3236
     !byte sprite_0                                                    ; 323b: 32          2
 
 ; *************************************************************************************
-l323c
+cached_players_and_men_status_bar
     !text "PLAYER"                                                    ; 323c: 50 4c 41... PLA
     !byte sprite_space                                                ; 3242: 00          .
-l3243
+player_number_on_players_and_men_status_bar
     !byte sprite_2                                                    ; 3243: 34          4
     !byte sprite_comma                                                ; 3244: 3f          ?
     !byte sprite_space                                                ; 3245: 00          .
-l3246
+number_of_men_on_players_and_men_status_bar
     !byte sprite_0                                                    ; 3246: 32          2
     !byte sprite_space                                                ; 3247: 00          .
     !text "MEN"                                                       ; 3248: 4d 45 4e    MEN
     !byte sprite_space                                                ; 324b: 00          .
     !byte sprite_space                                                ; 324c: 00          .
-l324d
+cave_letter_on_players_and_men_status_bar
     !byte 'B'                                                         ; 324d: 42          B
     !byte sprite_slash                                                ; 324e: 3e          >
-l324f
+difficulty_level_on_players_and_men_status_bar
     !byte sprite_4                                                    ; 324f: 36          6
 
 ; *************************************************************************************
@@ -3996,7 +3995,7 @@ pause_message
     !text "RESUME"                                                    ; 32d6: 52 45 53... RES
 
 ; *************************************************************************************
-highscore_last_status_bar
+score_last_status_bar
     !byte sprite_0                                                    ; 32dc: 32          2
     !byte sprite_0                                                    ; 32dd: 32          2
     !byte sprite_0                                                    ; 32de: 32          2
@@ -4232,7 +4231,7 @@ show_menu
     jsr reset_clock                                                   ; 3a06: 20 4d 2a     M*
     ; show last score line
     jsr reset_grid_of_sprites                                         ; 3a09: 20 92 22     ."
-    lda #<highscore_last_status_bar                                   ; 3a0c: a9 dc       ..
+    lda #<score_last_status_bar                                       ; 3a0c: a9 dc       ..
     sta status_text_address_low                                       ; 3a0e: 85 69       .i
     lda #>screen_addr_row_28                                          ; 3a10: a9 7b       .{
     ldy #<screen_addr_row_28                                          ; 3a12: a0 00       ..
@@ -4298,7 +4297,7 @@ waiting_for_demo_loop
     ldx #5                                                            ; 3a80: a2 05       ..
     lda #sprite_0                                                     ; 3a82: a9 32       .2
 zero_score_on_status_bar_loop
-    sta score_on_status_bar,x                                         ; 3a84: 9d 0e 32    ..2
+    sta score_on_regular_status_bar,x                                 ; 3a84: 9d 0e 32    ..2
     dex                                                               ; 3a87: ca          .
     bpl zero_score_on_status_bar_loop                                 ; 3a88: 10 fa       ..
     ldx #0                                                            ; 3a8a: a2 00       ..
@@ -4364,34 +4363,34 @@ unused43
 
 ; *************************************************************************************
 play_game
-    ldx #$13                                                          ; 3b00: a2 13       ..
-loop_c3b02
+    ldx #19                                                           ; 3b00: a2 13       ..
+copy_status_bar_loop
     lda default_status_bar,x                                          ; 3b02: bd 68 50    .hP
     sta players_and_men_status_bar,x                                  ; 3b05: 9d 14 32    ..2
-    sta l323c,x                                                       ; 3b08: 9d 3c 32    .<2
+    sta cached_players_and_men_status_bar,x                           ; 3b08: 9d 3c 32    .<2
     dex                                                               ; 3b0b: ca          .
-    bpl loop_c3b02                                                    ; 3b0c: 10 f4       ..
+    bpl copy_status_bar_loop                                          ; 3b0c: 10 f4       ..
     lda #sprite_2                                                     ; 3b0e: a9 34       .4
-    sta l3243                                                         ; 3b10: 8d 43 32    .C2
+    sta player_number_on_players_and_men_status_bar                   ; 3b10: 8d 43 32    .C2
     cmp number_of_players_status_bar                                  ; 3b13: cd 78 32    .x2
     beq c3b1d                                                         ; 3b16: f0 05       ..
     lda #sprite_0                                                     ; 3b18: a9 32       .2
-    sta l3246                                                         ; 3b1a: 8d 46 32    .F2
+    sta number_of_men_on_players_and_men_status_bar                   ; 3b1a: 8d 46 32    .F2
 c3b1d
     lda cave_letter                                                   ; 3b1d: ad 89 32    ..2
-    sta cave_letter_on_status_bar                                     ; 3b20: 8d 25 32    .%2
-    sta l324d                                                         ; 3b23: 8d 4d 32    .M2
+    sta cave_letter_on_regular_status_bar                             ; 3b20: 8d 25 32    .%2
+    sta cave_letter_on_players_and_men_status_bar                     ; 3b23: 8d 4d 32    .M2
     ldx number_of_players_status_bar_difficulty_level                 ; 3b26: ae 8b 32    ..2
-    stx difficulty_level_on_status_bar                                ; 3b29: 8e 27 32    .'2
-    stx l324f                                                         ; 3b2c: 8e 4f 32    .O2
+    stx difficulty_level_on_regular_status_bar                        ; 3b29: 8e 27 32    .'2
+    stx difficulty_level_on_players_and_men_status_bar                ; 3b2c: 8e 4f 32    .O2
     jsr sub_c3bc1                                                     ; 3b2f: 20 c1 3b     .;
     lda #sprite_0                                                     ; 3b32: a9 32       .2
     ldx #5                                                            ; 3b34: a2 05       ..
-loop_c3b36
-    sta score_on_status_bar,x                                         ; 3b36: 9d 0e 32    ..2
-    sta l3236,x                                                       ; 3b39: 9d 36 32    .62
+zero_score_loop
+    sta score_on_regular_status_bar,x                                 ; 3b36: 9d 0e 32    ..2
+    sta score_on_cached_regular_status_bar,x                          ; 3b39: 9d 36 32    .62
     dex                                                               ; 3b3c: ca          .
-    bpl loop_c3b36                                                    ; 3b3d: 10 f7       ..
+    bpl zero_score_loop                                               ; 3b3d: 10 f7       ..
 c3b3f
     ldx cave_number                                                   ; 3b3f: a6 87       ..
     lda difficulty_level                                              ; 3b41: a5 89       ..
@@ -4402,44 +4401,46 @@ c3b3f
 skip_adding_new_difficulty_level_to_menu
     jsr sub_c2e00                                                     ; 3b4b: 20 00 2e     ..
     ldy #5                                                            ; 3b4e: a0 05       ..
-    lda player_number_on_status_bar                                   ; 3b50: ad 1b 32    ..2
+    ; check if player one or two
+    lda player_number_on_regular_status_bar                           ; 3b50: ad 1b 32    ..2
     lsr                                                               ; 3b53: 4a          J
-    bcs c3b58                                                         ; 3b54: b0 02       ..
-    ldy #$13                                                          ; 3b56: a0 13       ..
-c3b58
+    bcs player_one                                                    ; 3b54: b0 02       ..
+    ; copy score from player two
+    ldy #19                                                           ; 3b56: a0 13       ..
+player_one
     ldx #5                                                            ; 3b58: a2 05       ..
-loop_c3b5a
-    lda score_on_status_bar,x                                         ; 3b5a: bd 0e 32    ..2
-    sta highscore_last_status_bar,y                                   ; 3b5d: 99 dc 32    ..2
+copy_score_to_last_score_loop
+    lda score_on_regular_status_bar,x                                 ; 3b5a: bd 0e 32    ..2
+    sta score_last_status_bar,y                                       ; 3b5d: 99 dc 32    ..2
     dey                                                               ; 3b60: 88          .
     dex                                                               ; 3b61: ca          .
-    bpl loop_c3b5a                                                    ; 3b62: 10 f6       ..
+    bpl copy_score_to_last_score_loop                                 ; 3b62: 10 f6       ..
     lda neighbour_cell_contents                                       ; 3b64: a5 64       .d
     cmp #8                                                            ; 3b66: c9 08       ..
     beq c3ba1                                                         ; 3b68: f0 37       .7
     lda cave_number                                                   ; 3b6a: a5 87       ..
-    cmp #$10                                                          ; 3b6c: c9 10       ..
+    cmp #16                                                           ; 3b6c: c9 10       ..
     bpl c3ba1                                                         ; 3b6e: 10 31       .1
     lda #sprite_0                                                     ; 3b70: a9 32       .2
-    cmp men_number_on_status_bar                                      ; 3b72: cd 1e 32    ..2
-    bne c3b7c                                                         ; 3b75: d0 05       ..
-    cmp l3246                                                         ; 3b77: cd 46 32    .F2
+    cmp men_number_on_regular_status_bar                              ; 3b72: cd 1e 32    ..2
+    bne swap_status_bars_with_cached_versions                         ; 3b75: d0 05       ..
+    cmp number_of_men_on_players_and_men_status_bar                   ; 3b77: cd 46 32    .F2
     beq return16                                                      ; 3b7a: f0 50       .P
-c3b7c
-    ldx #$27                                                          ; 3b7c: a2 27       .'
-loop_c3b7e
-    lda tile_map,x                                                    ; 3b7e: bd 00 32    ..2
-    ldy l3228,x                                                       ; 3b81: bc 28 32    .(2
-    sta l3228,x                                                       ; 3b84: 9d 28 32    .(2
+swap_status_bars_with_cached_versions
+    ldx #39                                                           ; 3b7c: a2 27       .'
+swap_loop
+    lda regular_status_bar,x                                          ; 3b7e: bd 00 32    ..2
+    ldy cached_regular_status_bar,x                                   ; 3b81: bc 28 32    .(2
+    sta cached_regular_status_bar,x                                   ; 3b84: 9d 28 32    .(2
     tya                                                               ; 3b87: 98          .
-    sta tile_map,x                                                    ; 3b88: 9d 00 32    ..2
+    sta regular_status_bar,x                                          ; 3b88: 9d 00 32    ..2
     dex                                                               ; 3b8b: ca          .
-    bpl loop_c3b7e                                                    ; 3b8c: 10 f0       ..
-    lda men_number_on_status_bar                                      ; 3b8e: ad 1e 32    ..2
+    bpl swap_loop                                                     ; 3b8c: 10 f0       ..
+    lda men_number_on_regular_status_bar                              ; 3b8e: ad 1e 32    ..2
     cmp #sprite_0                                                     ; 3b91: c9 32       .2
-    beq c3b7c                                                         ; 3b93: f0 e7       ..
-    lda cave_letter_on_status_bar                                     ; 3b95: ad 25 32    .%2
-    ldx difficulty_level_on_status_bar                                ; 3b98: ae 27 32    .'2
+    beq swap_status_bars_with_cached_versions                         ; 3b93: f0 e7       ..
+    lda cave_letter_on_regular_status_bar                             ; 3b95: ad 25 32    .%2
+    ldx difficulty_level_on_regular_status_bar                        ; 3b98: ae 27 32    .'2
     jsr sub_c3bc1                                                     ; 3b9b: 20 c1 3b     .;
     jmp c3b3f                                                         ; 3b9e: 4c 3f 3b    L?;
 
@@ -4458,7 +4459,7 @@ c3bb3
     sta cave_number                                                   ; 3bb5: 85 87       ..
     cmp #$10                                                          ; 3bb7: c9 10       ..
     bmi c3b3f                                                         ; 3bb9: 30 84       0.
-    inc men_number_on_status_bar                                      ; 3bbb: ee 1e 32    ..2
+    inc men_number_on_regular_status_bar                              ; 3bbb: ee 1e 32    ..2
     jmp c3b3f                                                         ; 3bbe: 4c 3f 3b    L?;
 
 sub_c3bc1
@@ -4888,7 +4889,7 @@ end_x
 cave_play_order
     !byte  1,  2,  3, 16,  5,  6,  7, 17,  9, 10                      ; 4c40: 01 02 03... ...
     !byte 11, 18, 13, 14, 15, 19,  4,  8, 12,  0                      ; 4c4a: 0b 12 0d... ...
-fungus_growth_intervals
+fungus_growth_intervals_for_cave
     !byte  0,  0,  0,  0,  0,  0, 40, 25,  0,  0                      ; 4c54: 00 00 00... ...
     !byte  0,  0, 32,  0, 10, 20,  0,  0,  0,  4                      ; 4c5e: 00 00 20... ..
 number_of_difficuly_levels_available_in_menu_for_each_cave
@@ -5825,9 +5826,6 @@ pydis_end
 !if (<highscore_high_status_bar) != $50 {
     !error "Assertion failed: <highscore_high_status_bar == $50"
 }
-!if (<highscore_last_status_bar) != $dc {
-    !error "Assertion failed: <highscore_last_status_bar == $dc"
-}
 !if (<map_row_0) != $00 {
     !error "Assertion failed: <map_row_0 == $00"
 }
@@ -5845,6 +5843,12 @@ pydis_end
 }
 !if (<players_and_men_status_bar) != $14 {
     !error "Assertion failed: <players_and_men_status_bar == $14"
+}
+!if (<regular_status_bar) != $00 {
+    !error "Assertion failed: <regular_status_bar == $00"
+}
+!if (<score_last_status_bar) != $dc {
+    !error "Assertion failed: <score_last_status_bar == $dc"
 }
 !if (<screen_addr_row_28) != $00 {
     !error "Assertion failed: <screen_addr_row_28 == $00"
@@ -6152,9 +6156,6 @@ pydis_end
 !if (<start_of_grid_screen_address) != $c0 {
     !error "Assertion failed: <start_of_grid_screen_address == $c0"
 }
-!if (<status_bar_sprite_numbers) != $00 {
-    !error "Assertion failed: <status_bar_sprite_numbers == $00"
-}
 !if (<strip_data) != $00 {
     !error "Assertion failed: <strip_data == $00"
 }
@@ -6220,6 +6221,9 @@ pydis_end
 }
 !if (>map_row_1) != $50 {
     !error "Assertion failed: >map_row_1 == $50"
+}
+!if (>regular_status_bar) != $32 {
+    !error "Assertion failed: >regular_status_bar == $32"
 }
 !if (>screen_addr_row_28) != $7b {
     !error "Assertion failed: >screen_addr_row_28 == $7b"
@@ -6524,14 +6528,8 @@ pydis_end
 !if (>start_of_grid_screen_address) != $5b {
     !error "Assertion failed: >start_of_grid_screen_address == $5b"
 }
-!if (>status_bar_sprite_numbers) != $32 {
-    !error "Assertion failed: >status_bar_sprite_numbers == $32"
-}
 !if (>strip_data) != $47 {
     !error "Assertion failed: >strip_data == $47"
-}
-!if (>tile_map) != $32 {
-    !error "Assertion failed: >tile_map == $32"
 }
 !if (cell_above) != $74 {
     !error "Assertion failed: cell_above == $74"
