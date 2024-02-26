@@ -62,14 +62,8 @@ substitute_labels = {
         "screen_addr1_high": "map_y",
         "real_keys_pressed": "lower_nybble_value",
     },
-    (0x22d3, 0x22d5): {
-        "l0072": "dissolve_to_solid_flag",
-    },
     (0x28c0, 0x28d3): {
-        "l0072": "amount_to_increment_status_bar",
-    },
-    (0x2ebf, 0x2ec1): {
-        "l0072": "dissolve_to_solid_flag",
+        "dissolve_to_solid_flag": "amount_to_increment_status_bar",
     },
     (0x2f82, 0x2fb8): {
         "ptr_low":  "map_address_low",
@@ -220,15 +214,32 @@ label(0x006d, "time_remaining")
 label(0x006f, "bonus_life_available")
 label(0x0070, "map_rockford_current_position_addr_low")
 label(0x0071, "map_rockford_current_position_addr_high")
-label(0x0073, "cell_above_left")
-label(0x0074, "cell_above")
-label(0x0075, "cell_above_right")
-label(0x0076, "cell_left")
-label(0x0077, "cell_current")
-label(0x0078, "cell_right")
-label(0x0079, "cell_below_left")
-label(0x007a, "cell_below")
-label(0x007b, "cell_below_right")
+label(0x0072, "dissolve_to_solid_flag")
+
+cell_directions = {
+    0x73: "cell_above_left",
+    0x74: "cell_above",
+    0x75: "cell_above_right",
+    0x76: "cell_left",
+    0x77: "cell_current",
+    0x78: "cell_right",
+    0x79: "cell_below_left",
+    0x7a: "cell_below",
+    0x7b: "cell_below_right",
+}
+
+for c in cell_directions:
+    label(c, cell_directions[c])
+
+#label(0x0073, "cell_above_left")
+#label(0x0074, "cell_above")
+#label(0x0075, "cell_above_right")
+#label(0x0076, "cell_left")
+#label(0x0077, "cell_current")
+#label(0x0078, "cell_right")
+#label(0x0079, "cell_below_left")
+#label(0x007a, "cell_below")
+#label(0x007b, "cell_below_right")
 label(0x007c, "real_keys_pressed")
 label(0x0073, "grid_x")
 label(0x0077, "loop_counter")
@@ -265,6 +276,7 @@ Difficulty levels: 1-5
 Some definitions:
 * Together a cave letter and difficulty level define a *stage*. A1 is a stage, for example.
 * The *tile map* is the 40x23 map of the entire stage.
+  Each row is 40 bytes. Rows are separated by 64 bytes in memory.
 * The *grid* is the visible area of sprites, showing a 20x12 section of the tile map.
   An offscreen cache of what sprites are currently displayed is stored in the 'grid_of_currently_displayed_sprites' array.
   This avoids redrawing a sprite if it's unchanged since the previous tick.
@@ -296,6 +308,7 @@ $21 = explosion frame #1
 $11 = explosion frame #2
 $0f = player looking out
 $1f = player walking left
+$2e = firefly for cave D?
 $2f = player walking right
 
 $43 = explosion out effect #1
@@ -565,20 +578,27 @@ for r in ranges:
         byte(i)
         expr(i, sprites)
 
+for i in range(16):
+    decimal(0x1e60+i)
+    byte(0x1e60+i)
+
 addrs = [0] * 106
 for i in range(0, 97):
+    addr = get_u8_binary(0x2000+i) + 256*get_u8_binary(0x2080+i)
     if i in sprite_addr:
         name  = sprite_addr[i]
+        if addr not in addrs:
+            addrs[i] = addr
     else:
-        name  = "sprite_addr_unused_" + str(i)
-    addr = get_u8_binary(0x2000+i) + 256*get_u8_binary(0x2080+i)
-    if addr not in addrs:
-        addrs[i] = addr
+        name  = "unused_sprite_addr_" + str(i)
     label(addr, name)
     byte(0x2000+i)
     byte(0x2080+i)
     expr(0x2000+i, make_lo(name))
     expr(0x2080+i, make_hi(name))
+
+for i in range(64):
+    byte(0x1e80+i)
 
 unused(0x2061)
 byte(0x2061, 0x2080-0x2061)
@@ -646,8 +666,8 @@ for i in range(64):
     t += 32
     b += 32
     expr(0x1e80+i, f"16*({sprites[t]}-0x20) + {sprites[b]}-0x20")
-label(0x1e60, "initial_values")
-expr(0x2e21, "initial_values")
+label(0x1e60, "initial_values_of_variables_from_0x50")
+expr(0x2e21, "initial_values_of_variables_from_0x50")
 comment(0x1e80, "Sprites to use for idle animation of rockford. They are encoded into the nybbles of each byte. First it cycles through the bottom nybbles until near the end of the idle animation, then cycles through through the top nybbles")
 stars(0x1ec0, True)
 unused(0x1ee0)
@@ -661,6 +681,7 @@ for i in range(15):
         expr(0x1f00+i, sprites)
     byte(0x1f00+i)
 
+stars(0x1f00, True)
 blank(0x1f0f)
 unused(0x1f0f)
 byte(0x1f0f, 35)
@@ -702,7 +723,12 @@ blank(0x2150)
 label(0x2150, "index_to_cell_type")
 label(0x2156, "exit_cell_type")
 byte(0x2156, 9)
+blank(0x215f)
+unused(0x215f)
 blank(0x2180)
+byte(0x2180, 16)
+blank(0x2190)
+unused(0x2190)
 stars(0x21c0, True)
 byte(0x21c0, 16)
 label(0x21c0, "handler_table_low")
@@ -746,8 +772,11 @@ byte(0x2202)
 expr(0x2202, "cell_above")
 byte(0x2203)
 expr(0x2203, "cell_below")
+label(0x2204, "direction_offsets")
 label(0x221c, "firefly_cell_values")
-byte(0x221c, 8)
+for i in range(8):
+    expr(0x221c+i, cell_directions)
+    byte(0x221c+i)
 label(0x2224, "rockford_cell_value_for_direction")
 label(0x2228, "inkey_keys_table")
 unused(0x2230)
@@ -764,8 +793,8 @@ comment(0x224a, "a small 'pseudo-random' number routine. Generates a sequence of
 stars(0x2256)
 comment(0x2256, "Clears the entire map to initial_cell_fill_value.\nClears the visible grid to $ff")
 label(0x2256, "clear_map_and_grid")
-expr(0x2257, make_lo("map_row_1-1"))
-expr(0x225b, make_hi("map_row_1-1"))
+expr(0x2257, make_lo("tile_map_row_1-1"))
+expr(0x225b, make_hi("tile_map_row_1-1"))
 comment(0x2260, "initial random seed", indent=1)
 decimal(0x2261)
 label(0x2264, "clear_map_loop")
@@ -779,8 +808,8 @@ comment(0x22ad, "cell is in the range $90-$9f, so we look up the replacement in 
 label(0x22b1, "not_in_range_so_change_nothing")
 stars(0x22b3)
 label(0x22b3, "reveal_or_hide_more_cells")
-expr(0x22b4, make_lo("map_row_0"))
-expr(0x22b8, make_hi("map_row_0"))
+expr(0x22b4, make_lo("tile_map_row_0"))
+expr(0x22b8, make_hi("tile_map_row_0"))
 comment(0x22bb, "loop over all the rows, X is the loop counter", indent=1)
 decimal(0x22bc)
 comment(0x22bf, "rows are stored in the first 40 bytes of every 64 bytes, so skip if we have exceeded the right range", indent=1)
@@ -866,17 +895,18 @@ expr(0x242a, "map_diamond")
 stars(0x2400)
 label(0x2400, "update_map")
 comment(0x2400, "set branch offset (self modifying code)", indent=1)
-expr(0x2401, "update_map_space - after_branch")
+expr(0x2401, "update_map_space - branch_instruction - 2")
 ab(0x2402, True)
 stars(0x2404)
 label(0x2404, "preprocess_map")
 comment(0x2404, "set branch offset (self modifying code)", indent=1)
-expr(0x2405, "mark_cell_above_as_processed_and_move_to_next_cell - after_branch")
+expr(0x2405, "mark_cell_above_as_processed_and_move_to_next_cell - branch_instruction - 2")
 label(0x2406, "set_branch_offset")
 comment(0x2409, "twenty rows", indent=1)
 decimal(0x240a)
-expr(0x240e, make_hi("map_row_0"))
-expr(0x2412, make_lo("map_row_0"))
+expr(0x240e, make_hi("tile_map_row_0"))
+expr(0x2412, make_lo("tile_map_row_0"))
+comment(0x2415, "Each row is stored in the first 40 bytes of every 64 bytes. Here we set Y to start on the second row, after the titanium wall border", indent=1)
 comment(0x2417, "loop through the twenty rows of map", indent=1)
 label(0x2417, "tile_map_y_loop")
 comment(0x2417, "38 columns (cells per row)", inline=1)
@@ -892,12 +922,12 @@ comment(0x2433, "the lower four bits are the type, each of which has a handler t
 comment(0x2439, "if we have an empty cell, branch (destination was set depending on where we entered this routine)", indent=1)
 label(0x2439, "branch_instruction")
 label(0x243a, "branch_offset")
-label(0x243b, "after_branch")
 comment(0x2444, "read cells into cell_above and cell_below variables", indent=1)
 comment(0x2450, "call the handler for the cell based on the type (0-15)", indent=1)
 comment(0x2453, "the handler may have changed the surreounding cells. store the new cell down", indent=1)
 comment(0x2459, "store the new cell up", indent=1)
 ab(0x245f, True)
+stars(0x2461, "This is the preprocessing step when we find a space in the map prior to gameplay")
 label(0x2461, "mark_cell_above_as_processed_and_move_to_next_cell")
 label(0x2467, "move_to_next_cell")
 comment(0x2469, "store the new cell left back into the map", indent=1)
@@ -913,6 +943,7 @@ comment(0x2486, "clear top bit in final row", indent=1)
 decimal(0x2487)
 label(0x2488, "clear_top_bit_on_final_row_loop")
 comment(0x2493, "clear top bit on end position", indent=1)
+stars(0x249a, "This is the update when we find a space in the map during gameplay")
 label(0x249a, "update_map_space")
 comment(0x249a, "get cell below", indent=1)
 comment(0x24a0, "check current cell", indent=1)
@@ -964,13 +995,14 @@ label(0x2667, "check_for_return_pressed")
 comment(0x266d, "return (and direction) is pressed", indent=1)
 comment(0x26e3, "mark rockford cell as visible", indent=1)
 ab(0x2687, True)
+stars(0x2689)
 label(0x2689, "read_keys")
 label(0x2691, "read_keys_loop")
 unused(0x26ab)
 label(0x26c3, "fill_with_a")
 unused(0x26df)
-comment(0x26e7, "branch if on flashing exit")
-comment(0x26eb, "wait for flashing rockford animation to finish", indent=1)
+comment(0x26e7, "branch if on exit", indent=1)
+comment(0x26ef, "wait for flashing rockford animation to finish", indent=1)
 expr(0x26fa, make_lo("regular_status_bar"))
 ret(0x26fd)
 unused(0x26fe)
@@ -981,6 +1013,8 @@ comment(0x2707, "Set A=0", indent=1)
 comment(0x270c, "clear sound", indent=1)
 label(0x270e, "zero_eight_bytes_loop")
 comment(0x2713, "zero variables", indent=1)
+comment(0x272c, "branch if not in demo mode", indent=1)
+comment(0x2730, "if a key is pressed in demo mode, then return", indent=1)
 label(0x2735, "update_demo_mode")
 expr(0x2736, make_lo("regular_status_bar"))
 comment(0x2737, "flip between status bar and demo mode text every 16 ticks", indent=1)
@@ -998,6 +1032,7 @@ label(0x278f, "skip_earth")
 comment(0x2793, "got diamond. play sounds", indent=1)
 label(0x27a4, "skip_got_diamond")
 comment(0x27a7, "update tick", indent=1)
+decimal(0x27d8)
 ret(0x27ef)
 unused(0x27f0)
 byte(0x27f0,16)
@@ -1079,6 +1114,7 @@ nonentry(0x29d2)
 comment(0x29d2, "beq $299c", indent=1)
 ret(0x29d4)
 unused_entry(0x29d5)
+unused(0x29db)
 nonentry(0x29dd)
 byte(0x29dd, 2)
 comment(0x29dd, "bne $299a", indent=1)
@@ -1091,10 +1127,10 @@ label(0x2a17, "skip_increment_high_byte2")
 ret(0x2a19)
 stars(0x2a1a)
 label(0x2a1a, "set_ptr_to_start_of_map")
-expr(0x2a1b, make_lo("map_row_1"))
+expr(0x2a1b, make_lo("tile_map_row_1"))
 label(0x2a1c, "set_ptr_high_to_start_of_map_with_offset_a")
 label(0x2a1e, "set_ptr_high_to_start_of_map")
-expr(0x2a1f, make_hi("map_row_1"))
+expr(0x2a1f, make_hi("tile_map_row_1"))
 stars(0x2a29)
 label(0x2a29, "palette_block")
 byte(0x2a29)
@@ -1135,9 +1171,13 @@ comment(0x2a79, "a bonus life is awarded every 500 points", indent=1)
 label(0x2a79, "check_for_bonus_life")
 expr(0x2a7d, "sprite_0")
 expr(0x2a81, "sprite_5")
+comment(0x2a84, "a bonus life only becomes available when the score doesn't have a zero or five in the hundreds column", indent=1)
 label(0x2a89, "zero_or_five_in_hundreds_column")
 label(0x2a8b, "check_for_non_zero_in_top_digits")
 expr(0x2a8f, "sprite_0")
+decimal(0x2a8a)
+decimal(0x2a94)
+comment(0x2a97, "all the top digits are zero, including the hundreds column, which means we are not 500 or more, so not eligible for a bonus life", indent=1)
 label(0x2a9c, "non_zero_digit_found_in_hundreds_column_or_above")
 comment(0x2ab0, "show bonus life text (very briefly)", indent=1)
 expr(0x2ab1, make_lo("bonus_life_text"))
@@ -1150,10 +1190,12 @@ expr(0x2abe, make_hi("big_rockford_sprite"))
 label(0x2ac3, "draw_big_rockford_loop")
 label(0x2aca, "check_if_byte_is_an_rle_byte_loop")
 ab(0x2ad2, True)
+stars(0x2ad4)
 label(0x2ad4, "get_repeat_count")
 label(0x2adc, "copy_x_bytes_in_rle_loop")
 label(0x2ae6, "skip_inc_high")
 ab(0x2ae9, True)
+stars(0x2aeb)
 label(0x2aeb, "get_next_ptr_byte")
 ret(0x2af3)
 unused(0x2af4)
@@ -1190,7 +1232,20 @@ label(0x2b92, "wait_for_a_centiseconds_and_read_keys")
 label(0x2b94, "wait_for_centiseconds_and_read_keys")
 label(0x2b98, "wait_loop")
 unused(0x2bc0)
+comment(0x2bca, """store earth ('*') in the following locations around the current position, and clear the others:
+00* 01* 02* 03*
+40* 41  42  43*
+80* 81  82  83*
+C0* C1* C2* C3*""")
+expr(0x2bcb, "map_earth")
+label(0x2bdf, "loop_done")
+ab(0x2bdd, True)
+comment(0x2bd0, "this next loop runs four times from $c3 to $c0, then four times more from $03 to $00", indent=1)
+label(0x2bd2, "store_earth_loop")
+comment(0x2beb, "set A=0 to clear cells in the middle", indent=1)
+comment(0x2bf3, "set firefly, or something else on cave D?", indent=1)
 unused(0x2bfe)
+ret(0x2bfd)
 
 for i in range(0, 9):
     byte(0x2c00+i*4, 4)
@@ -1240,7 +1295,9 @@ label(0x2d00, "write_strips")
 label(0x2d0a, "write_next_strip_loop")
 label(0x2d12, "skip_high_byte1")
 comment(0x2d12, "remember value", indent=1)
-comment(0x2d13, "get repeat count (from high nybble)", indent=1)
+comment(0x2d13, "get repeat count (from high nybble) into X", indent=1)
+label(0x2daf, "skip_write")
+comment(0x2d19, "recall value", indent=1)
 label(0x2d1e, "write_strip_loop")
 comment(0x2d20, "a value of 10 means move to the next row", indent=1)
 comment(0x2d24, "if it's this cave's skip value, then don't write to the map", indent=1)
@@ -1256,7 +1313,7 @@ ret(0x2d44)
 unused(0x2d45)
 stars(0x2d50)
 label(0x2d50, "add_patches")
-expr(0x2d51, make_lo("map_row_1-1"))
+expr(0x2d51, make_lo("tile_map_row_1-1"))
 label(0x2d55, "add_patches_loop")
 label(0x2d7a, "store_patch")
 label(0x2d74, "patch_value_is_not_three_or_one")
@@ -1303,12 +1360,20 @@ byte(0x2de9, 3)
 
 stars(0x2e00)
 expr(0x2e0b, make_lo("players_and_men_status_bar"))
+comment(0x2e03, "a bonus life only becomes available when the score doesn't have a zero or five in the hundreds column", indent=1)
+decimal(0x2e0f)
 expr(0x2e13, make_lo("bonus_life_text"))
 label(0x2e14, "skip_bonus_life_text")
+comment(0x2e16, "check if we are in demo mode", indent=1)
 expr(0x2e1b, make_lo("demonstration_mode_text"))
-comment(0x2e2c, "don't process horizontal strips", indent=1)
+label(0x2e1e, "skip_setting_demo_mode_text")
+comment(0x2e1e, "initialise variables $50-$5f", indent=1)
+label(0x2e20, "initialise_variables_loop")
+decimal(0x2e24)
+label(0x2e29, "skip_setting_variable")
+comment(0x2e2c, "don't process horizontal strips on the first preprocess pass", indent=1)
 expr(0x2e2f, "handler_table_high+12")
-comment(0x2e34, "process horizontal strips", indent=1)
+comment(0x2e34, "now process horizontal strips on the second preprocess pass", indent=1)
 expr(0x2e35, ">handler_for_horizontal_strip")
 expr(0x2e37, "handler_table_high+12")
 comment(0x2e3c, "map complete: draw titanium wall borders", indent=1)
@@ -1669,13 +1734,13 @@ byte(0x517b, 5)
 for i in range(24):
     addr = 0x5000+i*64
     if i != 16 and i != 17 and i != 18 and i != 19:
-        ten_by_four(addr, f"map_row_{i}")
+        ten_by_four(addr, f"tile_map_row_{i}")
         blank(addr+40)
         stars(addr)
         if i != 0 and i != 1 and i != 4 and i != 5:
             unused(addr+40)
     else:
-        label(addr, f"map_row_{i}")
+        label(addr, f"tile_map_row_{i}")
 
 message(0x5400, 0x5500)
 
@@ -1745,7 +1810,7 @@ acorn.bbc()
 
 print(""";
 ; Disassembly of Boulderdash, by TobyLobster 2024
-; This is a disassembly of the version from http://bbcmicro.co.uk/game.php?id=669
+; This is a disassembly of the BBC Micro version from http://bbcmicro.co.uk/game.php?id=669
 ;
 ; File: ___1___
 ;
