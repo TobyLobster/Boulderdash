@@ -659,6 +659,8 @@ label(0x1300, "initial_clock_value")
 
 stars(0x1e60, True)
 label(0x1e70, "set_clock_value")
+byte(0x1e70,5)
+unused(0x1e75)
 for i in range(64):
     v = get_u8_binary(0x1e80+i)
     t = v // 16
@@ -747,7 +749,7 @@ handlers = { 0x22a5: "handler_basics",
              0x23e0: "handler_for_vertical_strip",
              0x23f0: "handler_for_horizontal_strip",
              0x26ae: "handler_magic_wall",
-             0x2600: "handler_rockford2" }
+             0x2600: "handler_rockford" }
 
 for addr in handlers:
     stars(addr)
@@ -1609,6 +1611,7 @@ label(0x3a9e, "self_modify_move_left_or_right")
 label(0x3ab7, "decrease_difficulty_level")
 label(0x3abb, "dont_go_below_one")
 label(0x3abe, "toggle_one_or_two_players")
+expr(0x3ac2, make_xor("sprite_1", "sprite_2"))
 expr(0x3aca, "'S'")
 label(0x3ad1, "show_rockford_again_and_play_game")
 ret(0x3ae1)
@@ -1719,6 +1722,7 @@ stars(0x4e09, True)
 
 blank(0x4f41)
 unused(0x4f41)
+byte(0x4f41, 0x5000-0x4f41)
 
 label(0x5028, "current_status_bar_sprites")
 unused(0x503c)
