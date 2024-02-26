@@ -2673,9 +2673,10 @@ l2572 = sub_c2571+1
     bne set_palette_loop                                              ; 29c0: d0 ee       ..
     rts                                                               ; 29c2: 60          `
 
+; *************************************************************************************
 .unused24
     cmp (l0060),y                                                     ; 29c3: d1 60       .`
-    beq return6                                                       ; 29c5: f0 0d       ..
+    beq unused25                                                      ; 29c5: f0 0d       ..
     lda #4                                                            ; 29c7: a9 04       ..
     jsr add_a_to_ptr                                                  ; 29c9: 20 40 22     @"
     and #&3f                                                          ; 29cc: 29 3f       )?
@@ -2684,21 +2685,21 @@ l2572 = sub_c2571+1
     ; beq $299c
     equb &f0, &c8                                                     ; 29d2: f0 c8       ..
 
-.return6
+.unused25
     rts                                                               ; 29d4: 60          `
 
-.unused25
-    inc screen_addr1_low                                              ; 29d5: e6 8a       ..
-    bne unused26                                                      ; 29d7: d0 02       ..
-    inc screen_addr1_high                                             ; 29d9: e6 8b       ..
 .unused26
+    inc screen_addr1_low                                              ; 29d5: e6 8a       ..
+    bne unused27                                                      ; 29d7: d0 02       ..
+    inc screen_addr1_high                                             ; 29d9: e6 8b       ..
+.unused27
     lda cell_below                                                    ; 29db: a5 7a       .z
     ; bne $299a
     equb &d0, &bb                                                     ; 29dd: d0 bb       ..
 
     rts                                                               ; 29df: 60          `
 
-.unused27
+.unused28
     equb &7a, &d0, &bb, &60, &f0, &16, &8a, &18, &69,   8, &aa, &29   ; 29e0: 7a d0 bb... z..
     equb &3f, &c9, &28, &d0, &d9, &18, &8a, &69, &18, &aa, &90, &d2   ; 29ec: 3f c9 28... ?.(
     equb &e6, &8d, &d0, &ce, &60, &8d, &d0, &cc                       ; 29f8: e6 8d d0... ...
@@ -2709,7 +2710,7 @@ l2572 = sub_c2571+1
     lda ptr_low                                                       ; 2a02: a5 8c       ..
     and #&3f                                                          ; 2a04: 29 3f       )?
     cmp #&28                                                          ; 2a06: c9 28       .(
-    bne return7                                                       ; 2a08: d0 0f       ..
+    bne return6                                                       ; 2a08: d0 0f       ..
     lda ptr_low                                                       ; 2a0a: a5 8c       ..
     and #&c0                                                          ; 2a0c: 29 c0       ).
     clc                                                               ; 2a0e: 18          .
@@ -2719,7 +2720,7 @@ l2572 = sub_c2571+1
     inc ptr_high                                                      ; 2a15: e6 8d       ..
 .skip_increment_high_byte2
     dec x_loop_counter                                                ; 2a17: c6 7c       .|
-.return7
+.return6
     rts                                                               ; 2a19: 60          `
 
 ; *************************************************************************************
@@ -2746,7 +2747,7 @@ l2572 = sub_c2571+1
 ; *************************************************************************************
 .increment_next_ptr
     inc next_ptr_low                                                  ; 2a2e: e6 82       ..
-    bne return7                                                       ; 2a30: d0 e7       ..
+    bne return6                                                       ; 2a30: d0 e7       ..
     inc next_ptr_high                                                 ; 2a32: e6 83       ..
     rts                                                               ; 2a34: 60          `
 
@@ -2843,7 +2844,7 @@ l2572 = sub_c2571+1
 
 .non_zero_digit_found_in_hundreds_column_or_above
     lda bonus_life_available                                          ; 2a9c: a5 6f       .o
-    beq return8                                                       ; 2a9e: f0 14       ..
+    beq return7                                                       ; 2a9e: f0 14       ..
     ; award bonus life
     lda #0                                                            ; 2aa0: a9 00       ..
     sta bonus_life_available                                          ; 2aa2: 85 6f       .o
@@ -2858,7 +2859,7 @@ l2572 = sub_c2571+1
     ; show bonus life text (very briefly)
     lda #<bonus_life_text                                             ; 2ab0: a9 64       .d
     sta status_text_address_low                                       ; 2ab2: 85 69       .i
-.return8
+.return7
     rts                                                               ; 2ab4: 60          `
 
 ; *************************************************************************************
@@ -2893,7 +2894,7 @@ l2572 = sub_c2571+1
     inc ptr_low                                                       ; 2ade: e6 8c       ..
     bne skip_inc_high                                                 ; 2ae0: d0 04       ..
     inc ptr_high                                                      ; 2ae2: e6 8d       ..
-    bmi return9                                                       ; 2ae4: 30 0d       0.
+    bmi return8                                                       ; 2ae4: 30 0d       0.
 .skip_inc_high
     dex                                                               ; 2ae6: ca          .
     bne copy_x_bytes_in_rle_loop                                      ; 2ae7: d0 f3       ..
@@ -2903,18 +2904,18 @@ l2572 = sub_c2571+1
 .get_next_ptr_byte
     lda (next_ptr_low),y                                              ; 2aeb: b1 82       ..
     inc next_ptr_low                                                  ; 2aed: e6 82       ..
-    bne return9                                                       ; 2aef: d0 02       ..
+    bne return8                                                       ; 2aef: d0 02       ..
     inc next_ptr_high                                                 ; 2af1: e6 83       ..
-.return9
+.return8
     rts                                                               ; 2af3: 60          `
 
-.unused28
+.unused29
     equb &f0, &e5, &a9,   0                                           ; 2af4: f0 e5 a9... ...
 
 .rle_bytes_table
     equb &85, &48, &10, &ec, &ff, &0f,   0                            ; 2af8: 85 48 10... .H.
 
-.unused29
+.unused30
     equb &27                                                          ; 2aff: 27          '
 
 ; *************************************************************************************
@@ -3006,7 +3007,7 @@ l2572 = sub_c2571+1
     sta tile_map_ptr_high                                             ; 2b82: 85 86       ..
     rts                                                               ; 2b84: 60          `
 
-.unused30
+.unused31
     equb &86, &60, &a0, &1e, &a2, &fa, &a9,   1, &20, &f1, &ff        ; 2b85: 86 60 a0... .`.
 
 ; *************************************************************************************
@@ -3036,7 +3037,7 @@ l2572 = sub_c2571+1
     txa                                                               ; 2bbc: 8a          .
     jmp set_palette_colour_ax                                         ; 2bbd: 4c 35 2a    L5*
 
-.unused31
+.unused32
     equb &a9,   1, &a0, &43, &91, &8c, &a0, &c4, &88, &91             ; 2bc0: a9 01 a0... ...
 
 ; *************************************************************************************
@@ -3079,13 +3080,13 @@ l2572 = sub_c2571+1
     ldx #map_firefly                                                  ; 2bf3: a2 06       ..
     lda cave_number                                                   ; 2bf5: a5 87       ..
     cmp #3                                                            ; 2bf7: c9 03       ..
-    bne return10                                                      ; 2bf9: d0 02       ..
+    bne return9                                                       ; 2bf9: d0 02       ..
     ; set butterfly
     ldx #map_butterfly OR map_anim_state2                             ; 2bfb: a2 2e       ..
-.return10
+.return9
     rts                                                               ; 2bfd: 60          `
 
-.unused32
+.unused33
     equb &cb, &60                                                     ; 2bfe: cb 60       .`
 
 ; *************************************************************************************
@@ -3161,7 +3162,7 @@ l2572 = sub_c2571+1
     lda #osword_sound                                                 ; 2c6c: a9 07       ..
     jmp osword                                                        ; 2c6e: 4c f1 ff    L..            ; SOUND command
 
-.unused33
+.unused34
     equb 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0                  ; 2c71: 00 00 00... ...
 
 ; *************************************************************************************
@@ -3200,32 +3201,32 @@ l2572 = sub_c2571+1
     ldx #6                                                            ; 2cbc: a2 06       ..
     jsr play_sound_if_needed                                          ; 2cbe: 20 e8 2c     .,
     lda sound6_active_flag                                            ; 2cc1: a5 4c       .L
-    bne return11                                                      ; 2cc3: d0 2a       .*
+    bne return10                                                      ; 2cc3: d0 2a       .*
     ldx #4                                                            ; 2cc5: a2 04       ..
     jsr play_sound_if_needed                                          ; 2cc7: 20 e8 2c     .,
     lda sound4_active_flag                                            ; 2cca: a5 4a       .J
-    bne return11                                                      ; 2ccc: d0 21       .!
+    bne return10                                                      ; 2ccc: d0 21       .!
     ldy #&19                                                          ; 2cce: a0 19       ..
     ldx #&fb                                                          ; 2cd0: a2 fb       ..
     lda #osbyte_read_adc_or_get_buffer_status                         ; 2cd2: a9 80       ..
     jsr osbyte                                                        ; 2cd4: 20 f4 ff     ..            ; Read number of spaces remaining in sound channel 0 (X=251)
     cpx #&0b                                                          ; 2cd7: e0 0b       ..             ; X is the number of spaces remaining in sound channel 0
-    bmi return11                                                      ; 2cd9: 30 14       0.
+    bmi return10                                                      ; 2cd9: 30 14       0.
     lda sound4_active_flag                                            ; 2cdb: a5 4a       .J
     ora sound6_active_flag                                            ; 2cdd: 05 4c       .L
-    bne return11                                                      ; 2cdf: d0 0e       ..
+    bne return10                                                      ; 2cdf: d0 0e       ..
     ldx #2                                                            ; 2ce1: a2 02       ..
     jsr play_sound_if_needed                                          ; 2ce3: 20 e8 2c     .,
     ldx #3                                                            ; 2ce6: a2 03       ..
 .play_sound_if_needed
     lda sound0_active_flag,x                                          ; 2ce8: b5 46       .F
-    beq return11                                                      ; 2cea: f0 03       ..
+    beq return10                                                      ; 2cea: f0 03       ..
     jmp play_sound_x_pitch_y                                          ; 2cec: 4c 2c 2c    L,,
 
-.return11
+.return10
     rts                                                               ; 2cef: 60          `
 
-.unused34
+.unused35
     equb &85, &a6, &a8, &91, &70, &60, &a2,   3, &bd, &e3, &20, &18   ; 2cf0: 85 a6 a8... ...
     equb &69,   1, &c9, &0a                                           ; 2cfc: 69 01 c9... i..
 
@@ -3269,23 +3270,23 @@ l2572 = sub_c2571+1
     inc map_x                                                         ; 2d2a: e6 8a       ..
     lda map_x                                                         ; 2d2c: a5 8a       ..
     cmp #40                                                           ; 2d2e: c9 28       .(
-    bne get_map_address                                               ; 2d30: d0 0a       ..             ; redundant instruction
+    bne get_map_address                                               ; 2d30: d0 0a       ..
 .move_to_next_row
     sty map_x                                                         ; 2d32: 84 8a       ..
     inc map_y                                                         ; 2d34: e6 8b       ..
     lda map_y                                                         ; 2d36: a5 8b       ..
     cmp #21                                                           ; 2d38: c9 15       ..
-    beq return12                                                      ; 2d3a: f0 08       ..
+    beq return11                                                      ; 2d3a: f0 08       ..
 .get_map_address
     jsr map_xy_position_to_map_address                                ; 2d3c: 20 15 2b     .+
     dex                                                               ; 2d3f: ca          .
     bne write_strip_loop                                              ; 2d40: d0 dc       ..
     beq write_next_strip_loop                                         ; 2d42: f0 c6       ..             ; ALWAYS branch
 
-.return12
+.return11
     rts                                                               ; 2d44: 60          `
 
-.unused35
+.unused36
     equb &31, &15, &41, &15, &11, &25, &31, &12, &21, &15, &21        ; 2d45: 31 15 41... 1.A
 
 ; *************************************************************************************
@@ -3339,7 +3340,7 @@ l2572 = sub_c2571+1
     pla                                                               ; 2d7f: 68          h
     rts                                                               ; 2d80: 60          `
 
-.unused36
+.unused37
     equb &8a, &69, &18, &aa, &90, &d3, &e6, &8d, &d0, &cf, &60, &15   ; 2d81: 8a 69 18... .i.
     equb &11, &15, &51                                                ; 2d8d: 11 15 51    ..Q
 
@@ -3389,15 +3390,15 @@ l2572 = sub_c2571+1
     pla                                                               ; 2dbd: 68          h
     rts                                                               ; 2dbe: 60          `
 
-.unused37
+.unused38
     lda #&18                                                          ; 2dbf: a9 18       ..
     jsr add_a_to_ptr                                                  ; 2dc1: 20 40 22     @"
     dec real_keys_pressed                                             ; 2dc4: c6 7c       .|
-    bne unused38                                                      ; 2dc6: d0 02       ..
+    bne unused39                                                      ; 2dc6: d0 02       ..
     pla                                                               ; 2dc8: 68          h
     rts                                                               ; 2dc9: 60          `
 
-.unused38
+.unused39
     pla                                                               ; 2dca: 68          h
     asl a                                                             ; 2dcb: 0a          .
     asl a                                                             ; 2dcc: 0a          .
@@ -3407,7 +3408,7 @@ l2572 = sub_c2571+1
     equb &10, &d5                                                     ; 2dcf: 10 d5       ..
     equb &30, &c5                                                     ; 2dd1: 30 c5       0.             ; ALWAYS branch
 
-.unused39
+.unused40
     equb &11, &25, &b1, &15, &11, &15, &12, &25, &11, &15, &21, &15   ; 2dd3: 11 25 b1... .%.
     equb &11, &15, &21, &15, &11, &25, &41, &10, &51, &10             ; 2ddf: 11 15 21... ..!
     equb &21, &45, &21                                                ; 2de9: 21 45 21    !E!
@@ -3415,7 +3416,7 @@ l2572 = sub_c2571+1
     equb &51, &15, &11, &25, &16, &25, &11, &15                       ; 2df8: 51 15 11... Q..
 
 ; *************************************************************************************
-.sub_c2e00
+.play_game
     jsr prepare_stage                                                 ; 2e00: 20 00 29     .)
     ; a bonus life only becomes available when the score doesn't have a zero or five in
     ; the hundreds column
@@ -3498,36 +3499,37 @@ l2572 = sub_c2571+1
     sta player_number_on_game_over_text                               ; 2e86: 8d 9e 32    ..2
     lda #<game_over_text                                              ; 2e89: a9 8c       ..
     sta status_text_address_low                                       ; 2e8b: 85 69       .i
-    ldx #&50                                                          ; 2e8d: a2 50       .P
+    ldx #<highscore_high_status_bar                                   ; 2e8d: a2 50       .P
     lda player_number_on_regular_status_bar                           ; 2e8f: ad 1b 32    ..2
     cmp #sprite_1                                                     ; 2e92: c9 33       .3
-    beq c2e98                                                         ; 2e94: f0 02       ..
-    ldx #&5e                                                          ; 2e96: a2 5e       .^
-.c2e98
+    beq got_pointer_to_score                                          ; 2e94: f0 02       ..
+    ldx #<highscore_for_player_2                                      ; 2e96: a2 5e       .^
+.got_pointer_to_score
     stx which_status_bar_address1_low                                 ; 2e98: 8e aa 2e    ...
     stx which_status_bar_address2_low                                 ; 2e9b: 8e b8 2e    ...
     ldx #0                                                            ; 2e9e: a2 00       ..
     ldy #0                                                            ; 2ea0: a0 00       ..
-.loop_c2ea2
+.compare_highscores_loop
     lda score_on_regular_status_bar,x                                 ; 2ea2: bd 0e 32    ..2
     cpy #0                                                            ; 2ea5: c0 00       ..
     bne store_in_status_bar                                           ; 2ea7: d0 0e       ..
-.sub_c2ea9
-which_status_bar_address1_low = sub_c2ea9+1
+.compare
+which_status_bar_address1_low = compare+1
     cmp highscore_high_status_bar,x                                   ; 2ea9: dd 50 32    .P2
     bmi play_scren_dissolve_to_solid                                  ; 2eac: 30 0f       0.
     bne store_in_status_bar                                           ; 2eae: d0 07       ..
-.loop_c2eb0
+.goto_next_digit
     inx                                                               ; 2eb0: e8          .
     cpx #6                                                            ; 2eb1: e0 06       ..
-    bne loop_c2ea2                                                    ; 2eb3: d0 ed       ..
+    bne compare_highscores_loop                                       ; 2eb3: d0 ed       ..
     beq play_scren_dissolve_to_solid                                  ; 2eb5: f0 06       ..             ; ALWAYS branch
 
 .store_in_status_bar
 which_status_bar_address2_low = store_in_status_bar+1
     sta highscore_high_status_bar,x                                   ; 2eb7: 9d 50 32    .P2
     iny                                                               ; 2eba: c8          .
-    bne loop_c2eb0                                                    ; 2ebb: d0 f3       ..
+    bne goto_next_digit                                               ; 2ebb: d0 f3       ..
+
 .play_scren_dissolve_to_solid
     lda #&80                                                          ; 2ebd: a9 80       ..
 .play_screen_dissolve_effect
@@ -3550,7 +3552,7 @@ which_status_bar_address2_low = store_in_status_bar+1
     bpl screen_dissolve_loop                                          ; 2ee1: 10 e6       ..
     rts                                                               ; 2ee3: 60          `
 
-.unused40
+.unused41
     equb &60, &20, &c6, &5a, &10, &e6, &60, &28, &25, &26, &25, &28   ; 2ee4: 60 20 c6... ` .
     equb &25, &26, &27, &28, &25, &25, &25, &26, &20, &20, &23, &24   ; 2ef0: 25 26 27... %&'
     equb &24, &24, &23, &20                                           ; 2efc: 24 24 23... $$#
@@ -3570,7 +3572,7 @@ which_status_bar_address2_low = store_in_status_bar+1
     iny                                                               ; 2f16: c8          .
     jsr add_a_to_status_bar_number_at_y                               ; 2f17: 20 c0 28     .(
     dec diamonds_required                                             ; 2f1a: c6 6c       .l
-    bne return13                                                      ; 2f1c: d0 29       .)
+    bne return12                                                      ; 2f1c: d0 29       .)
     lda #7                                                            ; 2f1e: a9 07       ..
     ldx #0                                                            ; 2f20: a2 00       ..
     jsr set_palette_colour_ax                                         ; 2f22: 20 35 2a     5*
@@ -3592,10 +3594,10 @@ which_status_bar_address2_low = store_in_status_bar+1
     jsr add_a_to_status_bar_number_at_y                               ; 2f42: 20 c0 28     .(
     ; play sound 6
     inc sound6_active_flag                                            ; 2f45: e6 4c       .L
-.return13
+.return12
     rts                                                               ; 2f47: 60          `
 
-.unused41
+.unused42
     equb &91, &6a, &e6, &4c, &60,   0,   0,   0                       ; 2f48: 91 6a e6... .j.
 
 ; *************************************************************************************
@@ -3683,7 +3685,7 @@ which_status_bar_address2_low = store_in_status_bar+1
     lda #0                                                            ; 2fda: a9 00       ..
     rts                                                               ; 2fdc: 60          `
 
-.unused42
+.unused43
     equb   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0   ; 2fdd: 00 00 00... ...
     equb   0,   0,   0,   0,   0, &81,   0,   0,   0,   0, &84,   0   ; 2fe9: 00 00 00... ...
     equb   0, &86, &81,   0,   0,   1, &81, &d9, &19, &81, &ff        ; 2ff5: 00 86 81... ...
@@ -3708,19 +3710,19 @@ which_status_bar_address2_low = store_in_status_bar+1
 .c3018
     lda time_remaining                                                ; 3018: a5 6d       .m
     cmp #50                                                           ; 301a: c9 32       .2
-    bne return14                                                      ; 301c: d0 0d       ..
+    bne return13                                                      ; 301c: d0 0d       ..
     lda sub_second_ticks                                              ; 301e: a5 5c       .\
     cmp #7                                                            ; 3020: c9 07       ..
-    bne return14                                                      ; 3022: d0 07       ..
+    bne return13                                                      ; 3022: d0 07       ..
     lda #1                                                            ; 3024: a9 01       ..
     sta fungus_growth_interval                                        ; 3026: 85 55       .U
     ; Set A=0
     lsr a                                                             ; 3028: 4a          J
     sta fungus_counter                                                ; 3029: 85 57       .W
-.return14
+.return13
     rts                                                               ; 302b: 60          `
 
-.unused43
+.unused44
     equb &85, &57, &60, &1c, &1f, &1f, &1f, &1f, &1f, &1f, &1f, &1f   ; 302c: 85 57 60... .W`
     equb &1f, &1f, &1f, &1f, &1f, &1f, &1f, &1f                       ; 3038: 1f 1f 1f... ...
 
@@ -3764,7 +3766,7 @@ which_status_bar_address2_low = store_in_status_bar+1
     sta status_text_address_low                                       ; 3078: 85 69       .i
 .loop_c307a
     jsr sub_c30cf                                                     ; 307a: 20 cf 30     .0
-    bne return15                                                      ; 307d: d0 5d       .]
+    bne return14                                                      ; 307d: d0 5d       .]
     dec cell_above                                                    ; 307f: c6 74       .t
     bne loop_c307a                                                    ; 3081: d0 f7       ..
     rts                                                               ; 3083: 60          `
@@ -3814,7 +3816,7 @@ which_status_bar_address2_low = store_in_status_bar+1
     jsr wait_for_13_centiseconds_and_read_keys                        ; 30d5: 20 90 2b     .+
     lda keys_to_process                                               ; 30d8: a5 62       .b
     and #2                                                            ; 30da: 29 02       ).
-.return15
+.return14
     rts                                                               ; 30dc: 60          `
 
 ; *************************************************************************************
@@ -3828,7 +3830,7 @@ which_status_bar_address2_low = store_in_status_bar+1
     and #2                                                            ; 30e9: 29 02       ).
     rts                                                               ; 30eb: 60          `
 
-.unused44
+.unused45
     equb &62, &29,   2, &60,   0,   0,   0,   0,   0,   0,   0,   0   ; 30ec: 62 29 02... b).
     equb   0,   0,   0,   0,   0,   0,   0,   0                       ; 30f8: 00 00 00... ...
 
@@ -3875,7 +3877,7 @@ which_status_bar_address2_low = store_in_status_bar+1
     bne show_credits_loop                                             ; 31e2: d0 f6       ..
     jmp loop_c31cb                                                    ; 31e4: 4c cb 31    L.1
 
-.unused45
+.unused46
     equb &31, &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff   ; 31e7: 31 ff ff... 1..
     equb &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff   ; 31f3: ff ff ff... ...
     equb &ff                                                          ; 31ff: ff          .
@@ -3985,6 +3987,7 @@ which_status_bar_address2_low = store_in_status_bar+1
     equs "HIGH"                                                       ; 3258: 48 49 47... HIG
     equb sprite_space                                                 ; 325c: 00          .
     equb sprite_space                                                 ; 325d: 00          .
+.highscore_for_player_2
     equb sprite_0                                                     ; 325e: 32          2
     equb sprite_0                                                     ; 325f: 32          2
     equb sprite_0                                                     ; 3260: 32          2
@@ -4172,7 +4175,7 @@ which_status_bar_address2_low = store_in_status_bar+1
 ; 120 LDA #&7D:LDY #&80:JSR &2329
 ; 130 JSR &2292:LDX
 ; 
-.unused46
+.unused47
     equb &50, &0e                                                     ; 336c: 50 0e       P.
     equs " JSR 10829"                                                 ; 336e: 20 4a 53...  JS
     equb &0d,   0, &5a, &1e                                           ; 3378: 0d 00 5a... ..Z
@@ -4380,7 +4383,7 @@ which_status_bar_address2_low = store_in_status_bar+1
     asl a                                                             ; 3a73: 0a          .
     bcs toggle_one_or_two_players                                     ; 3a74: b0 48       .H
     asl a                                                             ; 3a76: 0a          .
-    bcs return16                                                      ; 3a77: b0 68       .h
+    bcs return15                                                      ; 3a77: b0 68       .h
     asl a                                                             ; 3a79: 0a          .
     bcs show_rockford_again_and_play_game                             ; 3a7a: b0 55       .U
     dec map_rockford_end_position_addr_low                            ; 3a7c: c6 6a       .j
@@ -4398,7 +4401,7 @@ which_status_bar_address2_low = store_in_status_bar+1
     stx demo_mode_tick_count                                          ; 3a8e: 86 65       .e
     inx                                                               ; 3a90: e8          .
     stx difficulty_level                                              ; 3a91: 86 89       ..
-    jsr sub_c2e00                                                     ; 3a93: 20 00 2e     ..
+    jsr play_game                                                     ; 3a93: 20 00 2e     ..
     jmp show_menu                                                     ; 3a96: 4c 00 3a    L.:
 
 .menu_move_left_to_change_cave
@@ -4443,19 +4446,19 @@ which_status_bar_address2_low = store_in_status_bar+1
     jsr reset_grid_of_sprites                                         ; 3ad4: 20 92 22     ."
     lda #&ff                                                          ; 3ad7: a9 ff       ..
     sta demo_mode_tick_count                                          ; 3ad9: 85 65       .e
-    jsr play_game                                                     ; 3adb: 20 00 3b     .;
+    jsr initialise_and_play_game                                      ; 3adb: 20 00 3b     .;
     jmp show_menu                                                     ; 3ade: 4c 00 3a    L.:
 
-.return16
+.return15
     rts                                                               ; 3ae1: 60          `
 
-.unused47
+.unused48
     equb &65, &20,   0, &3b, &4c,   0, &3a, &60, &ff, &ff, &ff, &ff   ; 3ae2: 65 20 00... e .
     equb &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff   ; 3aee: ff ff ff... ...
     equb &ff, &ff, &ff, &ff, &ff, &ff                                 ; 3afa: ff ff ff... ...
 
 ; *************************************************************************************
-.play_game
+.initialise_and_play_game
     ldx #19                                                           ; 3b00: a2 13       ..
 .copy_status_bar_loop
     lda default_status_bar,x                                          ; 3b02: bd 68 50    .hP
@@ -4476,7 +4479,7 @@ which_status_bar_address2_low = store_in_status_bar+1
     ldx number_of_players_status_bar_difficulty_level                 ; 3b26: ae 8b 32    ..2
     stx difficulty_level_on_regular_status_bar                        ; 3b29: 8e 27 32    .'2
     stx difficulty_level_on_players_and_men_status_bar                ; 3b2c: 8e 4f 32    .O2
-    jsr sub_c3bc1                                                     ; 3b2f: 20 c1 3b     .;
+    jsr set_cave_number_and_difficulty_level_from_status_bar          ; 3b2f: 20 c1 3b     .;
     lda #sprite_0                                                     ; 3b32: a9 32       .2
     ldx #5                                                            ; 3b34: a2 05       ..
 .zero_score_loop
@@ -4492,7 +4495,8 @@ which_status_bar_address2_low = store_in_status_bar+1
     ; add new difficulty level to menu
     sta number_of_difficuly_levels_available_in_menu_for_each_cave,x  ; 3b48: 9d 68 4c    .hL
 .skip_adding_new_difficulty_level_to_menu
-    jsr sub_c2e00                                                     ; 3b4b: 20 00 2e     ..
+    jsr play_game                                                     ; 3b4b: 20 00 2e     ..
+    ; save results after game
     ldy #5                                                            ; 3b4e: a0 05       ..
     ; check if player one or two
     lda player_number_on_regular_status_bar                           ; 3b50: ad 1b 32    ..2
@@ -4510,15 +4514,15 @@ which_status_bar_address2_low = store_in_status_bar+1
     bpl copy_score_to_last_score_loop                                 ; 3b62: 10 f6       ..
     lda neighbour_cell_contents                                       ; 3b64: a5 64       .d
     cmp #8                                                            ; 3b66: c9 08       ..
-    beq c3ba1                                                         ; 3b68: f0 37       .7
+    beq calculate_next_cave_number_and_difficuly_level                ; 3b68: f0 37       .7
     lda cave_number                                                   ; 3b6a: a5 87       ..
     cmp #16                                                           ; 3b6c: c9 10       ..
-    bpl c3ba1                                                         ; 3b6e: 10 31       .1
+    bpl calculate_next_cave_number_and_difficuly_level                ; 3b6e: 10 31       .1
     lda #sprite_0                                                     ; 3b70: a9 32       .2
     cmp men_number_on_regular_status_bar                              ; 3b72: cd 1e 32    ..2
     bne swap_status_bars_with_cached_versions                         ; 3b75: d0 05       ..
     cmp number_of_men_on_players_and_men_status_bar                   ; 3b77: cd 46 32    .F2
-    beq return17                                                      ; 3b7a: f0 50       .P
+    beq return16                                                      ; 3b7a: f0 50       .P
 .swap_status_bars_with_cached_versions
     ldx #39                                                           ; 3b7c: a2 27       .'
 .swap_loop
@@ -4534,28 +4538,29 @@ which_status_bar_address2_low = store_in_status_bar+1
     beq swap_status_bars_with_cached_versions                         ; 3b93: f0 e7       ..
     lda cave_letter_on_regular_status_bar                             ; 3b95: ad 25 32    .%2
     ldx difficulty_level_on_regular_status_bar                        ; 3b98: ae 27 32    .'2
-    jsr sub_c3bc1                                                     ; 3b9b: 20 c1 3b     .;
+    jsr set_cave_number_and_difficulty_level_from_status_bar          ; 3b9b: 20 c1 3b     .;
     jmp c3b3f                                                         ; 3b9e: 4c 3f 3b    L?;
 
-.c3ba1
+.calculate_next_cave_number_and_difficuly_level
     ldx cave_number                                                   ; 3ba1: a6 87       ..
     ldy difficulty_level                                              ; 3ba3: a4 89       ..
     lda cave_play_order,x                                             ; 3ba5: bd 40 4c    .@L
     sta cave_number                                                   ; 3ba8: 85 87       ..
-    bne c3bb3                                                         ; 3baa: d0 07       ..
+    bne store_cave_number_and_difficulty_level                        ; 3baa: d0 07       ..
     iny                                                               ; 3bac: c8          .
     cpy #6                                                            ; 3bad: c0 06       ..
-    bne c3bb3                                                         ; 3baf: d0 02       ..
+    bne store_cave_number_and_difficulty_level                        ; 3baf: d0 02       ..
     ldy #1                                                            ; 3bb1: a0 01       ..
-.c3bb3
+.store_cave_number_and_difficulty_level
     sty difficulty_level                                              ; 3bb3: 84 89       ..
     sta cave_number                                                   ; 3bb5: 85 87       ..
     cmp #&10                                                          ; 3bb7: c9 10       ..
     bmi c3b3f                                                         ; 3bb9: 30 84       0.
+    ; bonus life awarded on bonus level
     inc men_number_on_regular_status_bar                              ; 3bbb: ee 1e 32    ..2
     jmp c3b3f                                                         ; 3bbe: 4c 3f 3b    L?;
 
-.sub_c3bc1
+.set_cave_number_and_difficulty_level_from_status_bar
     sec                                                               ; 3bc1: 38          8
     sbc #'A'                                                          ; 3bc2: e9 41       .A
     sta cave_number                                                   ; 3bc4: 85 87       ..
@@ -4563,10 +4568,10 @@ which_status_bar_address2_low = store_in_status_bar+1
     sec                                                               ; 3bc7: 38          8
     sbc #sprite_0                                                     ; 3bc8: e9 32       .2
     sta difficulty_level                                              ; 3bca: 85 89       ..
-.return17
+.return16
     rts                                                               ; 3bcc: 60          `
 
-.unused48
+.unused49
     equb &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff   ; 3bcd: ff ff ff... ...
     equb &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff   ; 3bd9: ff ff ff... ...
     equb &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff, &ff   ; 3be5: ff ff ff... ...
@@ -4920,7 +4925,7 @@ which_status_bar_address2_low = store_in_status_bar+1
     equb   5, &11, &20, &0a, &81,   5,   1, &20, &0a, &91,   5, &20   ; 4ad7: 05 11 20... ..
     equb &0a, &a1, &2d, &0a, &a1, &20, &0a, &a1, &20, &0a, &f3, &23   ; 4ae3: 0a a1 2d... ..-
     equb &0b, &9a                                                     ; 4aef: 0b 9a       ..
-.unused49
+.unused50
     equb &90, &6a, &90, &0e, &0a, &f3, &23, &0b, &9a, &2a,   3, &34   ; 4af1: 90 6a 90... .j.
     equb   3, &3e,   3                                                ; 4afd: 03 3e 03    .>.
 
@@ -5089,7 +5094,7 @@ which_status_bar_address2_low = store_in_status_bar+1
     equb &55, &41,   0,   0                                           ; 4df0: 55 41 00... UA.            ; Difficulty 4: basics=0x4e55, map_start=0x5041, patch_addr=0x0
     equb &26, &3f, &54, &43                                           ; 4df4: 26 3f 54... &?T            ; Difficulty 5: basics=0x4e26, map_start=0x503f, patch_addr=0x4354
 
-.unused50
+.unused51
     equb   9,   4,   0, &0c, &11,   5,   1, &18,   9,   2, &0b, &23   ; 4df8: 09 04 00... ...
     equb &1b,   7,   2, &19, &0c                                      ; 4e04: 1b 07 02... ...
 
@@ -5189,7 +5194,7 @@ which_status_bar_address2_low = store_in_status_bar+1
     equb &0c, &50, &c5, &c0,   0, &c7,   0,   4, &1c, &30,   4, &0c   ; 4f2d: 0c 50 c5... .P.
     equb   0, &33, &c0,   1, &0c, &40, &43, &14                       ; 4f39: 00 33 c0... .3.
 
-.unused51
+.unused52
     equb &31, &40, &60, &33, &c0, &31, &0e, &0c,   1,   3,   0, &0c   ; 4f41: 31 40 60... 1@`
     equb &e0,   0, &c0, &50, &10, &c4, &33, &c0, &40, &0c, &e0,   0   ; 4f4d: e0 00 c0... ...
     equb &43, &12,   0, &40,   4, &50,   0, &5c, &31, &10, &1c,   3   ; 4f59: 43 12 00... C..
@@ -5225,7 +5230,7 @@ which_status_bar_address2_low = store_in_status_bar+1
     equs "REYALP"                                                     ; 5034: 52 45 59... REY
     equb sprite_space                                                 ; 503a: 00          .
     equb sprite_1                                                     ; 503b: 33          3
-.unused52
+.unused53
     equb &83, &83, &83,   1                                           ; 503c: 83 83 83... ...
 
 ; *************************************************************************************
@@ -5249,7 +5254,7 @@ which_status_bar_address2_low = store_in_status_bar+1
     equs "A"                                                          ; 5079: 41          A
     equb sprite_slash                                                 ; 507a: 3e          >
     equb sprite_2                                                     ; 507b: 34          4
-.unused53
+.unused54
     equb &83, &83, &83, &83                                           ; 507c: 83 83 83... ...
 
 ; *************************************************************************************
@@ -5259,7 +5264,7 @@ which_status_bar_address2_low = store_in_status_bar+1
     equb &81, &81, &81, &81, &81, &81, &81, &81, &81, &81             ; 5094: 81 81 81... ...
     equb &81, &81, &81, &81, &81, &81, &81, &81, &81, &83             ; 509e: 81 81 81... ...
 
-.unused54
+.unused55
     equb   1, &83, &83, &83, &83, &83, &83, &83, &83, &83, &83, &83   ; 50a8: 01 83 83... ...
     equb &83, &83, &83, &83, &83, &83, &83, &83, &83, &83, &83, &83   ; 50b4: 83 83 83... ...
 
@@ -5270,7 +5275,7 @@ which_status_bar_address2_low = store_in_status_bar+1
     equb &81, &81, &81, &81, &81, &81, &81, &81, &81, &81             ; 50d4: 81 81 81... ...
     equb &81, &81, &81, &81, &81, &81, &81, &81, &81, &83             ; 50de: 81 81 81... ...
 
-.unused55
+.unused56
     equb   1, &83, &83, &83, &83, &83, &83,   8, &83, &83,   2, &83   ; 50e8: 01 83 83... ...
     equb &83, &83, &83, &83,   5, &83,   5,   4, &83, &83, &83, &83   ; 50f4: 83 83 83... ...
 
@@ -5306,7 +5311,7 @@ which_status_bar_address2_low = store_in_status_bar+1
     equb &80, &81, &85, &81, &85, &81, &85, &81, &85, &81             ; 5194: 80 81 85... ...
     equb &85, &81, &85, &81, &81, &81, &81, &81, &81, &83             ; 519e: 85 81 85... ...
 
-.unused56
+.unused57
     equb &83, &83, &83, &83, &83, &83, &83, &83, &83, &83, &83, &83   ; 51a8: 83 83 83... ...
     equb &83, &83, &83, &83, &83, &83, &83, &83, &83, &83, &83, &83   ; 51b4: 83 83 83... ...
 
@@ -5317,7 +5322,7 @@ which_status_bar_address2_low = store_in_status_bar+1
     equb &80, &81, &81, &81, &81, &81, &81, &81, &81, &81             ; 51d4: 80 81 81... ...
     equb &81, &81, &81, &81, &81, &81, &81, &81, &81, &83             ; 51de: 81 81 81... ...
 
-.unused57
+.unused58
     equb &83, &83, &83, &83, &83, &83, &83, &83, &83, &83, &83, &83   ; 51e8: 83 83 83... ...
     equb &83, &83, &83, &83, &83, &83, &83, &83, &83, &83, &83, &83   ; 51f4: 83 83 83... ...
 
@@ -5328,7 +5333,7 @@ which_status_bar_address2_low = store_in_status_bar+1
     equb &80, &81, &81, &81, &81, &81, &81, &81, &81, &81             ; 5214: 80 81 81... ...
     equb &81, &81, &81, &81, &81, &81, &81, &81, &81, &83             ; 521e: 81 81 81... ...
 
-.unused58
+.unused59
     equb &83, &83, &83, &83, &83, &83, &83, &83, &83, &83, &83, &83   ; 5228: 83 83 83... ...
     equb &83, &83, &83, &83, &83, &83, &83, &83, &83, &83, &83, &83   ; 5234: 83 83 83... ...
 
@@ -5339,7 +5344,7 @@ which_status_bar_address2_low = store_in_status_bar+1
     equb &84, &80, &81, &81, &81, &81, &81, &81, &81, &81             ; 5254: 84 80 81... ...
     equb &81, &81, &81, &81, &81, &81, &81, &81, &81, &83             ; 525e: 81 81 81... ...
 
-.unused59
+.unused60
     equb &83, &83, &83, &83, &83, &83, &83, &83, &83, &83, &83, &83   ; 5268: 83 83 83... ...
     equb &83, &83, &83, &83, &83, &83, &83, &83, &83, &83, &83, &83   ; 5274: 83 83 83... ...
 
@@ -5350,7 +5355,7 @@ which_status_bar_address2_low = store_in_status_bar+1
     equb &81, &80, &81, &81, &81, &81, &81, &81, &81, &81             ; 5294: 81 80 81... ...
     equb &81, &81, &81, &81, &81, &81, &81, &81, &81, &83             ; 529e: 81 81 81... ...
 
-.unused60
+.unused61
     equb &83, &83, &83, &83, &83, &83, &83, &83, &83, &83, &83, &83   ; 52a8: 83 83 83... ...
     equb &83, &83, &83, &83, &83, &83, &83, &83, &83, &83, &83, &83   ; 52b4: 83 83 83... ...
 
@@ -5361,7 +5366,7 @@ which_status_bar_address2_low = store_in_status_bar+1
     equb &81, &80, &81, &81, &81, &81, &81, &81, &81, &81             ; 52d4: 81 80 81... ...
     equb &81, &81, &81, &81, &81, &81, &81, &81, &81, &83             ; 52de: 81 81 81... ...
 
-.unused61
+.unused62
     equb &83, &83, &83, &83, &83, &83, &83, &83, &83, &83, &83, &83   ; 52e8: 83 83 83... ...
     equb &83, &83, &83, &83, &83, &83, &83, &83, &83, &83, &83, &83   ; 52f4: 83 83 83... ...
 
@@ -5372,7 +5377,7 @@ which_status_bar_address2_low = store_in_status_bar+1
     equb &81, &80, &81, &81, &81, &81, &81, &81, &81, &81             ; 5314: 81 80 81... ...
     equb &81, &81, &81, &81, &81, &81, &81, &81, &81, &83             ; 531e: 81 81 81... ...
 
-.unused62
+.unused63
     equb &83, &83, &83, &83, &83, &83, &83, &83, &83, &83, &83, &83   ; 5328: 83 83 83... ...
     equb &83, &83, &83, &83, &83, &83, &83, &83, &83, &83, &83, &83   ; 5334: 83 83 83... ...
 
@@ -5383,7 +5388,7 @@ which_status_bar_address2_low = store_in_status_bar+1
     equb &81, &80, &81, &81, &81, &81, &81, &81, &81, &81             ; 5354: 81 80 81... ...
     equb &81, &81, &81, &81, &81, &81, &81, &81, &81, &83             ; 535e: 81 81 81... ...
 
-.unused63
+.unused64
     equb &83, &83, &83, &83, &83, &83, &83, &83, &83, &83, &83, &83   ; 5368: 83 83 83... ...
     equb &83, &83, &83, &83, &83, &83, &83, &83, &83, &83, &83, &83   ; 5374: 83 83 83... ...
 
@@ -5394,7 +5399,7 @@ which_status_bar_address2_low = store_in_status_bar+1
     equb &81, &80, &81, &81, &81, &81, &81, &81, &81, &81             ; 5394: 81 80 81... ...
     equb &81, &81, &81, &81, &81, &81, &81, &81, &81, &83             ; 539e: 81 81 81... ...
 
-.unused64
+.unused65
     equb &83, &83, &83, &83, &83, &83, &83, &83, &83, &83, &83, &83   ; 53a8: 83 83 83... ...
     equb &83, &83, &83, &83, &83, &83, &83, &83, &83, &83, &83, &83   ; 53b4: 83 83 83... ...
 
@@ -5405,7 +5410,7 @@ which_status_bar_address2_low = store_in_status_bar+1
     equb &81, &80, &81, &81, &81, &81, &81, &81, &81, &81             ; 53d4: 81 80 81... ...
     equb &81, &81, &81, &81, &81, &81, &81, &81, &81, &83             ; 53de: 81 81 81... ...
 
-.unused65
+.unused66
     equb &83, &83, &83, &83, &83, &83, &83, &83, &83, &83, &83, &83   ; 53e8: 83 83 83... ...
     equb &83, &83, &83, &83, &83, &83, &83, &83, &83, &83, &83, &83   ; 53f4: 83 83 83... ...
 
@@ -5520,7 +5525,7 @@ tile_map_row_19 = l54bc+4
     equb &81, &81, &81, &81, &81, &81, &81, &81, &81, &81             ; 5514: 81 81 81... ...
     equb &81, &81, &81, &81, &81, &81, &81, &81, &81, &83             ; 551e: 81 81 81... ...
 
-.unused66
+.unused67
     equb   1, &83, &83, &83, &83, &83, &83, &83, &83, &83, &83, &83   ; 5528: 01 83 83... ...
     equb &83, &83, &83, &83, &83, &83, &83, &83, &83, &83, &83, &83   ; 5534: 83 83 83... ...
 
@@ -5533,7 +5538,7 @@ tile_map_row_19 = l54bc+4
 
 
 ; unused copy of routine at $5700
-.unused67
+.unused68
     lda #osbyte_flush_buffer_class                                    ; 5568: a9 0f       ..
     ldx #0                                                            ; 556a: a2 00       ..
     jsr osbyte                                                        ; 556c: 20 f4 ff     ..            ; Flush all buffers (X=0)
@@ -5545,7 +5550,7 @@ tile_map_row_19 = l54bc+4
     bpl loop_c5571                                                    ; 5578: 10 f7       ..
     rts                                                               ; 557a: 60          `
 
-.unused70
+.unused71
     equb &a9,   0, &85, &8e, &a9                                      ; 557b: a9 00 85... ...
 
 ; *************************************************************************************
@@ -5555,7 +5560,7 @@ tile_map_row_19 = l54bc+4
     equb &8a, &85, &8f, &bd, &d0, &d6, &a8, &e0, &80, &d0             ; 5594: 8a 85 8f... ...
     equb &84, &c0, &c1, &f0, &c5, &b9, &80, &d6, &c9, &83             ; 559e: 84 c0 c1... ...
 
-.unused68
+.unused69
     equb &90, &1a, &a8, &bd, &d3, &56, &d0,   6, &b9, &1a, &56, &9d   ; 55a8: 90 1a a8... ...
     equb &d3, &56, &b9, &0e, &56, &48, &b9, &14, &56, &a8, &68, &de   ; 55b4: d3 56 b9... .V.
 
@@ -5566,7 +5571,7 @@ tile_map_row_19 = l54bc+4
     equb   9,   1, &48, &bd, &d3, &56, &d0,   3, &fe, &d0             ; 55d4: 09 01 48... ..H
     equb &56, &68, &a6, &8f, &9d, &bc, &56, &98, &9d, &be             ; 55de: 56 68 a6... Vh.
 
-.unused69
+.unused70
     equb &56, &8a, &18, &69, &b8, &aa, &a0, &56, &a9,   7, &20, &f1   ; 55e8: 56 8a 18... V..
     equb &ff, &e6, &8e, &26, &8e, &e0,   3, &d0, &82, &60, &83, &83   ; 55f4: ff e6 8e... ...
 
@@ -5623,7 +5628,7 @@ tile_map_row_19 = l54bc+4
 .tune_note_durations_table
     equb  3,  6,  9, 12                                               ; 56ee: 03 06 09... ...
 
-.unused71
+.unused72
     equb 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0                     ; 56f2: 00 00 00... ...
 
 ; *************************************************************************************
@@ -5718,7 +5723,7 @@ tile_map_row_19 = l54bc+4
     bne update_channels_loop                                          ; 5793: d0 82       ..
     rts                                                               ; 5795: 60          `
 
-.unused72
+.unused73
     equb &d0,   7, &c8, &c0,   6, &d0,   2, &a0,   1, &84, &89, &85   ; 5796: d0 07 c8... ...
     equb &87, &c9, &10, &30, &9d, &ee, &1e, &32, &d0, &98, &60,   0   ; 57a2: 87 c9 10... ...
     equb   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0   ; 57ae: 00 00 00... ...
@@ -5792,6 +5797,7 @@ tile_map_row_19 = l54bc+4
     assert <handler_fungus == &9e
     assert <handler_magic_wall == &ae
     assert <handler_rockford == &00
+    assert <highscore_for_player_2 == &5e
     assert <highscore_high_status_bar == &50
     assert <number_of_players_status_bar == &78
     assert <out_of_time_message == &b4
