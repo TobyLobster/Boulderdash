@@ -14,20 +14,25 @@ inkey_key_slash                        = 151
 inkey_key_space                        = 157
 inkey_key_x                            = 189
 inkey_key_z                            = 158
+map_anim_state0                        = 0
+map_anim_state1                        = 16
+map_anim_state2                        = 32
+map_anim_state3                        = 48
 map_butterfly                          = 14
 map_diamond                            = 4
 map_earth                              = 1
 map_earth_plus_firefly_4x4             = 9
-map_exit                               = 6
 map_explosion                          = 10
+map_firefly                            = 6
 map_fungus                             = 7
 map_horizontal_strip                   = 12
-map_player1                            = 8
-map_player2                            = 15
+map_magic_wall                         = 13
+map_player                             = 15
+map_player_intro                       = 8
 map_rock1                              = 5
-map_rock2                              = 13
 map_space                              = 0
 map_titanium_wall                      = 3
+map_unprocessed                        = 128
 map_vertical_strip                     = 11
 map_wall                               = 2
 opcode_dex                             = 202
@@ -122,8 +127,8 @@ sound5_active_flag                      = $4b
 sound6_active_flag                      = $4c
 sound7_active_flag                      = $4d
 pause_counter                           = $4e
-l0050                                   = $50
-fungus_timer                            = $51
+magic_wall_state                        = $50
+magic_wall_timer                        = $51
 l0052                                   = $52
 l0053                                   = $53
 l0054                                   = $54
@@ -250,7 +255,7 @@ lfff6                                   = $fff6
 ; $11 = explosion frame #2
 ; $0f = player looking out
 ; $1f = player walking left
-; $2e = firefly for cave D?
+; $2e = butterfly in a box, hardcoded for cave D
 ; $2f = player walking right
 ; 
 ; $43 = explosion out effect #1
@@ -1191,9 +1196,23 @@ l2110
 l2118
     !byte $b6, $be, $86, $8e, $96, $9e, $a6, $ae                      ; 2118: b6 be 86... ...
 
-cell_value_to_fill_vertically
-    !byte   0,   0,   0,   0, $85, $84,   0,   0,   0,   0,   0,   0  ; 2120: 00 00 00... ...
-    !byte   0,   0,   0,   0                                          ; 212c: 00 00 00... ...
+items_produced_by_the_magic_wall
+    !byte                             0                               ; 2120: 00          .
+    !byte                             0                               ; 2121: 00          .
+    !byte                             0                               ; 2122: 00          .
+    !byte                             0                               ; 2123: 00          .
+    !byte   map_unprocessed + map_rock1                               ; 2124: 85          .
+    !byte map_unprocessed + map_diamond                               ; 2125: 84          .
+    !byte                             0                               ; 2126: 00          .
+    !byte                             0                               ; 2127: 00          .
+    !byte                             0                               ; 2128: 00          .
+    !byte                             0                               ; 2129: 00          .
+    !byte                             0                               ; 212a: 00          .
+    !byte                             0                               ; 212b: 00          .
+    !byte                             0                               ; 212c: 00          .
+    !byte                             0                               ; 212d: 00          .
+    !byte                             0                               ; 212e: 00          .
+    !byte                             0                               ; 212f: 00          .
 
 some_array_of_cells
     !byte $84, $84, $84,   0, $84, $84, $84, $84,   0,   0,   0, $84  ; 2130: 84 84 84... ...
@@ -1260,9 +1279,23 @@ handler_table_high
     !byte             >handler_rockford                               ; 21df: 26          &
 
 ; *************************************************************************************
-l21e0
-    !byte $8f, $8f, $84,   0, $f1, $d1, $b6, $b1, $8f, $8f, $d1, $f1  ; 21e0: 8f 8f 84... ...
-    !byte $b1, $71,   0, $71                                          ; 21ec: b1 71 00... .q.
+basic_replacements
+    !byte map_player | map_unprocessed                                ; 21e0: 8f          .
+    !byte map_player | map_unprocessed                                ; 21e1: 8f          .
+    !byte map_diamond | map_unprocessed                               ; 21e2: 84          .
+    !byte map_space                                                   ; 21e3: 00          .
+    !byte $f1                                                         ; 21e4: f1          .
+    !byte $d1                                                         ; 21e5: d1          .
+    !byte $b6                                                         ; 21e6: b6          .
+    !byte $b1                                                         ; 21e7: b1          .
+    !byte $8f                                                         ; 21e8: 8f          .
+    !byte $8f                                                         ; 21e9: 8f          .
+    !byte $d1                                                         ; 21ea: d1          .
+    !byte $f1                                                         ; 21eb: f1          .
+    !byte $b1                                                         ; 21ec: b1          .
+    !byte $71                                                         ; 21ed: 71          q
+    !byte 0                                                           ; 21ee: 00          .
+    !byte $71                                                         ; 21ef: 71          q
 l21f0
     !byte $ff, $ff,   0,   0, $ff,   1,   0,   0,   0,   0, $ff,   0  ; 21f0: ff ff 00... ...
     !byte   0,   0,   0,   1                                          ; 21fc: 00 00 00... ...
@@ -1274,9 +1307,8 @@ neighbouring_cell_variable_from_direction_index
 direction_offsets
     !byte $43, $3f,   0, $c1                                          ; 2204: 43 3f 00... C?.
 l2208
-    !byte $42, $40,   1, $81,   0, $10                                ; 2208: 42 40 01... B@.
-    !text " &@P`p"                                                    ; 220e: 20 26 40...  &@
-    !byte $80, $90, $a0, $b0,   1, $d0, $e0, $f0                      ; 2214: 80 90 a0... ...
+    !byte $42, $40,   1, $81,   0, $10, $20, $26, $40, $50            ; 2208: 42 40 01... B@.
+    !byte $60, $70, $80, $90, $a0, $b0,   1, $d0, $e0, $f0            ; 2212: 60 70 80... `p.
 firefly_cell_values
     !byte cell_left                                                   ; 221c: 76          v
     !byte cell_right                                                  ; 221d: 78          x
@@ -1403,7 +1435,7 @@ handler_basics
     bpl not_in_range_so_change_nothing                                ; 22ab: 10 04       ..
     ; cell is in the range $90-$9f, so we look up the replacement in a table
     tax                                                               ; 22ad: aa          .
-    lda l21e0,x                                                       ; 22ae: bd e0 21    ..!
+    lda basic_replacements,x                                          ; 22ae: bd e0 21    ..!
 not_in_range_so_change_nothing
     tax                                                               ; 22b1: aa          .
     rts                                                               ; 22b2: 60          `
@@ -1628,10 +1660,10 @@ unused11
     !byte $a0,   7, $9a, $a9                                          ; 23dc: a0 07 9a... ...
 
 ; *************************************************************************************
-; Handler for filling in a vertical strip. Set the cells between $0b's to the value
-; above the first $0b.
+; Handler for filling in a vertical strip. Set the cells between two $0b's (including
+; the $0b's themselves) to the value above the first $0b.
 handler_for_vertical_strip
-    lda #$0b                                                          ; 23e0: a9 0b       ..
+    lda #map_vertical_strip                                           ; 23e0: a9 0b       ..
     cmp cell_below                                                    ; 23e2: c5 7a       .z
     bne replace_cell_below                                            ; 23e4: d0 02       ..
     lda cell_above                                                    ; 23e6: a5 74       .t
@@ -1644,13 +1676,15 @@ replace_cell_below
     rts                                                               ; 23ef: 60          `
 
 ; *************************************************************************************
+; Handler for a horizontal strip. Copy the cell to the left to the current cell and to
+; the right, until we get to .
 handler_for_horizontal_strip
     txa                                                               ; 23f0: 8a          .
     and #$7f                                                          ; 23f1: 29 7f       ).
     cmp cell_right                                                    ; 23f3: c5 78       .x
-    bne c23f9                                                         ; 23f5: d0 02       ..
+    bne store_cell_right                                              ; 23f5: d0 02       ..
     lda cell_left                                                     ; 23f7: a5 76       .v
-c23f9
+store_cell_right
     sta cell_right                                                    ; 23f9: 85 78       .x
     ldx cell_left                                                     ; 23fb: a6 76       .v
     rts                                                               ; 23fd: 60          `
@@ -1729,11 +1763,11 @@ jsr_handler_instruction
 handler_low = jsr_handler_instruction+1
 handler_high = jsr_handler_instruction+2
     jsr handler_firefly                                               ; 2450: 20 00 25     .%
-    ; the handler may have changed the surreounding cells. store the new cell down
+    ; the handler may have changed the surreounding cells. store the new cell below
     lda cell_below                                                    ; 2453: a5 7a       .z
     ldy #$81                                                          ; 2455: a0 81       ..
     sta (ptr_low),y                                                   ; 2457: 91 8c       ..
-    ; store the new cell up
+    ; store the new cell above
     lda cell_above                                                    ; 2459: a5 74       .t
     and #$7f                                                          ; 245b: 29 7f       ).
     ldy #1                                                            ; 245d: a0 01       ..
@@ -2158,35 +2192,42 @@ unused17
 ; *************************************************************************************
 handler_magic_wall
     txa                                                               ; 26ae: 8a          .
-    ldx l0050                                                         ; 26af: a6 50       .P
+    ldx magic_wall_state                                              ; 26af: a6 50       .P
     cmp #$bd                                                          ; 26b1: c9 bd       ..
-    bne c26da                                                         ; 26b3: d0 25       .%
+    bne check_if_magic_wall_is_active                                 ; 26b3: d0 25       .%
+    ; read what's above the wall, getting the cell type from the lower nybble
     lda cell_above                                                    ; 26b5: a5 74       .t
     and #$0f                                                          ; 26b7: 29 0f       ).
     tay                                                               ; 26b9: a8          .
-    lda cell_value_to_fill_vertically,y                               ; 26ba: b9 20 21    . !
-    beq fill_with_a                                                   ; 26bd: f0 04       ..
-    ldy #$80                                                          ; 26bf: a0 80       ..
+    ; read what cell types are allowed to fall through and what is produced as a result
+    ; (rocks turn into diamonds and vice versa)
+    lda items_produced_by_the_magic_wall,y                            ; 26ba: b9 20 21    . !
+    beq skip_storing_space_above                                      ; 26bd: f0 04       ..
+    ; something will fall into the wall, clear the cell above
+    ldy #map_unprocessed + map_space                                  ; 26bf: a0 80       ..
     sty cell_above                                                    ; 26c1: 84 74       .t
-fill_with_a
+skip_storing_space_above
     cpx #$2d                                                          ; 26c3: e0 2d       .-
-    beq c26d7                                                         ; 26c5: f0 10       ..
+    beq store_magic_wall_state                                        ; 26c5: f0 10       ..
+    ; if the cell below isn't empty, then don't store the item below
     ldy cell_below                                                    ; 26c7: a4 7a       .z
-    bne c26cd                                                         ; 26c9: d0 02       ..
+    bne magic_wall_is_active                                          ; 26c9: d0 02       ..
+    ; store the item that has fallen through the wall below
     sta cell_below                                                    ; 26cb: 85 7a       .z
-c26cd
+magic_wall_is_active
     ldx #$1d                                                          ; 26cd: a2 1d       ..
     inc sound1_active_flag                                            ; 26cf: e6 47       .G
-    ldy fungus_timer                                                  ; 26d1: a4 51       .Q
-    bne c26d7                                                         ; 26d3: d0 02       ..
+    ldy magic_wall_timer                                              ; 26d1: a4 51       .Q
+    bne store_magic_wall_state                                        ; 26d3: d0 02       ..
+    ; magic wall becomes inactive once the timer has run out
     ldx #$2d                                                          ; 26d5: a2 2d       .-
-c26d7
-    stx l0050                                                         ; 26d7: 86 50       .P
+store_magic_wall_state
+    stx magic_wall_state                                              ; 26d7: 86 50       .P
     rts                                                               ; 26d9: 60          `
 
-c26da
+check_if_magic_wall_is_active
     cpx #$1d                                                          ; 26da: e0 1d       ..
-    beq c26cd                                                         ; 26dc: f0 ef       ..
+    beq magic_wall_is_active                                          ; 26dc: f0 ef       ..
     rts                                                               ; 26de: 60          `
 
 unused18
@@ -2327,10 +2368,10 @@ skip_got_diamond
     lda tick_counter                                                  ; 27a9: a5 5a       .Z
     and #7                                                            ; 27ab: 29 07       ).
     bne c27b7                                                         ; 27ad: d0 08       ..
-    lda l0050                                                         ; 27af: a5 50       .P
+    lda magic_wall_state                                              ; 27af: a5 50       .P
     cmp #$1d                                                          ; 27b1: c9 1d       ..
     bne c27b7                                                         ; 27b3: d0 02       ..
-    dec fungus_timer                                                  ; 27b5: c6 51       .Q
+    dec magic_wall_timer                                              ; 27b5: c6 51       .Q
 c27b7
     ldx l005f                                                         ; 27b7: a6 5f       ._
     beq c27c8                                                         ; 27b9: f0 0d       ..
@@ -3050,12 +3091,13 @@ loop_done
     sta (ptr_low),y                                                   ; 2bed: 91 8c       ..
     sta cell_below                                                    ; 2bef: 85 7a       .z
     sta cell_right                                                    ; 2bf1: 85 78       .x
-    ; set firefly, or something else on cave D?
-    ldx #6                                                            ; 2bf3: a2 06       ..
+    ; set firefly, or butterfly on cave D
+    ldx #map_firefly                                                  ; 2bf3: a2 06       ..
     lda cave_number                                                   ; 2bf5: a5 87       ..
     cmp #3                                                            ; 2bf7: c9 03       ..
     bne return10                                                      ; 2bf9: d0 02       ..
-    ldx #$2e                                                          ; 2bfb: a2 2e       ..
+    ; set butterfly
+    ldx #map_butterfly | map_anim_state2                              ; 2bfb: a2 2e       ..
 return10
     rts                                                               ; 2bfd: 60          `
 
@@ -3415,7 +3457,7 @@ initialise_variables_loop
     lda initial_values_of_variables_from_0x50,x                       ; 2e20: bd 60 1e    .`.
     cmp #99                                                           ; 2e23: c9 63       .c
     beq skip_setting_variable                                         ; 2e25: f0 02       ..
-    sta l0050,x                                                       ; 2e27: 95 50       .P
+    sta magic_wall_state,x                                            ; 2e27: 95 50       .P
 skip_setting_variable
     dex                                                               ; 2e29: ca          .
     bpl initialise_variables_loop                                     ; 2e2a: 10 f4       ..
@@ -3602,7 +3644,7 @@ empty_status_bar_loop
     ; set the delay between fungus growth
     lda fungus_growth_intervals_for_cave,x                            ; 2f7b: bd 54 4c    .TL
     sta fungus_growth_interval                                        ; 2f7e: 85 55       .U
-    sta fungus_timer                                                  ; 2f80: 85 51       .Q
+    sta magic_wall_timer                                              ; 2f80: 85 51       .Q
     ; put the end tile on the map
     lda end_y,x                                                       ; 2f82: bd 18 4c    ..L
     sta map_y                                                         ; 2f85: 85 8b       ..
@@ -4977,9 +5019,10 @@ colour_2_lower_nybble_block_type_2_upper_for_each_cave
 colour_3_lower_nybble_block_type_3_upper_for_each_cave
     !byte $57, $57, $57, $13,   7, $57, $57, $57, $47,   7            ; 4ccc: 57 57 57... WWW
     !byte $57, $57, $57,   7, $57, $57,   6,   7,   7,   7            ; 4cd6: 57 57 57... WWW
+; each cave has a data set, except for the bonus levels
 cave_to_data_set
     !byte   0,   1,   2,   3, $ff,   4,   5,   6,   7, $ff            ; 4ce0: 00 01 02... ...
-    !byte   8,   9, $0a, $ff, $0b, $0c, $ff, $ff, $ff, $ff            ; 4cea: 08 09 0a... ...
+    !byte   8,   9,  10, $ff,  11,  12, $ff, $ff, $ff, $ff            ; 4cea: 08 09 0a... ...
 
 ; *************************************************************************************
 data_set_0
@@ -6660,11 +6703,38 @@ pydis_end
 !if (inkey_key_z) != $9e {
     !error "Assertion failed: inkey_key_z == $9e"
 }
+!if (map_butterfly | map_anim_state2) != $2e {
+    !error "Assertion failed: map_butterfly | map_anim_state2 == $2e"
+}
 !if (map_diamond) != $04 {
     !error "Assertion failed: map_diamond == $04"
 }
+!if (map_diamond | map_unprocessed) != $84 {
+    !error "Assertion failed: map_diamond | map_unprocessed == $84"
+}
 !if (map_earth) != $01 {
     !error "Assertion failed: map_earth == $01"
+}
+!if (map_firefly) != $06 {
+    !error "Assertion failed: map_firefly == $06"
+}
+!if (map_player | map_unprocessed) != $8f {
+    !error "Assertion failed: map_player | map_unprocessed == $8f"
+}
+!if (map_space) != $00 {
+    !error "Assertion failed: map_space == $00"
+}
+!if (map_unprocessed + map_diamond) != $84 {
+    !error "Assertion failed: map_unprocessed + map_diamond == $84"
+}
+!if (map_unprocessed + map_rock1) != $85 {
+    !error "Assertion failed: map_unprocessed + map_rock1 == $85"
+}
+!if (map_unprocessed + map_space) != $80 {
+    !error "Assertion failed: map_unprocessed + map_space == $80"
+}
+!if (map_vertical_strip) != $0b {
+    !error "Assertion failed: map_vertical_strip == $0b"
 }
 !if (mark_cell_above_as_processed_and_move_to_next_cell - branch_instruction - 2) != $26 {
     !error "Assertion failed: mark_cell_above_as_processed_and_move_to_next_cell - branch_instruction - 2 == $26"
