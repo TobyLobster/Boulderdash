@@ -200,6 +200,7 @@ label(0x0057, "fungus_counter")
 label(0x0058, "ticks_since_last_direction_key_pressed")
 label(0x0059, "countdown_while_switching_palette")
 label(0x005a, "tick_counter")
+label(0x005b, "current_rockford_sprite")
 label(0x005c, "sub_second_ticks")
 label(0x005d, "previous_direction_keys")
 label(0x005e, "just_pressed_direction_keys")
@@ -262,51 +263,48 @@ s = SubstituteLabels(substitute_labels)
 set_label_maker_hook(s.substitute_label_maker)
 
 comment(0x1300, """*************************************************************************************
-Caves: 20 caves total (16 main caves A-P plus four bonus caves Q-T)
-Difficulty levels: 1-5
+Caves: There are 20 caves total (16 main caves A-P plus four bonus caves Q-T)
+Difficulty levels: 1-5 for each cave
 
 Some definitions:
-* Together a cave letter and difficulty level define a *stage*. A1 is a stage, for example.
+* A *stage* consists of a cave letter and difficulty level. e.g. A1 is a stage.
 * The *tile map* is the 40x23 map of the entire stage.
-  Each row is 40 bytes. Rows are separated by 64 bytes in memory.
+  Rows are separated by 64 bytes in memory, despite only being 40 bytes in length.
+  (This is to simplify the conversion between row number and address and vice-versa).
+  Other data is placed in between some of the rows.
 * The *grid* is the visible area of sprites, showing a 20x12 section of the tile map.
-  An offscreen cache of what sprites are currently displayed is stored in the 'grid_of_currently_displayed_sprites' array.
-  This avoids redrawing a sprite if it's unchanged since the previous tick.
-* The *status bar* is single row at the top of the grid, showing useful status information.
+  An offscreen cache of the sprites currently displayed in the grid is stored in the 'grid_of_currently_displayed_sprites' array.
+  Using this we only need to draw the sprites that have changed since the previous tick.
+* The *status bar* is single row of text at the top of the grid, showing the current score etc.
+  Each player has a status bar, and different status bars are shown while the game is paused.
 
-tile_map:
+Cell values in tile_map:
 
-$00 = empty
+$00 = empty space
 $01 = earth
 $02 = wall
-$03 = titanium wall
+$03 = titanium wall      (as seen on the border of the whole map)
 $04 = diamond
 $05 = rock
-$06 = firefly
-$07 = fungus
-$08 = rockford
-$09 = 4x4 earth square with firefly pacing inside
+$06 = firefly            (with animation states $06, $16, $26, $36)
+$07 = fungus             (states $07, $17, $27, $37, $47, $57, $67, and $77 as the fungus grows)
+$08 = animated player appearing
+$09 = 4x4 earth square with firefly pacing inside (or butterfly on cave D)
 $0a = animated player exploding
-$0b = Vertical strip (value above is filled down to the next $0b)
-$0c = Horizontal strip
-$0d = magic wall?
-$0e = butterfly
-$0f = player?
+$0b = vertical strip     (during preprocessing: value above is filled down to the next $0b)
+$0c = horizontal strip   (during preprocessing: value is copied to the end of the row)
+$0d = magic wall
+$0e = butterfly          (with animation states $0e, $1e, $2e, $3e)
+$0f = player             ($0f=waiting, $1f=walking left, $2f=walking right)
 
-After post processing/during gameplay:
-$08 = flashing titanium wall and earth before player appears
 $18 = flashing exit
-$21 = explosion frame #1
-$11 = explosion frame #2
-$0f = player looking out
-$1f = player walking left
-$2e = butterfly in a box, hardcoded for cave D
-$2f = player walking right
-
+$21 = intro explosion frame #1
+$11 = intro explosion frame #2
 $43 = explosion out effect #1
 $33 = explosion out effect #2
 $23 = explosion out effect #3
 $13 = explosion out effect #4
+
 *************************************************************************************""")
 
 sprites = {
@@ -552,7 +550,7 @@ constant(0x4, "map_diamond")
 constant(0x5, "map_rock1")
 constant(0x6, "map_firefly")
 constant(0x7, "map_fungus")
-constant(0x8, "map_player_intro")   #?
+constant(0x8, "map_rockford_appearing")
 constant(0x9, "map_earth_plus_firefly_4x4")
 constant(0xa, "map_explosion")
 constant(0xb, "map_vertical_strip")
@@ -898,17 +896,17 @@ comment(0x23e0, "Handler for filling in a vertical strip. Set the cells between 
 expr(0x23e1, "map_vertical_strip")
 label(0x23e8, "replace_cell_below")
 comment(0x23ea, "copy cell above to current cell, clearing top bit", indent=1)
-comment(0x23f0, "Handler for a horizontal strip. Copy the cell to the left to the current cell and to the right, until we get to .")
+comment(0x23f0, "Handler for a horizontal strip. Copy the left cell to the current and right cells, until the end of the row.")
 label(0x23f9, "store_cell_right")
 unused(0x23fe)
 expr(0x242a, "map_diamond")
 
-stars(0x2400)
+stars(0x2400, "This is the map processing that happens every tick during gameplay. The map is parsed to handle any changes required.")
 label(0x2400, "update_map")
 comment(0x2400, "set branch offset (self modifying code)", indent=1)
 expr(0x2401, "update_map_space - branch_instruction - 2")
 ab(0x2402, True)
-stars(0x2404)
+stars(0x2404, "This is the preprocessing step prior to gameplay. The tile map is scanned looking for special cell values to replace e.g. with vertical strips or a firefly in a 4x4 box of earth. This step happens twice before gameplay. Once without processing horizontal strips, then once with. This means horizontal strips are applied last.")
 label(0x2404, "preprocess_map")
 comment(0x2404, "set branch offset (self modifying code)", indent=1)
 expr(0x2405, "mark_cell_above_as_processed_and_move_to_next_cell - branch_instruction - 2")
@@ -938,7 +936,7 @@ comment(0x2450, "call the handler for the cell based on the type (0-15)", indent
 comment(0x2453, "the handler may have changed the surreounding cells. store the new cell below", indent=1)
 comment(0x2459, "store the new cell above", indent=1)
 ab(0x245f, True)
-stars(0x2461, "This is the preprocessing step when we find a space in the map prior to gameplay")
+stars(0x2461, "This is part of the preprocessing step prior to gameplay, when we find a space in the map")
 label(0x2461, "mark_cell_above_as_processed_and_move_to_next_cell")
 label(0x2467, "move_to_next_cell")
 comment(0x2469, "store the new cell left back into the map", indent=1)
@@ -1043,16 +1041,23 @@ label(0x273f, "skip_demo_mode_text")
 expr(0x273e, make_lo("demonstration_mode_text"))
 blank(0x2752)
 label(0x2752, "got_key")
-label(0x2762, "not_rockford")
+comment(0x2755, "get the contents of the cell that rockford is influencing. This can be the cell underneath rockford, or by holding the RETURN key down and pressing a direction key it can be one of the neighbouring cells.\nWe clear the top bits to just extract the basic type.", indent=1)
+expr(0x275c, "map_rockford_appearing")
+label(0x2762, "rockford_is_not_appearing")
+comment(0x276b, "check if the player is still alive by reading the current rockford sprite", indent=1)
+comment(0x2773, "each 'second' of game time has 11 game ticks", indent=1)
+decimal(0x2774)
 comment(0x2777, "decrement time remaining", indent=1)
+decimal(0x2778)
 comment(0x2780, "out of time", indent=1)
 expr(0x2781, make_lo("out_of_time_message"))
-label(0x2787, "time_still_going")
+label(0x2787, "not_out_of_time")
 comment(0x278d, "got earth. play sound 3", indent=1)
 label(0x278f, "skip_earth")
 comment(0x2793, "got diamond. play sounds", indent=1)
 label(0x27a4, "skip_got_diamond")
 comment(0x27a7, "update tick", indent=1)
+comment(0x27a9, "update magic wall timer", indent=1)
 decimal(0x27d8)
 ret(0x27ef)
 unused(0x27f0)
@@ -1383,7 +1388,7 @@ nonentry(0x2dd3)
 byte(0x2de9, 3)
 
 stars(0x2e00)
-label(0x2e00, "play_game")
+label(0x2e00, "play_one_life")
 expr(0x2e0b, make_lo("players_and_men_status_bar"))
 comment(0x2e03, "a bonus life only becomes available when the score doesn't have a zero or five in the hundreds column", indent=1)
 decimal(0x2e0f)
@@ -1519,12 +1524,14 @@ label(0x3225, "cave_letter_on_regular_status_bar")
 string(0x3225, 1)
 label(0x3227, "difficulty_level_on_regular_status_bar")
 stars(0x3228, True)
-label(0x3236, "score_on_cached_regular_status_bar")
+label(0x3228, "inactive_players_regular_status_bar")
+label(0x3236, "score_on_inactive_players_regular_status_bar")
 stars(0x323c, True)
-label(0x3243, "player_number_on_players_and_men_status_bar")
-label(0x3246, "number_of_men_on_players_and_men_status_bar")
-label(0x324d, "cave_letter_on_players_and_men_status_bar")
-label(0x324f, "difficulty_level_on_players_and_men_status_bar")
+label(0x323c, "inactive_players_and_men_status_bar")
+label(0x3243, "player_number_on_inactive_players_and_men_status_bar")
+label(0x3246, "number_of_men_on_inactive_players_and_men_status_bar")
+label(0x324d, "cave_letter_on_inactive_players_and_men_status_bar")
+label(0x324f, "difficulty_level_on_inactive_players_and_men_status_bar")
 expr(0x324d, "'B'")
 stars(0x3250, True)
 label(0x3250, "highscore_high_status_bar")
@@ -1656,18 +1663,24 @@ decimal(0x3b01)
 label(0x3b02, "copy_status_bar_loop")
 expr(0x3b0f, "sprite_2")
 expr(0x3b19, "sprite_0")
+label(0x3b1d, "set_cave_letter_on_status_bar")
+comment(0x3b26, "copy difficuly level to other status bars", indent=1)
+comment(0x3b32, "zero scores on status bars", indent=1)
 expr(0x3b33, "sprite_0")
 label(0x3b36, "zero_score_loop")
+label(0x3b3f, "play_next_life")
+comment(0x3b3f, "add current stage to menu availablility", indent=1)
 comment(0x3b48, "add new difficulty level to menu", indent=1)
 label(0x3b4b, "skip_adding_new_difficulty_level_to_menu")
-comment(0x3b4e, "save results after game", indent=1)
+comment(0x3b4e, "save results after life\nfirst find the position of the score to copy from the status bar (which depends on the player number)", indent=1)
 comment(0x3b50, "check if player one or two", indent=1)
 decimal(0x3b57)
 comment(0x3b56, "copy score from player two", indent=1)
-label(0x3b58, "player_one")
+label(0x3b58, "copy_score")
 label(0x3b5a, "copy_score_to_last_score_loop")
+comment(0x3b70, "check for zero men left for the current player", indent=1)
+comment(0x3b77, "check for zero men left for other player", indent=1)
 expr(0x3b71, "sprite_0")
-label(0x3228, "cached_regular_status_bar")
 expr(0x3b91, "sprite_0")
 expr(0x3b92, "sprite_0")
 label(0x3bb3, "store_cave_number_and_difficulty_level")
@@ -1677,10 +1690,9 @@ expr(0x3bc9, "sprite_0")
 ret(0x3bcc)
 unused(0x3bcd)
 byte(0x3bcd, 0x4700 - 0x3bcd)
-label(0x323c, "cached_players_and_men_status_bar")
 decimal(0x3b6d)
 decimal(0x3b7d)
-label(0x3b7c, "swap_status_bars_with_cached_versions")
+label(0x3b7c, "swap_status_bars_with_inactive_player_versions")
 label(0x3b7e, "swap_loop")
 label(0x3ba1, "calculate_next_cave_number_and_difficuly_level")
 label(0x3bc1, "set_cave_number_and_difficulty_level_from_status_bar")

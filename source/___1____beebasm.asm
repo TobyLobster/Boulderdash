@@ -28,8 +28,8 @@ map_fungus                             = 7
 map_horizontal_strip                   = 12
 map_magic_wall                         = 13
 map_player                             = 15
-map_player_intro                       = 8
 map_rock1                              = 5
+map_rockford_appearing                 = 8
 map_space                              = 0
 map_titanium_wall                      = 3
 map_unprocessed                        = 128
@@ -138,7 +138,7 @@ fungus_counter                          = &0057
 ticks_since_last_direction_key_pressed  = &0058
 countdown_while_switching_palette       = &0059
 tick_counter                            = &005a
-l005b                                   = &005b
+current_rockford_sprite                 = &005b
 sub_second_ticks                        = &005c
 previous_direction_keys                 = &005d
 just_pressed_direction_keys             = &005e
@@ -214,54 +214,55 @@ lfff6                                   = &fff6
     org &1300
 
 ; *************************************************************************************
-; Caves: 20 caves total (16 main caves A-P plus four bonus caves Q-T)
-; Difficulty levels: 1-5
+; Caves: There are 20 caves total (16 main caves A-P plus four bonus caves Q-T)
+; Difficulty levels: 1-5 for each cave
 ; 
 ; Some definitions:
-; * Together a cave letter and difficulty level define a *stage*. A1 is a stage, for
-; example.
+; * A *stage* consists of a cave letter and difficulty level. e.g. A1 is a stage.
 ; * The *tile map* is the 40x23 map of the entire stage.
-;   Each row is 40 bytes. Rows are separated by 64 bytes in memory.
+;   Rows are separated by 64 bytes in memory, despite only being 40 bytes in length.
+;   (This is to simplify the conversion between row number and address and vice-versa).
+;   Other data is placed in between some of the rows.
 ; * The *grid* is the visible area of sprites, showing a 20x12 section of the tile map.
-;   An offscreen cache of what sprites are currently displayed is stored in the
+;   An offscreen cache of the sprites currently displayed in the grid is stored in the
 ; 'grid_of_currently_displayed_sprites' array.
-;   This avoids redrawing a sprite if it's unchanged since the previous tick.
-; * The *status bar* is single row at the top of the grid, showing useful status
-; information.
+;   Using this we only need to draw the sprites that have changed since the previous
+; tick.
+; * The *status bar* is single row of text at the top of the grid, showing the current
+; score etc.
+;   Each player has a status bar, and different status bars are shown while the game is
+; paused.
 ; 
-; tile_map:
+; Cell values in tile_map:
 ; 
-; $00 = empty
+; $00 = empty space
 ; $01 = earth
 ; $02 = wall
-; $03 = titanium wall
+; $03 = titanium wall      (as seen on the border of the whole map)
 ; $04 = diamond
 ; $05 = rock
-; $06 = firefly
-; $07 = fungus
-; $08 = rockford
-; $09 = 4x4 earth square with firefly pacing inside
+; $06 = firefly            (with animation states $06, $16, $26, $36)
+; $07 = fungus             (states $07, $17, $27, $37, $47, $57, $67, and $77 as the
+; fungus grows)
+; $08 = animated player appearing
+; $09 = 4x4 earth square with firefly pacing inside (or butterfly on cave D)
 ; $0a = animated player exploding
-; $0b = Vertical strip (value above is filled down to the next $0b)
-; $0c = Horizontal strip
-; $0d = magic wall?
-; $0e = butterfly
-; $0f = player?
+; $0b = vertical strip     (during preprocessing: value above is filled down to the
+; next $0b)
+; $0c = horizontal strip   (during preprocessing: value is copied to the end of the
+; row)
+; $0d = magic wall
+; $0e = butterfly          (with animation states $0e, $1e, $2e, $3e)
+; $0f = player             ($0f=waiting, $1f=walking left, $2f=walking right)
 ; 
-; After post processing/during gameplay:
-; $08 = flashing titanium wall and earth before player appears
 ; $18 = flashing exit
-; $21 = explosion frame #1
-; $11 = explosion frame #2
-; $0f = player looking out
-; $1f = player walking left
-; $2e = butterfly in a box, hardcoded for cave D
-; $2f = player walking right
-; 
+; $21 = intro explosion frame #1
+; $11 = intro explosion frame #2
 ; $43 = explosion out effect #1
 ; $33 = explosion out effect #2
 ; $23 = explosion out effect #3
 ; $13 = explosion out effect #4
+; 
 ; *************************************************************************************
 .sprite_addr_space
 .initial_clock_value
@@ -1660,8 +1661,8 @@ grid_write_address_high = write_instruction+2
     rts                                                               ; 23ef: 60          `
 
 ; *************************************************************************************
-; Handler for a horizontal strip. Copy the cell to the left to the current cell and to
-; the right, until we get to .
+; Handler for a horizontal strip. Copy the left cell to the current and right cells,
+; until the end of the row.
 .handler_for_horizontal_strip
     txa                                                               ; 23f0: 8a          .
     and #&7f                                                          ; 23f1: 29 7f       ).
@@ -1677,11 +1678,23 @@ grid_write_address_high = write_instruction+2
     equb &76, &60                                                     ; 23fe: 76 60       v`
 
 ; *************************************************************************************
+; 
+; This is the map processing that happens every tick during gameplay. The map is parsed
+; to handle any changes required.
+; 
+; *************************************************************************************
     ; set branch offset (self modifying code)
 .update_map
     ldy #update_map_space - branch_instruction - 2                    ; 2400: a0 5f       ._
     bne set_branch_offset                                             ; 2402: d0 02       ..             ; ALWAYS branch
 
+; *************************************************************************************
+; 
+; This is the preprocessing step prior to gameplay. The tile map is scanned looking for
+; special cell values to replace e.g. with vertical strips or a firefly in a 4x4 box of
+; earth. This step happens twice before gameplay. Once without processing horizontal
+; strips, then once with. This means horizontal strips are applied last.
+; 
 ; *************************************************************************************
     ; set branch offset (self modifying code)
 .preprocess_map
@@ -1759,7 +1772,8 @@ handler_high = jsr_handler_instruction+2
 
 ; *************************************************************************************
 ; 
-; This is the preprocessing step when we find a space in the map prior to gameplay
+; This is part of the preprocessing step prior to gameplay, when we find a space in the
+; map
 ; 
 ; *************************************************************************************
 .mark_cell_above_as_processed_and_move_to_next_cell
@@ -2064,7 +2078,7 @@ l2572 = sub_c2571+1
 
 ; *************************************************************************************
 .handler_rockford
-    stx l005b                                                         ; 2600: 86 5b       .[
+    stx current_rockford_sprite                                       ; 2600: 86 5b       .[
     lda l005f                                                         ; 2602: a5 5f       ._
     bne c2609                                                         ; 2604: d0 03       ..
     inx                                                               ; 2606: e8          .
@@ -2301,34 +2315,40 @@ l2572 = sub_c2571+1
 
 .got_key
     jsr update_map                                                    ; 2752: 20 00 24     .$
+    ; get the contents of the cell that rockford is influencing. This can be the cell
+    ; underneath rockford, or by holding the RETURN key down and pressing a direction
+    ; key it can be one of the neighbouring cells.
+    ; We clear the top bits to just extract the basic type.
     lda neighbour_cell_contents                                       ; 2755: a5 64       .d
     and #&0f                                                          ; 2757: 29 0f       ).
     sta neighbour_cell_contents                                       ; 2759: 85 64       .d
-    cmp #8                                                            ; 275b: c9 08       ..
-    bne not_rockford                                                  ; 275d: d0 03       ..
+    cmp #map_rockford_appearing                                       ; 275b: c9 08       ..
+    bne rockford_is_not_appearing                                     ; 275d: d0 03       ..
     jmp check_for_pause_key                                           ; 275f: 4c 40 30    L@0
 
-.not_rockford
+.rockford_is_not_appearing
     jsr draw_grid_of_sprites                                          ; 2762: 20 00 23     .#
     jsr draw_status_bar                                               ; 2765: 20 25 23     %#
     jsr sub_c3000                                                     ; 2768: 20 00 30     .0
-    lda l005b                                                         ; 276b: a5 5b       .[
-    beq time_still_going                                              ; 276d: f0 18       ..
+    ; check if the player is still alive by reading the current rockford sprite
+    lda current_rockford_sprite                                       ; 276b: a5 5b       .[
+    beq not_out_of_time                                               ; 276d: f0 18       ..
     dec sub_second_ticks                                              ; 276f: c6 5c       .\
-    bpl time_still_going                                              ; 2771: 10 14       ..
-    ldx #&0b                                                          ; 2773: a2 0b       ..
+    bpl not_out_of_time                                               ; 2771: 10 14       ..
+    ; each 'second' of game time has 11 game ticks
+    ldx #11                                                           ; 2773: a2 0b       ..
     stx sub_second_ticks                                              ; 2775: 86 5c       .\
     ; decrement time remaining
-    ldy #&0c                                                          ; 2777: a0 0c       ..
+    ldy #12                                                           ; 2777: a0 0c       ..
     jsr decrement_status_bar_number                                   ; 2779: 20 aa 28     .(
     dec time_remaining                                                ; 277c: c6 6d       .m
-    bne time_still_going                                              ; 277e: d0 07       ..
+    bne not_out_of_time                                               ; 277e: d0 07       ..
     ; out of time
     lda #<out_of_time_message                                         ; 2780: a9 b4       ..
     sta status_text_address_low                                       ; 2782: 85 69       .i
     jmp check_for_pause_key                                           ; 2784: 4c 40 30    L@0
 
-.time_still_going
+.not_out_of_time
     lda neighbour_cell_contents                                       ; 2787: a5 64       .d
     cmp #1                                                            ; 2789: c9 01       ..
     bne skip_earth                                                    ; 278b: d0 02       ..
@@ -2349,6 +2369,7 @@ l2572 = sub_c2571+1
     jsr update_sounds                                                 ; 27a4: 20 80 2c     .,
     ; update tick
     dec tick_counter                                                  ; 27a7: c6 5a       .Z
+    ; update magic wall timer
     lda tick_counter                                                  ; 27a9: a5 5a       .Z
     and #7                                                            ; 27ab: 29 07       ).
     bne c27b7                                                         ; 27ad: d0 08       ..
@@ -3416,7 +3437,7 @@ l2572 = sub_c2571+1
     equb &51, &15, &11, &25, &16, &25, &11, &15                       ; 2df8: 51 15 11... Q..
 
 ; *************************************************************************************
-.play_game
+.play_one_life
     jsr prepare_stage                                                 ; 2e00: 20 00 29     .)
     ; a bonus life only becomes available when the score doesn't have a zero or five in
     ; the hundreds column
@@ -3931,7 +3952,7 @@ which_status_bar_address2_low = store_in_status_bar+1
     equb sprite_4                                                     ; 3227: 36          6
 
 ; *************************************************************************************
-.cached_regular_status_bar
+.inactive_players_regular_status_bar
     equb sprite_6                                                     ; 3228: 38          8
     equb sprite_0                                                     ; 3229: 32          2
     equb sprite_diamond1                                              ; 322a: 03          .
@@ -3946,7 +3967,7 @@ which_status_bar_address2_low = store_in_status_bar+1
     equb sprite_5                                                     ; 3233: 37          7
     equb sprite_0                                                     ; 3234: 32          2
     equb sprite_space                                                 ; 3235: 00          .
-.score_on_cached_regular_status_bar
+.score_on_inactive_players_regular_status_bar
     equb sprite_0                                                     ; 3236: 32          2
     equb sprite_0                                                     ; 3237: 32          2
     equb sprite_0                                                     ; 3238: 32          2
@@ -3955,23 +3976,23 @@ which_status_bar_address2_low = store_in_status_bar+1
     equb sprite_0                                                     ; 323b: 32          2
 
 ; *************************************************************************************
-.cached_players_and_men_status_bar
+.inactive_players_and_men_status_bar
     equs "PLAYER"                                                     ; 323c: 50 4c 41... PLA
     equb sprite_space                                                 ; 3242: 00          .
-.player_number_on_players_and_men_status_bar
+.player_number_on_inactive_players_and_men_status_bar
     equb sprite_2                                                     ; 3243: 34          4
     equb sprite_comma                                                 ; 3244: 3f          ?
     equb sprite_space                                                 ; 3245: 00          .
-.number_of_men_on_players_and_men_status_bar
+.number_of_men_on_inactive_players_and_men_status_bar
     equb sprite_0                                                     ; 3246: 32          2
     equb sprite_space                                                 ; 3247: 00          .
     equs "MEN"                                                        ; 3248: 4d 45 4e    MEN
     equb sprite_space                                                 ; 324b: 00          .
     equb sprite_space                                                 ; 324c: 00          .
-.cave_letter_on_players_and_men_status_bar
+.cave_letter_on_inactive_players_and_men_status_bar
     equb 'B'                                                          ; 324d: 42          B
     equb sprite_slash                                                 ; 324e: 3e          >
-.difficulty_level_on_players_and_men_status_bar
+.difficulty_level_on_inactive_players_and_men_status_bar
     equb sprite_4                                                     ; 324f: 36          6
 
 ; *************************************************************************************
@@ -4401,7 +4422,7 @@ which_status_bar_address2_low = store_in_status_bar+1
     stx demo_mode_tick_count                                          ; 3a8e: 86 65       .e
     inx                                                               ; 3a90: e8          .
     stx difficulty_level                                              ; 3a91: 86 89       ..
-    jsr play_game                                                     ; 3a93: 20 00 2e     ..
+    jsr play_one_life                                                 ; 3a93: 20 00 2e     ..
     jmp show_menu                                                     ; 3a96: 4c 00 3a    L.:
 
 .menu_move_left_to_change_cave
@@ -4463,31 +4484,34 @@ which_status_bar_address2_low = store_in_status_bar+1
 .copy_status_bar_loop
     lda default_status_bar,x                                          ; 3b02: bd 68 50    .hP
     sta players_and_men_status_bar,x                                  ; 3b05: 9d 14 32    ..2
-    sta cached_players_and_men_status_bar,x                           ; 3b08: 9d 3c 32    .<2
+    sta inactive_players_and_men_status_bar,x                         ; 3b08: 9d 3c 32    .<2
     dex                                                               ; 3b0b: ca          .
     bpl copy_status_bar_loop                                          ; 3b0c: 10 f4       ..
     lda #sprite_2                                                     ; 3b0e: a9 34       .4
-    sta player_number_on_players_and_men_status_bar                   ; 3b10: 8d 43 32    .C2
+    sta player_number_on_inactive_players_and_men_status_bar          ; 3b10: 8d 43 32    .C2
     cmp number_of_players_status_bar                                  ; 3b13: cd 78 32    .x2
-    beq c3b1d                                                         ; 3b16: f0 05       ..
+    beq set_cave_letter_on_status_bar                                 ; 3b16: f0 05       ..
     lda #sprite_0                                                     ; 3b18: a9 32       .2
-    sta number_of_men_on_players_and_men_status_bar                   ; 3b1a: 8d 46 32    .F2
-.c3b1d
+    sta number_of_men_on_inactive_players_and_men_status_bar          ; 3b1a: 8d 46 32    .F2
+.set_cave_letter_on_status_bar
     lda cave_letter                                                   ; 3b1d: ad 89 32    ..2
     sta cave_letter_on_regular_status_bar                             ; 3b20: 8d 25 32    .%2
-    sta cave_letter_on_players_and_men_status_bar                     ; 3b23: 8d 4d 32    .M2
+    sta cave_letter_on_inactive_players_and_men_status_bar            ; 3b23: 8d 4d 32    .M2
+    ; copy difficuly level to other status bars
     ldx number_of_players_status_bar_difficulty_level                 ; 3b26: ae 8b 32    ..2
     stx difficulty_level_on_regular_status_bar                        ; 3b29: 8e 27 32    .'2
-    stx difficulty_level_on_players_and_men_status_bar                ; 3b2c: 8e 4f 32    .O2
+    stx difficulty_level_on_inactive_players_and_men_status_bar       ; 3b2c: 8e 4f 32    .O2
     jsr set_cave_number_and_difficulty_level_from_status_bar          ; 3b2f: 20 c1 3b     .;
+    ; zero scores on status bars
     lda #sprite_0                                                     ; 3b32: a9 32       .2
     ldx #5                                                            ; 3b34: a2 05       ..
 .zero_score_loop
     sta score_on_regular_status_bar,x                                 ; 3b36: 9d 0e 32    ..2
-    sta score_on_cached_regular_status_bar,x                          ; 3b39: 9d 36 32    .62
+    sta score_on_inactive_players_regular_status_bar,x                ; 3b39: 9d 36 32    .62
     dex                                                               ; 3b3c: ca          .
     bpl zero_score_loop                                               ; 3b3d: 10 f7       ..
-.c3b3f
+    ; add current stage to menu availablility
+.play_next_life
     ldx cave_number                                                   ; 3b3f: a6 87       ..
     lda difficulty_level                                              ; 3b41: a5 89       ..
     cmp number_of_difficuly_levels_available_in_menu_for_each_cave,x  ; 3b43: dd 68 4c    .hL
@@ -4495,16 +4519,18 @@ which_status_bar_address2_low = store_in_status_bar+1
     ; add new difficulty level to menu
     sta number_of_difficuly_levels_available_in_menu_for_each_cave,x  ; 3b48: 9d 68 4c    .hL
 .skip_adding_new_difficulty_level_to_menu
-    jsr play_game                                                     ; 3b4b: 20 00 2e     ..
-    ; save results after game
+    jsr play_one_life                                                 ; 3b4b: 20 00 2e     ..
+    ; save results after life
+    ; first find the position of the score to copy from the status bar (which depends
+    ; on the player number)
     ldy #5                                                            ; 3b4e: a0 05       ..
     ; check if player one or two
     lda player_number_on_regular_status_bar                           ; 3b50: ad 1b 32    ..2
     lsr a                                                             ; 3b53: 4a          J
-    bcs player_one                                                    ; 3b54: b0 02       ..
+    bcs copy_score                                                    ; 3b54: b0 02       ..
     ; copy score from player two
     ldy #19                                                           ; 3b56: a0 13       ..
-.player_one
+.copy_score
     ldx #5                                                            ; 3b58: a2 05       ..
 .copy_score_to_last_score_loop
     lda score_on_regular_status_bar,x                                 ; 3b5a: bd 0e 32    ..2
@@ -4518,28 +4544,30 @@ which_status_bar_address2_low = store_in_status_bar+1
     lda cave_number                                                   ; 3b6a: a5 87       ..
     cmp #16                                                           ; 3b6c: c9 10       ..
     bpl calculate_next_cave_number_and_difficuly_level                ; 3b6e: 10 31       .1
+    ; check for zero men left for the current player
     lda #sprite_0                                                     ; 3b70: a9 32       .2
     cmp men_number_on_regular_status_bar                              ; 3b72: cd 1e 32    ..2
-    bne swap_status_bars_with_cached_versions                         ; 3b75: d0 05       ..
-    cmp number_of_men_on_players_and_men_status_bar                   ; 3b77: cd 46 32    .F2
+    bne swap_status_bars_with_inactive_player_versions                ; 3b75: d0 05       ..
+    ; check for zero men left for other player
+    cmp number_of_men_on_inactive_players_and_men_status_bar          ; 3b77: cd 46 32    .F2
     beq return16                                                      ; 3b7a: f0 50       .P
-.swap_status_bars_with_cached_versions
+.swap_status_bars_with_inactive_player_versions
     ldx #39                                                           ; 3b7c: a2 27       .'
 .swap_loop
     lda regular_status_bar,x                                          ; 3b7e: bd 00 32    ..2
-    ldy cached_regular_status_bar,x                                   ; 3b81: bc 28 32    .(2
-    sta cached_regular_status_bar,x                                   ; 3b84: 9d 28 32    .(2
+    ldy inactive_players_regular_status_bar,x                         ; 3b81: bc 28 32    .(2
+    sta inactive_players_regular_status_bar,x                         ; 3b84: 9d 28 32    .(2
     tya                                                               ; 3b87: 98          .
     sta regular_status_bar,x                                          ; 3b88: 9d 00 32    ..2
     dex                                                               ; 3b8b: ca          .
     bpl swap_loop                                                     ; 3b8c: 10 f0       ..
     lda men_number_on_regular_status_bar                              ; 3b8e: ad 1e 32    ..2
     cmp #sprite_0                                                     ; 3b91: c9 32       .2
-    beq swap_status_bars_with_cached_versions                         ; 3b93: f0 e7       ..
+    beq swap_status_bars_with_inactive_player_versions                ; 3b93: f0 e7       ..
     lda cave_letter_on_regular_status_bar                             ; 3b95: ad 25 32    .%2
     ldx difficulty_level_on_regular_status_bar                        ; 3b98: ae 27 32    .'2
     jsr set_cave_number_and_difficulty_level_from_status_bar          ; 3b9b: 20 c1 3b     .;
-    jmp c3b3f                                                         ; 3b9e: 4c 3f 3b    L?;
+    jmp play_next_life                                                ; 3b9e: 4c 3f 3b    L?;
 
 .calculate_next_cave_number_and_difficuly_level
     ldx cave_number                                                   ; 3ba1: a6 87       ..
@@ -4555,10 +4583,10 @@ which_status_bar_address2_low = store_in_status_bar+1
     sty difficulty_level                                              ; 3bb3: 84 89       ..
     sta cave_number                                                   ; 3bb5: 85 87       ..
     cmp #&10                                                          ; 3bb7: c9 10       ..
-    bmi c3b3f                                                         ; 3bb9: 30 84       0.
+    bmi play_next_life                                                ; 3bb9: 30 84       0.
     ; bonus life awarded on bonus level
     inc men_number_on_regular_status_bar                              ; 3bbb: ee 1e 32    ..2
-    jmp c3b3f                                                         ; 3bbe: 4c 3f 3b    L?;
+    jmp play_next_life                                                ; 3bbe: 4c 3f 3b    L?;
 
 .set_cave_number_and_difficulty_level_from_status_bar
     sec                                                               ; 3bc1: 38          8
@@ -6061,6 +6089,7 @@ tile_map_row_19 = l54bc+4
     assert map_earth == &01
     assert map_firefly == &06
     assert map_player OR map_unprocessed == &8f
+    assert map_rockford_appearing == &08
     assert map_space == &00
     assert map_unprocessed + map_diamond == &84
     assert map_unprocessed + map_rock1 == &85
