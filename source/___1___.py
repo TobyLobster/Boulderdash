@@ -26,10 +26,10 @@ def sound(addr, lab):
     decimal(addr+2)
     decimal(addr+4)
     decimal(addr+6)
-    comment(addr, "channel", inline=True)
-    comment(addr+2, "amplitude", inline=True)
-    comment(addr+4, "pitch", inline=True)
-    comment(addr+6, "duration", inline=True)
+    comment(addr,   "channel   (2 bytes)", inline=True)
+    comment(addr+2, "amplitude (2 bytes)", inline=True)
+    comment(addr+4, "pitch     (2 bytes)", inline=True)
+    comment(addr+6, "duration  (2 bytes)", inline=True)
 
 
 def envelope(addr, lab):
@@ -582,7 +582,7 @@ constant(0x1, "map_earth")
 constant(0x2, "map_wall")
 constant(0x3, "map_titanium_wall")
 constant(0x4, "map_diamond")
-constant(0x5, "map_rock1")
+constant(0x5, "map_rock")
 constant(0x6, "map_firefly")
 constant(0x7, "map_fungus")
 constant(0x8, "map_rockford_appearing")
@@ -654,6 +654,7 @@ for addr in range(0x4ce0, 0x4cf4):
         data_sets_present.append(get_u8_binary(addr))
 
 basics = {}
+patches = []
 j = 0
 for data_set in range(len(data_sets_present)):
     addr = 0x4cf4 + data_set * 20
@@ -669,13 +670,37 @@ for data_set in range(len(data_sets_present)):
             map_start = map_start & 127
         map_start += 0x5000
         patch_addr = get_u8_binary(addr + 2) + 256*get_u8_binary(addr + 3)
-        comment(addr, f"Difficulty {difficulty+1}: basics={hex(basics_addr)}, map_start={hex(map_start)}, patch_addr={hex(patch_addr)}", inline=True)
+        patch_label = ""
+        if patch_addr != 0:
+            patch_label = f"patch_for_data_set_{data_set}_difficulty_{difficulty+1}"
+            label(patch_addr, patch_label)
+            patch_label = "="+patch_label
+        comment(addr, f"Difficulty {difficulty+1}: basics={hex(basics_addr)}, map_start={hex(map_start)}, patch_addr={hex(patch_addr)}{patch_label}", inline=True)
         addr += 4
         if not basics_addr in basics:
             basics[basics_addr] = f"basics_for_data_set_{j}_difficulty_{difficulty+1}"
             label(basics_addr, basics[basics_addr])
+        if patch_addr != 0:
+            if patch_addr not in patches:
+                patches.append(patch_addr)
 
-blank(0x4df8)
+patches.sort()
+prev = patches[0]
+for i in range(1, len(patches)):
+    length = 0
+    for j in range(256):
+        length += 1
+        v = get_u8_binary(prev + j)
+        if (v & 7) == 3:
+            break
+    byte(prev, length)
+    prev = patches[i]
+
+byte(0x46bc, 0x46e8-0x46bc)
+unused(0x3de4)
+unused(0x42e8)
+unused(0x46e8)
+blank(0x46e8)
 
 constant(20, "total_caves")
 constant(0xac, "opcode_ldy_abs")
@@ -747,7 +772,7 @@ stars(0x2100, True)
 blank(0x2120)
 byte(0x2120, 16, 1)
 label(0x2120, "items_produced_by_the_magic_wall")
-expr(0x2124, make_add("map_unprocessed", "map_rock1"))
+expr(0x2124, make_add("map_unprocessed", "map_rock"))
 expr(0x2125, make_add("map_unprocessed", "map_diamond"))
 blank(0x2130)
 label(0x2130, "some_array_of_cells")
@@ -781,10 +806,10 @@ expr(0x21e3, "map_space")
 blank(0x259e)
 
 handlers = { 0x22a5: "handler_basics",
-             0x2500: "handler_firefly",
+             0x2500: "handler_firefly_or_butterfly",
              0x259e: "handler_fungus",
              0x2bca: "handler_firefly_in_box",
-             0x26e3: "handler_flashing_rockford",
+             0x26e3: "handler_rockford_intro_or_exit",
              0x23e0: "handler_for_vertical_strip",
              0x23f0: "handler_for_horizontal_strip",
              0x26ae: "handler_magic_wall",
@@ -1327,11 +1352,15 @@ comment(0x2c00, "Sound 6 = Got all required diamonds / rockford exploding sound"
 comment(0x2c00, "Sound 7 = TODO")
 comment(0x2c00, "Sound 8 = TODO")
 label(0x2c00, "in_game_sound_data")
-sound(0x2c24, "in_game_sound_block")
+label(0x2c24, "in_game_sound_block")
 label(0x2c26, "in_game_sound_amplitude")
 label(0x2c27, "in_game_sound_amplitude+1")
 label(0x2c28, "in_game_sound_pitch")
 label(0x2c2a, "in_game_sound_duration")
+word(0x2c24)
+word(0x2c26)
+word(0x2c28)
+word(0x2c2a)
 stars(0x2c2c)
 comment(0x2c2c, "If X is negative, then play sound (X AND 127) with pitch Y.\nIf X is non-negative, play sound X with default pitch.")
 label(0x2c2c, "play_sound_x_pitch_y")
@@ -1387,14 +1416,14 @@ comment(0x2d5b, "the top five bits are the offset into the map to change.", inde
 comment(0x2d60, "add X to ptr (where we only use 40 out of every 64 bytes for the map)", indent=1)
 label(0x2d60, "add_X_to_map_ptr_loop")
 comment(0x2d68, "recall the byte, and isolate the bottom three bits.", indent=1)
-comment(0x2d6b, """0 = store value 0
-1 = skip this byte (no change)
-2 = store value 2
+comment(0x2d6b, """0 = store value 0 (map_space)
+1 = no change     (this is used to skip to offsets larger than 32 bytes.)
+2 = store value 2 (map_wall)
 3 = terminator
-4 = store value 4
-5 = store value 5
-6 = store value 6
-7 = store value 1""", indent=1)
+4 = store value 4 (map_diamond)
+5 = store value 5 (map_rock)
+6 = store value 6 (map_firefly)
+7 = store value 1 (map_earth)""", indent=1)
 label(0x2d7f, "pull_a_and_return")
 unused(0x2d81)
 stars(0x2d90)
@@ -1724,7 +1753,7 @@ expr(0x3bc3, "'A'")
 expr(0x3bc9, "sprite_0")
 ret(0x3bcc)
 unused(0x3bcd)
-byte(0x3bcd, 0x4700 - 0x3bcd)
+#byte(0x3bcd, 0x4700 - 0x3bcd)
 decimal(0x3b6d)
 decimal(0x3b7d)
 label(0x3b7c, "swap_status_bars_with_inactive_player_versions")
@@ -1732,6 +1761,24 @@ label(0x3b7e, "swap_loop")
 label(0x3ba1, "calculate_next_cave_number_and_difficuly_level")
 label(0x3bc1, "set_cave_number_and_difficulty_level_from_status_bar")
 
+blank(0x3c00)
+stars(0x3c00, """Patch data.
+
+These patches are applied to the tile_map after the 'basics' (the basics being a two bit per cell base coat of paint for the stage).
+
+The top five bits of each byte is the offset to the next patch byte (add one for an offset from 1 to 32 bytes), and the bottom three bits are what to do:
+
+0 = store value 0 (map_space)
+1 = no change     (this is used to skip to offsets larger than 32 bytes.)
+2 = store value 2 (map_wall)
+3 = terminator
+4 = store value 4 (map_diamond)
+5 = store value 5 (map_rock)
+6 = store value 6 (map_firefly)
+7 = store value 1 (map_earth)""")
+
+blank(0x4700)
+stars(0x4700)
 label(0x4700, "strip_data")
 addr = 0x4700
 for i in range(20):
@@ -1804,6 +1851,7 @@ stars(0x4cf4, True)
 label(0x4cf4, "data_sets")
 
 unused(0x4df8)
+blank(0x4df8)
 
 stars(0x4e09, True)
 
@@ -1854,8 +1902,11 @@ stars(0x56b8, True)
 sound(0x56b8, "sound1")
 label(0x56bc, "sound1_pitch")
 label(0x56be, "sound1_duration")
+blank(0x56c0)
 sound(0x56c0, "sound2")
+blank(0x56c8)
 sound(0x56c8, "sound3")
+blank(0x56d0)
 label(0x56d0, "tune_position_per_channel")
 byte(0x56d0, 3)
 label(0x56d3, "tune_note_repeat_per_channel")
