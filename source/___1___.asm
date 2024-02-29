@@ -1,117 +1,179 @@
+; *************************************************************************************
 ;
 ; Disassembly of Boulderdash, by TobyLobster 2024
-; This is a disassembly of the BBC Micro version from http://bbcmicro.co.uk/game.php?id=669
 ;
 ; File: ___1___
 ;
+; This is a disassembly of the BBC Micro version from http://bbcmicro.co.uk/game.php?id=669
+;
+; Ingredients
+; -----------
+;
+; Caves: There are 20 caves total (16 main caves A-P plus four bonus caves Q-T)
+; Difficulty levels: 1-5 for each cave
+;
+; * A *stage* consists of a cave letter and difficulty level. e.g. A1 is a stage.
+;
+; * The *tile map* is the 40x23 map of the entire stage.
+;   Map rows are separated by 64 bytes in memory, despite only being 40 bytes in length.
+;   (This simplifies the conversion between row number and address and vice-versa).
+;
+;   Sometimes other data is stored in the spare bytes between rows.
+;
+;   Each entry in the tile map is a *cell*, which holds a basic cell type in the lower
+;   4 bits and a modifier in the top four bits. These are converted into sprites using
+;   the 'cell_type_to_sprite' lookup table.
+;
+; * The *grid* is the visible area of sprites, showing a 20x12 section of the tile map.
+;
+;   An offscreen cache of the sprites currently displayed in the grid is stored in the
+; 'grid_of_currently_displayed_sprites' array.
+;
+;   By consulting and updating the cache, we only draw sprites that have changed since
+;   the previous tick.
+;
+; * The *status bar* is single row of text at the top of the grid, showing the current
+; score etc.
+;
+;   Each player has a status bar, and different status bars are shown while paused.
+;
+; Cell values in tile_map:
+;
+; $00 = empty space
+; $01 = earth
+; $02 = wall
+; $03 = titanium wall      (as seen on the border of the whole map)
+; $04 = diamond
+; $05 = rock
+; $06 = firefly            (with animation states $06, $16, $26, $36)
+; $07 = fungus             (states $07, $17, $27, $37, $47, $57, $67, and $77 as the
+;                           fungus grows)
+; $08 = animated player appearing
+; $09 = 4x4 earth square with firefly pacing inside (or butterfly on cave D)
+; $0a = animated player exploding
+; $0b = vertical strip     (in preprocessing: value above is filled down to the next $0b)
+; $0c = horizontal strip   (in preprocessing: value is copied to the end of the row)
+; $0d = magic wall
+; $0e = butterfly          (with animation states $0e, $1e, $2e, $3e)
+; $0f = player             ($0f=waiting, $1f=walking left, $2f=walking right)
+;
+; $18 = flashing exit
+; $21 = intro explosion frame #1
+; $11 = intro explosion frame #2
+; $43 = explosion out effect #1
+; $33 = explosion out effect #2
+; $23 = explosion out effect #3
+; $13 = explosion out effect #4
+;
+; *************************************************************************************
 
 ; Constants
-inkey_key_b                            = 155
-inkey_key_colon                        = 183
-inkey_key_escape                       = 143
-inkey_key_return                       = 182
-inkey_key_slash                        = 151
-inkey_key_space                        = 157
-inkey_key_x                            = 189
-inkey_key_z                            = 158
-map_anim_state0                        = 0
-map_anim_state1                        = 16
-map_anim_state2                        = 32
-map_anim_state3                        = 48
-map_butterfly                          = 14
-map_diamond                            = 4
-map_earth                              = 1
-map_earth_plus_firefly_4x4             = 9
-map_explosion                          = 10
-map_firefly                            = 6
-map_fungus                             = 7
-map_horizontal_strip                   = 12
-map_magic_wall                         = 13
-map_rock                               = 5
-map_rockford                           = 15
-map_rockford_appearing                 = 8
-map_space                              = 0
-map_titanium_wall                      = 3
-map_unprocessed                        = 128
-map_vertical_strip                     = 11
-map_wall                               = 2
-opcode_dex                             = 202
-opcode_inx                             = 232
-opcode_lda_abs_y                       = 185
-opcode_ldy_abs                         = 172
-osbyte_flush_buffer_class              = 15
-osbyte_inkey                           = 129
-osbyte_read_adc_or_get_buffer_status   = 128
-osword_read_clock                      = 1
-osword_sound                           = 7
-osword_write_clock                     = 2
-osword_write_palette                   = 12
-sprite_0                               = 50
-sprite_1                               = 51
-sprite_2                               = 52
-sprite_3                               = 53
-sprite_4                               = 54
-sprite_5                               = 55
-sprite_6                               = 56
-sprite_7                               = 57
-sprite_8                               = 58
-sprite_9                               = 59
-sprite_boulder1                        = 1
-sprite_boulder2                        = 2
-sprite_box                             = 9
-sprite_butterfly1                      = 22
-sprite_butterfly2                      = 23
-sprite_butterfly3                      = 24
-sprite_comma                           = 63
-sprite_dash                            = 61
-sprite_diamond1                        = 3
-sprite_diamond2                        = 4
-sprite_diamond3                        = 5
-sprite_diamond4                        = 6
-sprite_earth1                          = 29
-sprite_earth2                          = 30
-sprite_explosion1                      = 12
-sprite_explosion2                      = 13
-sprite_explosion3                      = 14
-sprite_explosion4                      = 15
-sprite_firefly1                        = 25
-sprite_firefly2                        = 26
-sprite_firefly3                        = 27
-sprite_firefly4                        = 28
-sprite_full_stop                       = 64
-sprite_fungus1                         = 20
-sprite_fungus2                         = 21
-sprite_magic_wall1                     = 16
-sprite_magic_wall2                     = 17
-sprite_magic_wall3                     = 18
-sprite_magic_wall4                     = 19
-sprite_pathway                         = 31
-sprite_rockford_blinking1              = 32
-sprite_rockford_blinking2              = 33
-sprite_rockford_blinking3              = 34
-sprite_rockford_moving_down1           = 37
-sprite_rockford_moving_down2           = 38
-sprite_rockford_moving_down3           = 39
-sprite_rockford_moving_left1           = 42
-sprite_rockford_moving_left2           = 43
-sprite_rockford_moving_left3           = 44
-sprite_rockford_moving_left4           = 45
-sprite_rockford_moving_right1          = 46
-sprite_rockford_moving_right2          = 47
-sprite_rockford_moving_right3          = 48
-sprite_rockford_moving_right4          = 49
-sprite_rockford_moving_up1             = 40
-sprite_rockford_moving_up2             = 41
-sprite_rockford_winking1               = 35
-sprite_rockford_winking2               = 36
-sprite_slash                           = 62
-sprite_space                           = 0
-sprite_titanium_wall1                  = 7
-sprite_titanium_wall2                  = 8
-sprite_wall1                           = 10
-sprite_wall2                           = 11
-sprite_white                           = 60
-total_caves                            = 20
+inkey_key_b                              = 155
+inkey_key_colon                          = 183
+inkey_key_escape                         = 143
+inkey_key_return                         = 182
+inkey_key_slash                          = 151
+inkey_key_space                          = 157
+inkey_key_x                              = 189
+inkey_key_z                              = 158
+map_anim_state0                          = 0
+map_anim_state1                          = 16
+map_anim_state2                          = 32
+map_anim_state3                          = 48
+map_butterfly                            = 14
+map_diamond                              = 4
+map_earth                                = 1
+map_earth_plus_firefly_4x4               = 9
+map_explosion                            = 10
+map_firefly                              = 6
+map_fungus                               = 7
+map_horizontal_strip                     = 12
+map_magic_wall                           = 13
+map_rock                                 = 5
+map_rockford                             = 15
+map_rockford_appearing_or_end_position   = 8
+map_space                                = 0
+map_titanium_wall                        = 3
+map_unprocessed                          = 128
+map_vertical_strip                       = 11
+map_wall                                 = 2
+opcode_dex                               = 202
+opcode_inx                               = 232
+opcode_lda_abs_y                         = 185
+opcode_ldy_abs                           = 172
+osbyte_flush_buffer_class                = 15
+osbyte_inkey                             = 129
+osbyte_read_adc_or_get_buffer_status     = 128
+osword_read_clock                        = 1
+osword_sound                             = 7
+osword_write_clock                       = 2
+osword_write_palette                     = 12
+sprite_0                                 = 50
+sprite_1                                 = 51
+sprite_2                                 = 52
+sprite_3                                 = 53
+sprite_4                                 = 54
+sprite_5                                 = 55
+sprite_6                                 = 56
+sprite_7                                 = 57
+sprite_8                                 = 58
+sprite_9                                 = 59
+sprite_boulder1                          = 1
+sprite_boulder2                          = 2
+sprite_box                               = 9
+sprite_butterfly1                        = 22
+sprite_butterfly2                        = 23
+sprite_butterfly3                        = 24
+sprite_comma                             = 63
+sprite_dash                              = 61
+sprite_diamond1                          = 3
+sprite_diamond2                          = 4
+sprite_diamond3                          = 5
+sprite_diamond4                          = 6
+sprite_earth1                            = 29
+sprite_earth2                            = 30
+sprite_explosion1                        = 12
+sprite_explosion2                        = 13
+sprite_explosion3                        = 14
+sprite_explosion4                        = 15
+sprite_firefly1                          = 25
+sprite_firefly2                          = 26
+sprite_firefly3                          = 27
+sprite_firefly4                          = 28
+sprite_full_stop                         = 64
+sprite_fungus1                           = 20
+sprite_fungus2                           = 21
+sprite_magic_wall1                       = 16
+sprite_magic_wall2                       = 17
+sprite_magic_wall3                       = 18
+sprite_magic_wall4                       = 19
+sprite_pathway                           = 31
+sprite_rockford_blinking1                = 32
+sprite_rockford_blinking2                = 33
+sprite_rockford_blinking3                = 34
+sprite_rockford_moving_down1             = 37
+sprite_rockford_moving_down2             = 38
+sprite_rockford_moving_down3             = 39
+sprite_rockford_moving_left1             = 42
+sprite_rockford_moving_left2             = 43
+sprite_rockford_moving_left3             = 44
+sprite_rockford_moving_left4             = 45
+sprite_rockford_moving_right1            = 46
+sprite_rockford_moving_right2            = 47
+sprite_rockford_moving_right3            = 48
+sprite_rockford_moving_right4            = 49
+sprite_rockford_moving_up1               = 40
+sprite_rockford_moving_up2               = 41
+sprite_rockford_winking1                 = 35
+sprite_rockford_winking2                 = 36
+sprite_slash                             = 62
+sprite_space                             = 0
+sprite_titanium_wall1                    = 7
+sprite_titanium_wall2                    = 8
+sprite_wall1                             = 10
+sprite_wall2                             = 11
+sprite_white                             = 60
+total_caves                              = 20
 
 ; Memory locations
 l0000                                   = $00
@@ -130,10 +192,10 @@ pause_counter                           = $4e
 magic_wall_state                        = $50
 magic_wall_timer                        = $51
 rockford_cell_value                     = $52
-l0053                                   = $53
-l0054                                   = $54
+delay_trying_to_push_rock               = $53
+fungus_replacement                      = $54
 fungus_growth_interval                  = $55
-l0056                                   = $56
+number_of_fungus_cells_found            = $56
 fungus_counter                          = $57
 ticks_since_last_direction_key_pressed  = $58
 countdown_while_switching_palette       = $59
@@ -142,16 +204,16 @@ current_rockford_sprite                 = $5b
 sub_second_ticks                        = $5c
 previous_direction_keys                 = $5d
 just_pressed_direction_keys             = $5e
-l005f                                   = $5f
-l0060                                   = $60
+rockford_explosion_cell_type            = $5f
+current_fungus_cell_type                = $60
 keys_to_process                         = $62
 neighbour_cell_contents                 = $64
 demo_mode_tick_count                    = $65
-l0066                                   = $66
+zeroed_but_unused                       = $66
 demo_key_duration                       = $67
 status_text_address_low                 = $69
-l006a                                   = $6a
 map_rockford_end_position_addr_low      = $6a
+timeout_until_demo_mode                 = $6a
 map_rockford_end_position_addr_high     = $6b
 diamonds_required                       = $6c
 time_remaining                          = $6d
@@ -165,6 +227,7 @@ grid_column_counter                     = $73
 grid_x                                  = $73
 neighbouring_cell_variable              = $73
 cell_above                              = $74
+out_of_time_message_countdown           = $74
 cell_above_right                        = $75
 cell_left                               = $76
 cell_current                            = $77
@@ -213,61 +276,6 @@ lfff6                                   = $fff6
 
     * = $1300
 
-; *************************************************************************************
-; Caves: There are 20 caves total (16 main caves A-P plus four bonus caves Q-T)
-; Difficulty levels: 1-5 for each cave
-; 
-; Some definitions:
-; * A *stage* consists of a cave letter and difficulty level. e.g. A1 is a stage.
-; * The *tile map* is the 40x23 map of the entire stage.
-;   Rows are separated by 64 bytes in memory, despite only being 40 bytes in length.
-;   (This is to simplify the conversion between row number and address and vice-versa).
-;   Other data is placed in between some of the rows.
-;   Each entry in the tile map is a *cell*, which usually holds a basic cell type in
-; the
-;   lower 4 bits and a modifier in the top four bits. These are converted into sprites
-;   using the 'cell_type_to_sprite' lookup table.
-; * The *grid* is the visible area of sprites, showing a 20x12 section of the tile map.
-;   An offscreen cache of the sprites currently displayed in the grid is stored in the
-; 'grid_of_currently_displayed_sprites' array.
-;   Using this we only need to draw the sprites that have changed since the previous
-; tick.
-; * The *status bar* is single row of text at the top of the grid, showing the current
-; score etc.
-;   Each player has a status bar, and different status bars are shown while the game is
-; paused.
-; 
-; Cell values in tile_map:
-; 
-; $00 = empty space
-; $01 = earth
-; $02 = wall
-; $03 = titanium wall      (as seen on the border of the whole map)
-; $04 = diamond
-; $05 = rock
-; $06 = firefly            (with animation states $06, $16, $26, $36)
-; $07 = fungus             (states $07, $17, $27, $37, $47, $57, $67, and $77 as the
-; fungus grows)
-; $08 = animated player appearing
-; $09 = 4x4 earth square with firefly pacing inside (or butterfly on cave D)
-; $0a = animated player exploding
-; $0b = vertical strip     (during preprocessing: value above is filled down to the
-; next $0b)
-; $0c = horizontal strip   (during preprocessing: value is copied to the end of the
-; row)
-; $0d = magic wall
-; $0e = butterfly          (with animation states $0e, $1e, $2e, $3e)
-; $0f = player             ($0f=waiting, $1f=walking left, $2f=walking right)
-; 
-; $18 = flashing exit
-; $21 = intro explosion frame #1
-; $11 = intro explosion frame #2
-; $43 = explosion out effect #1
-; $33 = explosion out effect #2
-; $23 = explosion out effect #3
-; $13 = explosion out effect #4
-; 
-; *************************************************************************************
 sprite_addr_space
 initial_clock_value
 pydis_start
@@ -637,22 +645,22 @@ sprite_addr_Z
 ; *************************************************************************************
 unused_sprite_addr_91
 initial_values_of_variables_from_0x50
-    !byte 13                                                                            ; 1e60: 0d          .
-    !byte 99                                                                            ; 1e61: 63          c
-    !byte 159                                                                           ; 1e62: 9f          .
-    !byte 4                                                                             ; 1e63: 04          .
-    !byte 0                                                                             ; 1e64: 00          .
-    !byte 99                                                                            ; 1e65: 63          c
-    !byte 0                                                                             ; 1e66: 00          .
-    !byte 1                                                                             ; 1e67: 01          .
-    !byte 240                                                                           ; 1e68: f0          .
-    !byte 0                                                                             ; 1e69: 00          .
-    !byte 31                                                                            ; 1e6a: 1f          .
-    !byte 0                                                                             ; 1e6b: 00          .
-    !byte 12                                                                            ; 1e6c: 0c          .
-    !byte 0                                                                             ; 1e6d: 00          .
-    !byte 0                                                                             ; 1e6e: 00          .
-    !byte 0                                                                             ; 1e6f: 00          .
+    !byte 13                                                                            ; 1e60: 0d          .              ; magic_wall_state
+    !byte 99                                                                            ; 1e61: 63          c              ; magic_wall_timer
+    !byte 159                                                                           ; 1e62: 9f          .              ; rockford_cell_value
+    !byte 4                                                                             ; 1e63: 04          .              ;
+    !byte 0                                                                             ; 1e64: 00          .              ;
+    !byte 99                                                                            ; 1e65: 63          c              ; fungus_growth_interval
+    !byte 0                                                                             ; 1e66: 00          .              ;
+    !byte 1                                                                             ; 1e67: 01          .              ; fungus_counter
+    !byte 240                                                                           ; 1e68: f0          .              ; ticks_since_last_direction_key_pressed
+    !byte 0                                                                             ; 1e69: 00          .              ; countdown_while_switching_palette
+    !byte 31                                                                            ; 1e6a: 1f          .              ; tick_counter
+    !byte 0                                                                             ; 1e6b: 00          .              ; current_rockford_sprite
+    !byte 12                                                                            ; 1e6c: 0c          .              ; sub_second_ticks
+    !byte 0                                                                             ; 1e6d: 00          .              ; previous_direction_keys
+    !byte 0                                                                             ; 1e6e: 00          .              ; just_pressed_direction_keys
+    !byte 0                                                                             ; 1e6f: 00          .              ;
 set_clock_value
     !byte 5, 0, 0, 0, 0                                                                 ; 1e70: 05 00 00... ...            ; Five byte clock value (low byte to high byte)
 unused6
@@ -1203,7 +1211,7 @@ l2100
     !byte 1                                                                             ; 2105: 01          .              ; map_rock
     !byte 0                                                                             ; 2106: 00          .              ; map_firefly
     !byte 1                                                                             ; 2107: 01          .              ; map_fungus
-    !byte 0                                                                             ; 2108: 00          .              ; map_rockford_appearing
+    !byte 0                                                                             ; 2108: 00          .              ; map_rockford_appearing_or_end_position
     !byte 0                                                                             ; 2109: 00          .              ; map_earth_plus_firefly_4x4
     !byte 0                                                                             ; 210a: 00          .              ; map_explosion
     !byte 0                                                                             ; 210b: 00          .              ; map_vertical_strip
@@ -1232,7 +1240,7 @@ items_produced_by_the_magic_wall
     !byte map_unprocessed + map_diamond                                                 ; 2125: 84          .              ; map_rock
     !byte 0                                                                             ; 2126: 00          .              ; map_firefly
     !byte 0                                                                             ; 2127: 00          .              ; map_fungus
-    !byte 0                                                                             ; 2128: 00          .              ; map_rockford_appearing
+    !byte 0                                                                             ; 2128: 00          .              ; map_rockford_appearing_or_end_position
     !byte 0                                                                             ; 2129: 00          .              ; map_earth_plus_firefly_4x4
     !byte 0                                                                             ; 212a: 00          .              ; map_explosion
     !byte 0                                                                             ; 212b: 00          .              ; map_vertical_strip
@@ -1268,7 +1276,7 @@ l2180
     !byte 0                                                                             ; 2185: 00          .              ; map_rock
     !byte $46                                                                           ; 2186: 46          F              ; map_firefly
     !byte 0                                                                             ; 2187: 00          .              ; map_fungus
-    !byte 0                                                                             ; 2188: 00          .              ; map_rockford_appearing
+    !byte 0                                                                             ; 2188: 00          .              ; map_rockford_appearing_or_end_position
     !byte 0                                                                             ; 2189: 00          .              ; map_earth_plus_firefly_4x4
     !byte 0                                                                             ; 218a: 00          .              ; map_explosion
     !byte $7d                                                                           ; 218b: 7d          }              ; map_vertical_strip
@@ -1335,7 +1343,7 @@ collision_for_cell_type
     !byte 1                                                                             ; 21f5: 01          .              ; map_rock
     !byte 0                                                                             ; 21f6: 00          .              ; map_firefly
     !byte 0                                                                             ; 21f7: 00          .              ; map_fungus
-    !byte 0                                                                             ; 21f8: 00          .              ; map_rockford_appearing
+    !byte 0                                                                             ; 21f8: 00          .              ; map_rockford_appearing_or_end_position
     !byte 0                                                                             ; 21f9: 00          .              ; map_earth_plus_firefly_4x4
     !byte $ff                                                                           ; 21fa: ff          .              ; map_explosion
     !byte 0                                                                             ; 21fb: 00          .              ; map_vertical_strip
@@ -2103,25 +2111,26 @@ unused17
 
 ; *************************************************************************************
 handler_fungus
-    lda l0054                                                                           ; 259e: a5 54       .T
+    lda fungus_replacement                                                              ; 259e: a5 54       .T
     beq update_fungus                                                                   ; 25a0: f0 04       ..
     tax                                                                                 ; 25a2: aa          .
     sta sound6_active_flag                                                              ; 25a3: 85 4c       .L
     rts                                                                                 ; 25a5: 60          `
 
 update_fungus
-    inc l0056                                                                           ; 25a6: e6 56       .V
+    inc number_of_fungus_cells_found                                                    ; 25a6: e6 56       .V
+    ; check for surrounding space or earth allowing the fungus to grow
     lda #$0e                                                                            ; 25a8: a9 0e       ..
     bit cell_above                                                                      ; 25aa: 24 74       $t
-    beq c25ba                                                                           ; 25ac: f0 0c       ..
+    beq fungus_can_grow                                                                 ; 25ac: f0 0c       ..
     bit cell_left                                                                       ; 25ae: 24 76       $v
-    beq c25ba                                                                           ; 25b0: f0 08       ..
+    beq fungus_can_grow                                                                 ; 25b0: f0 08       ..
     bit cell_right                                                                      ; 25b2: 24 78       $x
-    beq c25ba                                                                           ; 25b4: f0 04       ..
+    beq fungus_can_grow                                                                 ; 25b4: f0 04       ..
     bit cell_below                                                                      ; 25b6: 24 7a       $z
     bne return3                                                                         ; 25b8: d0 3b       .;
-c25ba
-    stx l0060                                                                           ; 25ba: 86 60       .`
+fungus_can_grow
+    stx current_fungus_cell_type                                                        ; 25ba: 86 60       .`
     stx sound0_active_flag                                                              ; 25bc: 86 46       .F
     inc fungus_counter                                                                  ; 25be: e6 57       .W
     lda fungus_counter                                                                  ; 25c0: a5 57       .W
@@ -2175,13 +2184,13 @@ unused19
 ; *************************************************************************************
 handler_rockford
     stx current_rockford_sprite                                                         ; 2600: 86 5b       .[
-    lda l005f                                                                           ; 2602: a5 5f       ._
-    bne c2609                                                                           ; 2604: d0 03       ..
+    lda rockford_explosion_cell_type                                                    ; 2602: a5 5f       ._
+    bne start_death_explosion                                                           ; 2604: d0 03       ..
     inx                                                                                 ; 2606: e8          .
     bne check_for_direction_key_pressed                                                 ; 2607: d0 05       ..
-c2609
+start_death_explosion
     ldx #$46                                                                            ; 2609: a2 46       .F
-    stx l005f                                                                           ; 260b: 86 5f       ._
+    stx rockford_explosion_cell_type                                                    ; 260b: 86 5f       ._
     rts                                                                                 ; 260d: 60          `
 
 check_for_direction_key_pressed
@@ -2234,12 +2243,12 @@ c2636
     lda neighbour_cell_contents                                                         ; 2653: a5 64       .d
     cmp #$45                                                                            ; 2655: c9 45       .E
     beq check_if_value_is_empty                                                         ; 2657: f0 1b       ..
-    dec l0053                                                                           ; 2659: c6 53       .S
+    dec delay_trying_to_push_rock                                                       ; 2659: c6 53       .S
     bne check_if_value_is_empty                                                         ; 265b: d0 17       ..
     ora #$80                                                                            ; 265d: 09 80       ..
     sta (ptr_low),y                                                                     ; 265f: 91 8c       ..
     lda #4                                                                              ; 2661: a9 04       ..
-    sta l0053                                                                           ; 2663: 85 53       .S
+    sta delay_trying_to_push_rock                                                       ; 2663: 85 53       .S
     inc sound4_active_flag                                                              ; 2665: e6 4a       .J
 check_for_return_pressed
     lda keys_to_process                                                                 ; 2667: a5 62       .b
@@ -2365,8 +2374,8 @@ start_gameplay
     sta demo_key_duration                                                               ; 2705: 85 67       .g
     ; Set A=0
     lsr                                                                                 ; 2707: 4a          J
-    sta l0066                                                                           ; 2708: 85 66       .f
-c270a
+    sta zeroed_but_unused                                                               ; 2708: 85 66       .f
+gameplay_loop
     lda #0                                                                              ; 270a: a9 00       ..
     ; clear sound
     ldx #7                                                                              ; 270c: a2 07       ..
@@ -2376,21 +2385,23 @@ zero_eight_bytes_loop
     bpl zero_eight_bytes_loop                                                           ; 2711: 10 fb       ..
     ; zero variables
     sta status_text_address_low                                                         ; 2713: 85 69       .i
-    sta l0060                                                                           ; 2715: 85 60       .`
+    sta current_fungus_cell_type                                                        ; 2715: 85 60       .`
     sta neighbour_cell_contents                                                         ; 2717: 85 64       .d
     lda #$41                                                                            ; 2719: a9 41       .A
     sta sound2_active_flag                                                              ; 271b: 85 48       .H
+    ; reset number of fungus cells found, and if already zero then clear the
+    ; fungus_replacement
     ldx #0                                                                              ; 271d: a2 00       ..
-    lda l0056                                                                           ; 271f: a5 56       .V
-    stx l0056                                                                           ; 2721: 86 56       .V
-    bne c2727                                                                           ; 2723: d0 02       ..
-    stx l0054                                                                           ; 2725: 86 54       .T
-c2727
-    stx l0060                                                                           ; 2727: 86 60       .`
+    lda number_of_fungus_cells_found                                                    ; 271f: a5 56       .V
+    stx number_of_fungus_cells_found                                                    ; 2721: 86 56       .V
+    bne skip_clearing_fungus_replacement                                                ; 2723: d0 02       ..
+    stx fungus_replacement                                                              ; 2725: 86 54       .T
+skip_clearing_fungus_replacement
+    stx current_fungus_cell_type                                                        ; 2727: 86 60       .`
     jsr wait_for_13_centiseconds_and_read_keys                                          ; 2729: 20 90 2b     .+
     ; branch if not in demo mode
     ldx demo_mode_tick_count                                                            ; 272c: a6 65       .e
-    bmi got_key                                                                         ; 272e: 30 22       0"
+    bmi update_gameplay                                                                 ; 272e: 30 22       0"
     ; if a key is pressed in demo mode, then return
     lda keys_to_process                                                                 ; 2730: a5 62       .b
     beq update_demo_mode                                                                ; 2732: f0 01       ..
@@ -2408,13 +2419,13 @@ skip_demo_mode_text
     lda demonstration_keys,x                                                            ; 2741: bd 00 31    ..1
     sta keys_to_process                                                                 ; 2744: 85 62       .b
     dec demo_key_duration                                                               ; 2746: c6 67       .g
-    bne got_key                                                                         ; 2748: d0 08       ..
+    bne update_gameplay                                                                 ; 2748: d0 08       ..
     inc demo_mode_tick_count                                                            ; 274a: e6 65       .e
     inx                                                                                 ; 274c: e8          .
     lda demonstration_key_durations,x                                                   ; 274d: bd 60 31    .`1
     sta demo_key_duration                                                               ; 2750: 85 67       .g
 
-got_key
+update_gameplay
     jsr update_map                                                                      ; 2752: 20 00 24     .$
     ; get the contents of the cell that rockford is influencing. This can be the cell
     ; underneath rockford, or by holding the RETURN key down and pressing a direction
@@ -2423,33 +2434,37 @@ got_key
     lda neighbour_cell_contents                                                         ; 2755: a5 64       .d
     and #$0f                                                                            ; 2757: 29 0f       ).
     sta neighbour_cell_contents                                                         ; 2759: 85 64       .d
-    cmp #map_rockford_appearing                                                         ; 275b: c9 08       ..
-    bne rockford_is_not_appearing                                                       ; 275d: d0 03       ..
-    jmp check_for_pause_key                                                             ; 275f: 4c 40 30    L@0
+    cmp #map_rockford_appearing_or_end_position                                         ; 275b: c9 08       ..
+    bne rockford_is_not_at_end_position                                                 ; 275d: d0 03       ..
+    jmp update_with_gameplay_not_active                                                 ; 275f: 4c 40 30    L@0
 
-rockford_is_not_appearing
+rockford_is_not_at_end_position
     jsr draw_grid_of_sprites                                                            ; 2762: 20 00 23     .#
     jsr draw_status_bar                                                                 ; 2765: 20 25 23     %#
-    jsr sub_c3000                                                                       ; 2768: 20 00 30     .0
-    ; check if the player is still alive by reading the current rockford sprite
+    jsr update_fungus_timing                                                            ; 2768: 20 00 30     .0
+    ; check if the player is still alive by reading the current rockford sprite (branch
+    ; if not)
     lda current_rockford_sprite                                                         ; 276b: a5 5b       .[
-    beq not_out_of_time                                                                 ; 276d: f0 18       ..
+    beq check_for_earth                                                                 ; 276d: f0 18       ..
+    ; update game timer (sub seconds)
     dec sub_second_ticks                                                                ; 276f: c6 5c       .\
-    bpl not_out_of_time                                                                 ; 2771: 10 14       ..
+    bpl check_for_earth                                                                 ; 2771: 10 14       ..
     ; each 'second' of game time has 11 game ticks
     ldx #11                                                                             ; 2773: a2 0b       ..
     stx sub_second_ticks                                                                ; 2775: 86 5c       .\
-    ; decrement time remaining
+    ; decrement time remaining ('seconds') on the status bar and in the separate
+    ; variable
     ldy #12                                                                             ; 2777: a0 0c       ..
     jsr decrement_status_bar_number                                                     ; 2779: 20 aa 28     .(
     dec time_remaining                                                                  ; 277c: c6 6d       .m
-    bne not_out_of_time                                                                 ; 277e: d0 07       ..
+    ; branch if there's still time left
+    bne check_for_earth                                                                 ; 277e: d0 07       ..
     ; out of time
     lda #<out_of_time_message                                                           ; 2780: a9 b4       ..
     sta status_text_address_low                                                         ; 2782: 85 69       .i
-    jmp check_for_pause_key                                                             ; 2784: 4c 40 30    L@0
+    jmp update_with_gameplay_not_active                                                 ; 2784: 4c 40 30    L@0
 
-not_out_of_time
+check_for_earth
     lda neighbour_cell_contents                                                         ; 2787: a5 64       .d
     cmp #1                                                                              ; 2789: c9 01       ..
     bne skip_earth                                                                      ; 278b: d0 02       ..
@@ -2468,48 +2483,53 @@ skip_earth
     jsr got_diamond_so_update_status_bar                                                ; 27a1: 20 00 2f     ./
 skip_got_diamond
     jsr update_sounds                                                                   ; 27a4: 20 80 2c     .,
-    ; update tick
+    ; update game tick
     dec tick_counter                                                                    ; 27a7: c6 5a       .Z
     ; update magic wall timer
     lda tick_counter                                                                    ; 27a9: a5 5a       .Z
     and #7                                                                              ; 27ab: 29 07       ).
-    bne c27b7                                                                           ; 27ad: d0 08       ..
+    bne update_death_explosion                                                          ; 27ad: d0 08       ..
     lda magic_wall_state                                                                ; 27af: a5 50       .P
     cmp #$1d                                                                            ; 27b1: c9 1d       ..
-    bne c27b7                                                                           ; 27b3: d0 02       ..
+    bne update_death_explosion                                                          ; 27b3: d0 02       ..
     dec magic_wall_timer                                                                ; 27b5: c6 51       .Q
-c27b7
-    ldx l005f                                                                           ; 27b7: a6 5f       ._
-    beq c27c8                                                                           ; 27b9: f0 0d       ..
+update_death_explosion
+    ldx rockford_explosion_cell_type                                                    ; 27b7: a6 5f       ._
+    beq check_for_escape_key_pressed_to_die                                             ; 27b9: f0 0d       ..
     inx                                                                                 ; 27bb: e8          .
-    stx l005f                                                                           ; 27bc: 86 5f       ._
+    stx rockford_explosion_cell_type                                                    ; 27bc: 86 5f       ._
     cpx #$4b                                                                            ; 27be: e0 4b       .K
-    bmi c27c8                                                                           ; 27c0: 30 06       0.
+    bmi check_for_escape_key_pressed_to_die                                             ; 27c0: 30 06       0.
+    ; if key is pressed at end of the death explosion sequence, then return
     lda keys_to_process                                                                 ; 27c2: a5 62       .b
     bne return5                                                                         ; 27c4: d0 29       .)
-    dec l005f                                                                           ; 27c6: c6 5f       ._
-c27c8
+    dec rockford_explosion_cell_type                                                    ; 27c6: c6 5f       ._
+    ; branch if escape not pressed
+check_for_escape_key_pressed_to_die
     lda keys_to_process                                                                 ; 27c8: a5 62       .b
     lsr                                                                                 ; 27ca: 4a          J
     bcc c27d5                                                                           ; 27cb: 90 08       ..
-    lda l005f                                                                           ; 27cd: a5 5f       ._
+    ; branch if explosion already underway
+    lda rockford_explosion_cell_type                                                    ; 27cd: a5 5f       ._
     bne c27d5                                                                           ; 27cf: d0 04       ..
+    ; start death explosion
     lda #$46                                                                            ; 27d1: a9 46       .F
-    sta l005f                                                                           ; 27d3: 85 5f       ._
+    sta rockford_explosion_cell_type                                                    ; 27d3: 85 5f       ._
 c27d5
     lda cave_number                                                                     ; 27d5: a5 87       ..
     cmp #16                                                                             ; 27d7: c9 10       ..
-    bpl c27ec                                                                           ; 27d9: 10 11       ..
+    bpl gameplay_loop_local                                                             ; 27d9: 10 11       ..
     lda previous_direction_keys                                                         ; 27db: a5 5d       .]
     and #$b0                                                                            ; 27dd: 29 b0       ).
     eor #$b0                                                                            ; 27df: 49 b0       I.
-    beq c27ec                                                                           ; 27e1: f0 09       ..
+    beq gameplay_loop_local                                                             ; 27e1: f0 09       ..
+    ; check if pause pressed
     lda keys_to_process                                                                 ; 27e3: a5 62       .b
     and #2                                                                              ; 27e5: 29 02       ).
-    beq c27ec                                                                           ; 27e7: f0 03       ..
-    jsr check_for_pause_key                                                             ; 27e9: 20 40 30     @0
-c27ec
-    jmp c270a                                                                           ; 27ec: 4c 0a 27    L.'
+    beq gameplay_loop_local                                                             ; 27e7: f0 03       ..
+    jsr update_with_gameplay_not_active                                                 ; 27e9: 20 40 30     @0
+gameplay_loop_local
+    jmp gameplay_loop                                                                   ; 27ec: 4c 0a 27    L.'
 
 return5
     rts                                                                                 ; 27ef: 60          `
@@ -2794,7 +2814,7 @@ set_palette_loop
 
 ; *************************************************************************************
 unused27
-    cmp (l0060),y                                                                       ; 29c3: d1 60       .`
+    cmp (current_fungus_cell_type),y                                                    ; 29c3: d1 60       .`
     beq unused28                                                                        ; 29c5: f0 0d       ..
     lda #4                                                                              ; 29c7: a9 04       ..
     jsr add_a_to_ptr                                                                    ; 29c9: 20 40 22     @"
@@ -3806,23 +3826,24 @@ unused46
     !byte $81, $d9, $19, $81, $ff                                                       ; 2ffb: 81 d9 19... ...
 
 ; *************************************************************************************
-sub_c3000
-    lda l0056                                                                           ; 3000: a5 56       .V
-    beq c3018                                                                           ; 3002: f0 14       ..
+update_fungus_timing
+    lda number_of_fungus_cells_found                                                    ; 3000: a5 56       .V
+    beq check_for_fungus_timeout                                                        ; 3002: f0 14       ..
     sta sound0_active_flag                                                              ; 3004: 85 46       .F
-    ldy l0060                                                                           ; 3006: a4 60       .`
-    bne c3010                                                                           ; 3008: d0 06       ..
+    ldy current_fungus_cell_type                                                        ; 3006: a4 60       .`
+    bne found_fungus                                                                    ; 3008: d0 06       ..
     inc sound7_active_flag                                                              ; 300a: e6 4d       .M
-    ldx #$92                                                                            ; 300c: a2 92       ..
-    bne c3016                                                                           ; 300e: d0 06       ..             ; ALWAYS branch
+    ldx #(map_unprocessed | map_anim_state1) | map_wall                                 ; 300c: a2 92       ..
+    bne fungus_replacement_found                                                        ; 300e: d0 06       ..             ; ALWAYS branch
 
-c3010
+found_fungus
     adc #$38                                                                            ; 3010: 69 38       i8
-    bcc c3018                                                                           ; 3012: 90 04       ..
-    ldx #$85                                                                            ; 3014: a2 85       ..
-c3016
-    stx l0054                                                                           ; 3016: 86 54       .T
-c3018
+    bcc check_for_fungus_timeout                                                        ; 3012: 90 04       ..
+    ; towards the end of the level time the fungus turns into rock
+    ldx #map_unprocessed | map_rock                                                     ; 3014: a2 85       ..
+fungus_replacement_found
+    stx fungus_replacement                                                              ; 3016: 86 54       .T
+check_for_fungus_timeout
     lda time_remaining                                                                  ; 3018: a5 6d       .m
     cmp #50                                                                             ; 301a: c9 32       .2
     bne return13                                                                        ; 301c: d0 0d       ..
@@ -3831,7 +3852,7 @@ c3018
     bne return13                                                                        ; 3022: d0 07       ..
     lda #1                                                                              ; 3024: a9 01       ..
     sta fungus_growth_interval                                                          ; 3026: 85 55       .U
-    ; Set A=0
+    ; Set A=0 and zero the fungus counter
     lsr                                                                                 ; 3028: 4a          J
     sta fungus_counter                                                                  ; 3029: 85 57       .W
 return13
@@ -3842,10 +3863,16 @@ unused47
     !byte $1f, $1f, $1f, $1f, $1f                                                       ; 303b: 1f 1f 1f... ...
 
 ; *************************************************************************************
-check_for_pause_key
+; 
+; update while paused, or out of time, or at end position (i.e. when gameplay started
+; but is not currently active)
+; 
+; *************************************************************************************
+    ; check for pause key
+update_with_gameplay_not_active
     lda keys_to_process                                                                 ; 3040: a5 62       .b
     and #2                                                                              ; 3042: 29 02       ).
-    beq no_pause                                                                        ; 3044: f0 26       .&
+    beq check_if_end_position_reached                                                   ; 3044: f0 26       .&
     ; pause mode. show pause message.
     lda #<pause_message                                                                 ; 3046: a9 c8       ..
     sta status_text_address_low                                                         ; 3048: 85 69       .i
@@ -3864,29 +3891,32 @@ pause_loop
     ldx #<players_and_men_status_bar                                                    ; 305d: a2 14       ..
 skip_showing_players_and_men
     stx status_text_address_low                                                         ; 305f: 86 69       .i
-    jsr sub_c30cf                                                                       ; 3061: 20 cf 30     .0
+    jsr update_during_pause_or_out_of_time                                              ; 3061: 20 cf 30     .0
     beq pause_loop                                                                      ; 3064: f0 ed       ..
 update_while_finally_pressing_unpause_loop
     jsr update_during_pause_mode                                                        ; 3066: 20 dd 30     .0
     bne update_while_finally_pressing_unpause_loop                                      ; 3069: d0 fb       ..
     rts                                                                                 ; 306b: 60          `
 
-no_pause
+check_if_end_position_reached
     lda neighbour_cell_contents                                                         ; 306c: a5 64       .d
-    cmp #8                                                                              ; 306e: c9 08       ..
-    beq c3084                                                                           ; 3070: f0 12       ..
+    ; check if end position has been reached
+    cmp #map_rockford_appearing_or_end_position                                         ; 306e: c9 08       ..
+    beq rockford_reached_end_position                                                   ; 3070: f0 12       ..
+    ; show out of time message for a while, then return
     lda #$0e                                                                            ; 3072: a9 0e       ..
-    sta cell_above                                                                      ; 3074: 85 74       .t
+    sta out_of_time_message_countdown                                                   ; 3074: 85 74       .t
     lda #<out_of_time_message                                                           ; 3076: a9 b4       ..
     sta status_text_address_low                                                         ; 3078: 85 69       .i
-loop_c307a
-    jsr sub_c30cf                                                                       ; 307a: 20 cf 30     .0
+out_of_time_loop
+    jsr update_during_pause_or_out_of_time                                              ; 307a: 20 cf 30     .0
     bne return14                                                                        ; 307d: d0 5d       .]
-    dec cell_above                                                                      ; 307f: c6 74       .t
-    bne loop_c307a                                                                      ; 3081: d0 f7       ..
+    dec out_of_time_message_countdown                                                   ; 307f: c6 74       .t
+    bne out_of_time_loop                                                                ; 3081: d0 f7       ..
     rts                                                                                 ; 3083: 60          `
 
-c3084
+    ; clear rockford's final position, and set rockford on end position
+rockford_reached_end_position
     ldy #0                                                                              ; 3084: a0 00       ..
     lda (map_rockford_current_position_addr_low),y                                      ; 3086: b1 70       .p
     and #$7f                                                                            ; 3088: 29 7f       ).
@@ -3897,8 +3927,8 @@ c3084
     sta (map_rockford_end_position_addr_low),y                                          ; 308f: 91 6a       .j
     jsr draw_grid_of_sprites                                                            ; 3091: 20 00 23     .#
     lda time_remaining                                                                  ; 3094: a5 6d       .m
-    beq c30cb                                                                           ; 3096: f0 33       .3
-c3098
+    beq skip_bonus                                                                      ; 3096: f0 33       .3
+count_up_bonus_at_end_of_stage_loop
     ldy #$13                                                                            ; 3098: a0 13       ..
     jsr increment_status_bar_number                                                     ; 309a: 20 98 28     .(
     ldy #$0c                                                                            ; 309d: a0 0c       ..
@@ -3921,11 +3951,11 @@ c3098
     sta wait_delay_centiseconds                                                         ; 30c2: 85 84       ..
     jsr wait_for_centiseconds_and_read_keys                                             ; 30c4: 20 94 2b     .+
     dec time_remaining                                                                  ; 30c7: c6 6d       .m
-    bne c3098                                                                           ; 30c9: d0 cd       ..
-c30cb
+    bne count_up_bonus_at_end_of_stage_loop                                             ; 30c9: d0 cd       ..
+skip_bonus
     lda #<regular_status_bar                                                            ; 30cb: a9 00       ..
     sta status_text_address_low                                                         ; 30cd: 85 69       .i
-sub_c30cf
+update_during_pause_or_out_of_time
     jsr draw_grid_of_sprites                                                            ; 30cf: 20 00 23     .#
     jsr draw_status_bar                                                                 ; 30d2: 20 25 23     %#
     jsr wait_for_13_centiseconds_and_read_keys                                          ; 30d5: 20 90 2b     .+
@@ -4431,7 +4461,7 @@ show_menu
     ldy #1                                                                              ; 3a2a: a0 01       ..
 handle_menu_loop
     lda #0                                                                              ; 3a2c: a9 00       ..
-    sta map_rockford_end_position_addr_low                                              ; 3a2e: 85 6a       .j
+    sta timeout_until_demo_mode                                                         ; 3a2e: 85 6a       .j
     stx cave_number                                                                     ; 3a30: 86 87       ..
     sty difficulty_level                                                                ; 3a32: 84 89       ..
     txa                                                                                 ; 3a34: 8a          .
@@ -4472,7 +4502,7 @@ waiting_for_demo_loop
     bcs return15                                                                        ; 3a77: b0 68       .h
     asl                                                                                 ; 3a79: 0a          .
     bcs show_rockford_again_and_play_game                                               ; 3a7a: b0 55       .U
-    dec map_rockford_end_position_addr_low                                              ; 3a7c: c6 6a       .j
+    dec timeout_until_demo_mode                                                         ; 3a7c: c6 6a       .j
     bne waiting_for_demo_loop                                                           ; 3a7e: d0 c5       ..
 
     ; demo mode
@@ -6341,6 +6371,9 @@ pydis_end
 !if ((map_unprocessed | map_anim_state1) | map_firefly) != $96 {
     !error "Assertion failed: (map_unprocessed | map_anim_state1) | map_firefly == $96"
 }
+!if ((map_unprocessed | map_anim_state1) | map_wall) != $92 {
+    !error "Assertion failed: (map_unprocessed | map_anim_state1) | map_wall == $92"
+}
 !if ((map_unprocessed | map_anim_state2) | map_butterfly) != $ae {
     !error "Assertion failed: (map_unprocessed | map_anim_state2) | map_butterfly == $ae"
 }
@@ -7325,8 +7358,8 @@ pydis_end
 !if (map_rockford | map_unprocessed) != $8f {
     !error "Assertion failed: map_rockford | map_unprocessed == $8f"
 }
-!if (map_rockford_appearing) != $08 {
-    !error "Assertion failed: map_rockford_appearing == $08"
+!if (map_rockford_appearing_or_end_position) != $08 {
+    !error "Assertion failed: map_rockford_appearing_or_end_position == $08"
 }
 !if (map_space) != $00 {
     !error "Assertion failed: map_space == $00"
@@ -7339,6 +7372,9 @@ pydis_end
 }
 !if (map_unprocessed + map_space) != $80 {
     !error "Assertion failed: map_unprocessed + map_space == $80"
+}
+!if (map_unprocessed | map_rock) != $85 {
+    !error "Assertion failed: map_unprocessed | map_rock == $85"
 }
 !if (map_vertical_strip) != $0b {
     !error "Assertion failed: map_vertical_strip == $0b"

@@ -107,8 +107,11 @@ substitute_labels = {
         "screen_addr1_low":  "map_x",
         "screen_addr1_high": "map_y",
     },
+    (0x306c, 0x3083): {
+        "cell_above": "out_of_time_message_countdown",
+    },
     (0x3a00, 0x3b00): {
-        "l006a": "timeout_until_demo_mode",
+        "map_rockford_end_position_addr_low": "timeout_until_demo_mode",
     },
 }
 
@@ -232,7 +235,10 @@ label(0x004e, "pause_counter")
 label(0x0050, "magic_wall_state")
 label(0x0051, "magic_wall_timer")
 label(0x0052, "rockford_cell_value")
+label(0x0053, "delay_trying_to_push_rock")
+label(0x0054, "fungus_replacement")
 label(0x0055, "fungus_growth_interval")
+label(0x0056, "number_of_fungus_cells_found")
 label(0x0057, "fungus_counter")
 label(0x0058, "ticks_since_last_direction_key_pressed")
 label(0x0059, "countdown_while_switching_palette")
@@ -241,9 +247,12 @@ label(0x005b, "current_rockford_sprite")
 label(0x005c, "sub_second_ticks")
 label(0x005d, "previous_direction_keys")
 label(0x005e, "just_pressed_direction_keys")
+label(0x005f, "rockford_explosion_cell_type")
+label(0x0060, "current_fungus_cell_type")
 label(0x0062, "keys_to_process")
 label(0x0064, "neighbour_cell_contents")
 label(0x0065, "demo_mode_tick_count")
+label(0x0066, "zeroed_but_unused")
 label(0x0067, "demo_key_duration")
 label(0x0069, "status_text_address_low")
 label(0x006a, "map_rockford_end_position_addr_low")
@@ -298,54 +307,6 @@ label(0x008f, "offset_to_sound")
 # (Class SubstituteLabels is defined in common.py to implement the substitute labels)
 s = SubstituteLabels(substitute_labels)
 set_label_maker_hook(s.substitute_label_maker)
-
-comment(0x1300, """*************************************************************************************
-Caves: There are 20 caves total (16 main caves A-P plus four bonus caves Q-T)
-Difficulty levels: 1-5 for each cave
-
-Some definitions:
-* A *stage* consists of a cave letter and difficulty level. e.g. A1 is a stage.
-* The *tile map* is the 40x23 map of the entire stage.
-  Rows are separated by 64 bytes in memory, despite only being 40 bytes in length.
-  (This is to simplify the conversion between row number and address and vice-versa).
-  Other data is placed in between some of the rows.
-  Each entry in the tile map is a *cell*, which usually holds a basic cell type in the
-  lower 4 bits and a modifier in the top four bits. These are converted into sprites
-  using the 'cell_type_to_sprite' lookup table.
-* The *grid* is the visible area of sprites, showing a 20x12 section of the tile map.
-  An offscreen cache of the sprites currently displayed in the grid is stored in the 'grid_of_currently_displayed_sprites' array.
-  Using this we only need to draw the sprites that have changed since the previous tick.
-* The *status bar* is single row of text at the top of the grid, showing the current score etc.
-  Each player has a status bar, and different status bars are shown while the game is paused.
-
-Cell values in tile_map:
-
-$00 = empty space
-$01 = earth
-$02 = wall
-$03 = titanium wall      (as seen on the border of the whole map)
-$04 = diamond
-$05 = rock
-$06 = firefly            (with animation states $06, $16, $26, $36)
-$07 = fungus             (states $07, $17, $27, $37, $47, $57, $67, and $77 as the fungus grows)
-$08 = animated player appearing
-$09 = 4x4 earth square with firefly pacing inside (or butterfly on cave D)
-$0a = animated player exploding
-$0b = vertical strip     (during preprocessing: value above is filled down to the next $0b)
-$0c = horizontal strip   (during preprocessing: value is copied to the end of the row)
-$0d = magic wall
-$0e = butterfly          (with animation states $0e, $1e, $2e, $3e)
-$0f = player             ($0f=waiting, $1f=walking left, $2f=walking right)
-
-$18 = flashing exit
-$21 = intro explosion frame #1
-$11 = intro explosion frame #2
-$43 = explosion out effect #1
-$33 = explosion out effect #2
-$23 = explosion out effect #3
-$13 = explosion out effect #4
-
-*************************************************************************************""")
 
 sprites = {
     0: "sprite_space",
@@ -591,7 +552,7 @@ map_cell_types = {
     0x5: "map_rock",
     0x6: "map_firefly",
     0x7: "map_fungus",
-    0x8: "map_rockford_appearing",
+    0x8: "map_rockford_appearing_or_end_position",
     0x9: "map_earth_plus_firefly_4x4",
     0xa: "map_explosion",
     0xb: "map_vertical_strip",
@@ -609,6 +570,26 @@ constant(0x10, "map_anim_state1")
 constant(0x20, "map_anim_state2")
 constant(0x30, "map_anim_state3")
 constant(0x80, "map_unprocessed")
+
+
+comment(0x1e60, "magic_wall_state", inline=True)
+comment(0x1e61, "magic_wall_timer", inline=True)
+comment(0x1e62, "rockford_cell_value", inline=True)
+comment(0x1e63, "", inline=True)
+comment(0x1e64, "", inline=True)
+comment(0x1e65, "fungus_growth_interval", inline=True)
+comment(0x1e66, "", inline=True)
+comment(0x1e67, "fungus_counter", inline=True)
+comment(0x1e68, "ticks_since_last_direction_key_pressed", inline=True)
+comment(0x1e69, "countdown_while_switching_palette", inline=True)
+comment(0x1e6a, "tick_counter", inline=True)
+comment(0x1e6b, "current_rockford_sprite", inline=True)
+comment(0x1e6c, "sub_second_ticks", inline=True)
+comment(0x1e6d, "previous_direction_keys", inline=True)
+comment(0x1e6e, "just_pressed_direction_keys", inline=True)
+comment(0x1e6f, "", inline=True)
+
+
 
 blank(0x1e80)
 stars(0x1e80)
@@ -1105,10 +1086,14 @@ comment(0x2589, "write to below left cell", indent=1)
 comment(0x258f, "write to below right cell", indent=1)
 entry(0x2598)
 unused(0x2598)
+label(0x25a6, "update_fungus")
+comment(0x25a8, "check for surrounding space or earth allowing the fungus to grow", indent=1)
 ret(0x25f5)
 unused_entry(0x25f6)
+label(0x25ba, "fungus_can_grow")
 unused_entry(0x25fc)
 
+label(0x2609, "start_death_explosion")
 label(0x260e, "check_for_direction_key_pressed")
 comment(0x2614, "player is not moving in any direction", indent=1)
 label(0x2616, "update_player_at_current_location")
@@ -1153,9 +1138,13 @@ unused(0x26fe)
 stars(0x2700)
 label(0x2700, "start_gameplay")
 comment(0x2707, "Set A=0", indent=1)
+label(0x270a, "gameplay_loop")
+label(0x27ec, "gameplay_loop_local")
 comment(0x270c, "clear sound", indent=1)
 label(0x270e, "zero_eight_bytes_loop")
 comment(0x2713, "zero variables", indent=1)
+comment(0x271d, "reset number of fungus cells found, and if already zero then clear the fungus_replacement", indent=1)
+label(0x2727, "skip_clearing_fungus_replacement")
 comment(0x272c, "branch if not in demo mode", indent=1)
 comment(0x2730, "if a key is pressed in demo mode, then return", indent=1)
 label(0x2735, "update_demo_mode")
@@ -1164,25 +1153,34 @@ comment(0x2737, "flip between status bar and demo mode text every 16 ticks", ind
 label(0x273f, "skip_demo_mode_text")
 expr(0x273e, make_lo("demonstration_mode_text"))
 blank(0x2752)
-label(0x2752, "got_key")
+label(0x2752, "update_gameplay")
 comment(0x2755, "get the contents of the cell that rockford is influencing. This can be the cell underneath rockford, or by holding the RETURN key down and pressing a direction key it can be one of the neighbouring cells.\nWe clear the top bits to just extract the basic type.", indent=1)
-expr(0x275c, "map_rockford_appearing")
-label(0x2762, "rockford_is_not_appearing")
-comment(0x276b, "check if the player is still alive by reading the current rockford sprite", indent=1)
+expr(0x275c, "map_rockford_appearing_or_end_position")
+label(0x2762, "rockford_is_not_at_end_position")
+comment(0x276b, "check if the player is still alive by reading the current rockford sprite (branch if not)", indent=1)
+comment(0x276f, "update game timer (sub seconds)", indent=1)
 comment(0x2773, "each 'second' of game time has 11 game ticks", indent=1)
 decimal(0x2774)
-comment(0x2777, "decrement time remaining", indent=1)
+comment(0x2777, "decrement time remaining ('seconds') on the status bar and in the separate variable", indent=1)
+comment(0x277e, "branch if there's still time left", indent=1)
 decimal(0x2778)
 comment(0x2780, "out of time", indent=1)
 expr(0x2781, make_lo("out_of_time_message"))
-label(0x2787, "not_out_of_time")
+label(0x2787, "check_for_earth")
 comment(0x278d, "got earth. play sound 3", indent=1)
 label(0x278f, "skip_earth")
 comment(0x2793, "got diamond. play sounds", indent=1)
 label(0x27a4, "skip_got_diamond")
-comment(0x27a7, "update tick", indent=1)
+comment(0x27a7, "update game tick", indent=1)
 comment(0x27a9, "update magic wall timer", indent=1)
+label(0x27b7, "update_death_explosion")
+comment(0x27c2, "if key is pressed at end of the death explosion sequence, then return", indent=1)
+label(0x27c8, "check_for_escape_key_pressed_to_die")
+comment(0x27c8, "branch if escape not pressed", indent=1)
+comment(0x27cd, "branch if explosion already underway", indent=1)
+comment(0x27d1, "start death explosion", indent=1)
 decimal(0x27d8)
+comment(0x27e3, "check if pause pressed", indent=1)
 ret(0x27ef)
 unused(0x27f0)
 byte(0x27f0,16)
@@ -1215,7 +1213,6 @@ unused(0x288a)
 label(0x2898, "increment_status_bar_number")
 expr(0x28a3, "sprite_0")
 stars(0x2898)
-label(0x25a6, "update_fungus")
 expr(0x28b1, "sprite_0")
 label(0x28bc, "finished_change")
 stars(0x28c0)
@@ -1599,14 +1596,22 @@ comment(0x2fda, "return zero", indent=1)
 unused(0x2fdd)
 
 stars(0x3000)
+label(0x3000, "update_fungus_timing")
 expr(0x3005, "sound0_active_flag")
+expr(0x300d, make_or(make_or("map_unprocessed", "map_anim_state1"), "map_wall"))
 ab(0x300e, True)
+label(0x3010, "found_fungus")
+comment(0x3014, "towards the end of the level time the fungus turns into rock", indent=1)
+expr(0x3015, make_or("map_unprocessed", "map_rock"))
+label(0x3016, "fungus_replacement_found")
+label(0x3018, "check_for_fungus_timeout")
 decimal(0x301b)
-comment(0x3028, "Set A=0", indent=1)
+comment(0x3028, "Set A=0 and zero the fungus counter", indent=1)
 ret(0x302b)
 unused(0x302c)
-stars(0x3040)
-label(0x3040, "check_for_pause_key")
+stars(0x3040, "update while paused, or out of time, or at end position (i.e. when gameplay started but is not currently active)")
+label(0x3040, "update_with_gameplay_not_active")
+comment(0x3040, "check for pause key", indent=1)
 comment(0x3046, "pause mode. show pause message.", indent=1)
 comment(0x3057, "toggle between showing pause message and regular status bar every 16 ticks", indent=1)
 label(0x305f, "skip_showing_players_and_men")
@@ -1616,9 +1621,18 @@ label(0x3053, "pause_loop")
 expr(0x3056, make_lo("pause_message"))
 expr(0x305e, make_lo("players_and_men_status_bar"))
 label(0x03066, "update_while_finally_pressing_unpause_loop")
-label(0x306c, "no_pause")
+label(0x306c, "check_if_end_position_reached")
+comment(0x306e, "check if end position has been reached", indent=1)
+expr(0x306f, "map_rockford_appearing_or_end_position")
+comment(0x3072, "show out of time message for a while, then return", indent=1)
 expr(0x3077, make_lo("out_of_time_message"))
+label(0x307a, "out_of_time_loop")
+label(0x3084, "rockford_reached_end_position")
+comment(0x3084, "clear rockford's final position, and set rockford on end position", indent=1)
+label(0x3098, "count_up_bonus_at_end_of_stage_loop")
+label(0x30cb, "skip_bonus")
 expr(0x30cc, make_lo("regular_status_bar"))
+label(0x30cf, "update_during_pause_or_out_of_time")
 ret(0x30dc)
 stars(0x30dd)
 label(0x30dd, "update_during_pause_mode")
@@ -2038,12 +2052,74 @@ label(0x5800 + 28*0x140, "screen_addr_row_28")
 label(0x5800 + 30*0x140, "screen_addr_row_30")
 acorn.bbc()
 
-print(""";
+print("""; *************************************************************************************
+;
 ; Disassembly of Boulderdash, by TobyLobster 2024
-; This is a disassembly of the BBC Micro version from http://bbcmicro.co.uk/game.php?id=669
 ;
 ; File: ___1___
 ;
+; This is a disassembly of the BBC Micro version from http://bbcmicro.co.uk/game.php?id=669
+;
+; Ingredients
+; -----------
+;
+; Caves: There are 20 caves total (16 main caves A-P plus four bonus caves Q-T)
+; Difficulty levels: 1-5 for each cave
+;
+; * A *stage* consists of a cave letter and difficulty level. e.g. A1 is a stage.
+;
+; * The *tile map* is the 40x23 map of the entire stage.
+;   Map rows are separated by 64 bytes in memory, despite only being 40 bytes in length.
+;   (This simplifies the conversion between row number and address and vice-versa).
+;
+;   Sometimes other data is stored in the spare bytes between rows.
+;
+;   Each entry in the tile map is a *cell*, which holds a basic cell type in the lower
+;   4 bits and a modifier in the top four bits. These are converted into sprites using
+;   the 'cell_type_to_sprite' lookup table.
+;
+; * The *grid* is the visible area of sprites, showing a 20x12 section of the tile map.
+;
+;   An offscreen cache of the sprites currently displayed in the grid is stored in the
+; 'grid_of_currently_displayed_sprites' array.
+;
+;   By consulting and updating the cache, we only draw sprites that have changed since
+;   the previous tick.
+;
+; * The *status bar* is single row of text at the top of the grid, showing the current
+; score etc.
+;
+;   Each player has a status bar, and different status bars are shown while paused.
+;
+; Cell values in tile_map:
+;
+; $00 = empty space
+; $01 = earth
+; $02 = wall
+; $03 = titanium wall      (as seen on the border of the whole map)
+; $04 = diamond
+; $05 = rock
+; $06 = firefly            (with animation states $06, $16, $26, $36)
+; $07 = fungus             (states $07, $17, $27, $37, $47, $57, $67, and $77 as the
+;                           fungus grows)
+; $08 = animated player appearing
+; $09 = 4x4 earth square with firefly pacing inside (or butterfly on cave D)
+; $0a = animated player exploding
+; $0b = vertical strip     (in preprocessing: value above is filled down to the next $0b)
+; $0c = horizontal strip   (in preprocessing: value is copied to the end of the row)
+; $0d = magic wall
+; $0e = butterfly          (with animation states $0e, $1e, $2e, $3e)
+; $0f = player             ($0f=waiting, $1f=walking left, $2f=walking right)
+;
+; $18 = flashing exit
+; $21 = intro explosion frame #1
+; $11 = intro explosion frame #2
+; $43 = explosion out effect #1
+; $33 = explosion out effect #2
+; $23 = explosion out effect #3
+; $13 = explosion out effect #4
+;
+; *************************************************************************************
 """)
 
 go()
