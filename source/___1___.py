@@ -59,6 +59,14 @@ def envelope(addr, lab):
 #   This is to make the addresses unique.
 #
 substitute_labels = {
+    (0x2256, 0x22a4): {
+        "cell_right": "amount_to_increment_ptr_minus_one",
+        "cell_below_left": "value_to_clear_map_to",
+    },
+    (0x2900, 0x290d): {
+        "cell_right": "amount_to_increment_ptr_minus_one",
+        "cell_below_left": "value_to_clear_map_to",
+    },
     (0x260e, 0x2800): {
         "data_set_ptr_low": "sound_active_flag_table",
         "data_set_ptr_high": "sound1_active_flag",
@@ -886,14 +894,18 @@ stars(0x224a)
 label(0x224a, "get_next_random_byte")
 comment(0x224a, "a small 'pseudo-random' number routine. Generates a sequence of 256 numbers.")
 stars(0x2256)
-comment(0x2256, "Clears the entire map to initial_cell_fill_value.\nClears the visible grid to $ff")
+comment(0x2256, "Clears the entire map to initial_cell_fill_value.\nClears the visible grid to $ff\ncell_right is always zero in this routine, making some of the instructions unused.")
 label(0x2256, "clear_map_and_grid")
 expr(0x2257, make_lo("tile_map_row_1-1"))
 expr(0x225b, make_hi("tile_map_row_1-1"))
 comment(0x2260, "initial random seed", indent=1)
 decimal(0x2261)
 label(0x2264, "clear_map_loop")
+label(0x226b, "unused_repeated_subtraction_loop")
+label(0x2274, "store_increment")
+comment(0x2274, "loop counter", inline=True)
 label(0x2276, "increment_ptr_using_40_bytes_out_of_every_64")
+label(0x2288, "skip_moving_to_next_row")
 label(0x2292, "reset_grid_of_sprites")
 label(0x2296, "reset_grid_of_sprites_loop")
 comment(0x229c, "clear the current status bar", indent=1)
@@ -1179,7 +1191,10 @@ label(0x27c8, "check_for_escape_key_pressed_to_die")
 comment(0x27c8, "branch if escape not pressed", indent=1)
 comment(0x27cd, "branch if explosion already underway", indent=1)
 comment(0x27d1, "start death explosion", indent=1)
+label(0x27d5, "check_if_pause_is_available")
+comment(0x27d5, "branch if on a bonus stage (no pause available)", indent=1)
 decimal(0x27d8)
+comment(0x27db, "check for up, down, and right keys pressed together. If all pressed, don't check for SPACE BAR for pause [is this protection against ghost key matrix presses?]", indent=1)
 comment(0x27e3, "check if pause pressed", indent=1)
 ret(0x27ef)
 unused(0x27f0)
@@ -1225,7 +1240,7 @@ label(0x28aa, "decrement_status_bar_number")
 
 stars(0x2900)
 label(0x2900, "prepare_stage")
-comment(0x2910, "high nybbles in the cave colour arrays store the sprite to use for three basic block types. copy them into cell_above_left/cell_above/cell_above_right", indent=1)
+comment(0x2910, "the high nybbles in the cave colour arrays store the sprite to use for three basic block types. copy them into cell_above_left/cell_above/cell_above_right", indent=1)
 label(0x2914, "loop_three_times")
 expr(0x291c, "cell_above_left-1")
 comment(0x291d, "add number of caves to Y, in order to get next block type", indent=1)
@@ -1937,11 +1952,11 @@ label(0x4c7c, "length_of_strip_data_for_each_cave")
 cave_comments(0x4c7c)
 label(0x4c90, "fill_cell_in_lower_nybble_strip_value_to_skip_in_upper_for_each_cave")
 cave_comments(0x4c90)
-label(0x4ca4, "colour_1_lower_nybble_block_type_1_upper_for_each_cave")
+label(0x4ca4, "colour_1_lower_nybble_cell_type_1_upper_for_each_cave")
 cave_comments(0x4ca4)
-label(0x4ca4+20*1, "colour_2_lower_nybble_block_type_2_upper_for_each_cave")
+label(0x4ca4+20*1, "colour_2_lower_nybble_cell_type_2_upper_for_each_cave")
 cave_comments(0x4ca4+20*1)
-label(0x4ca4+20*2, "colour_3_lower_nybble_block_type_3_upper_for_each_cave")
+label(0x4ca4+20*2, "colour_3_lower_nybble_cell_type_3_upper_for_each_cave")
 cave_comments(0x4ca4+20*2)
 label(0x4ca4+20*3, "cave_to_data_set")
 cave_comments(0x4ca4+20*3)

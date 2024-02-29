@@ -232,9 +232,11 @@ cell_above_right                        = &0075
 cell_left                               = &0076
 cell_current                            = &0077
 loop_counter                            = &0077
+amount_to_increment_ptr_minus_one       = &0078
 cell_right                              = &0078
 cell_below_left                         = &0079
 initial_cell_fill_value                 = &0079
+value_to_clear_map_to                   = &0079
 cell_below                              = &007a
 cell_below_right                        = &007b
 lower_nybble_value                      = &007c
@@ -1355,6 +1357,7 @@ lfff6                                   = &fff6
 ; *************************************************************************************
 ; Clears the entire map to initial_cell_fill_value.
 ; Clears the visible grid to $ff
+; cell_right is always zero in this routine, making some of the instructions unused.
 .clear_map_and_grid
     lda #<(tile_map_row_1-1)                                                            ; 2256: a9 3f       .?
     sta ptr_low                                                                         ; 2258: 85 8c       ..
@@ -1365,31 +1368,31 @@ lfff6                                   = &fff6
     ldx #20                                                                             ; 2260: a2 14       ..
     stx random_seed                                                                     ; 2262: 86 88       ..
 .clear_map_loop
-    lda cell_right                                                                      ; 2264: a5 78       .x
-    beq c2274                                                                           ; 2266: f0 0c       ..
+    lda amount_to_increment_ptr_minus_one                                               ; 2264: a5 78       .x
+    beq store_increment                                                                 ; 2266: f0 0c       ..
     jsr get_next_random_byte                                                            ; 2268: 20 4a 22     J"
-.loop_c226b
-    cmp cell_right                                                                      ; 226b: c5 78       .x
-    bcc c2274                                                                           ; 226d: 90 05       ..
+.unused_repeated_subtraction_loop
+    cmp amount_to_increment_ptr_minus_one                                               ; 226b: c5 78       .x
+    bcc store_increment                                                                 ; 226d: 90 05       ..
     sec                                                                                 ; 226f: 38          8
-    sbc cell_right                                                                      ; 2270: e5 78       .x
-    bne loop_c226b                                                                      ; 2272: d0 f7       ..
-.c2274
-    sta cell_current                                                                    ; 2274: 85 77       .w
+    sbc amount_to_increment_ptr_minus_one                                               ; 2270: e5 78       .x
+    bne unused_repeated_subtraction_loop                                                ; 2272: d0 f7       ..
+.store_increment
+    sta cell_current                                                                    ; 2274: 85 77       .w             ; loop counter
 .increment_ptr_using_40_bytes_out_of_every_64
     inc ptr_low                                                                         ; 2276: e6 8c       ..
     lda ptr_low                                                                         ; 2278: a5 8c       ..
     and #&3f                                                                            ; 227a: 29 3f       )?
     cmp #&28                                                                            ; 227c: c9 28       .(
-    bcc c2288                                                                           ; 227e: 90 08       ..
+    bcc skip_moving_to_next_row                                                         ; 227e: 90 08       ..
     lda #&18                                                                            ; 2280: a9 18       ..
     jsr add_a_to_ptr                                                                    ; 2282: 20 40 22     @"
     dex                                                                                 ; 2285: ca          .
     beq return1                                                                         ; 2286: f0 c1       ..
-.c2288
+.skip_moving_to_next_row
     dec cell_current                                                                    ; 2288: c6 77       .w
     bpl increment_ptr_using_40_bytes_out_of_every_64                                    ; 228a: 10 ea       ..
-    lda cell_below_left                                                                 ; 228c: a5 79       .y
+    lda value_to_clear_map_to                                                           ; 228c: a5 79       .y
     sta (ptr_low),y                                                                     ; 228e: 91 8c       ..
     bpl clear_map_loop                                                                  ; 2290: 10 d2       ..
 .reset_grid_of_sprites
@@ -2412,17 +2415,20 @@ l2572 = sub_c2571+1
 .check_for_escape_key_pressed_to_die
     lda keys_to_process                                                                 ; 27c8: a5 62       .b
     lsr a                                                                               ; 27ca: 4a          J
-    bcc c27d5                                                                           ; 27cb: 90 08       ..
+    bcc check_if_pause_is_available                                                     ; 27cb: 90 08       ..
     ; branch if explosion already underway
     lda rockford_explosion_cell_type                                                    ; 27cd: a5 5f       ._
-    bne c27d5                                                                           ; 27cf: d0 04       ..
+    bne check_if_pause_is_available                                                     ; 27cf: d0 04       ..
     ; start death explosion
     lda #&46                                                                            ; 27d1: a9 46       .F
     sta rockford_explosion_cell_type                                                    ; 27d3: 85 5f       ._
-.c27d5
+    ; branch if on a bonus stage (no pause available)
+.check_if_pause_is_available
     lda cave_number                                                                     ; 27d5: a5 87       ..
     cmp #16                                                                             ; 27d7: c9 10       ..
     bpl gameplay_loop_local                                                             ; 27d9: 10 11       ..
+    ; check for up, down, and right keys pressed together. If all pressed, don't check
+    ; for SPACE BAR for pause [is this protection against ghost key matrix presses?]
     lda previous_direction_keys                                                         ; 27db: a5 5d       .]
     and #&b0                                                                            ; 27dd: 29 b0       ).
     eor #&b0                                                                            ; 27df: 49 b0       I.
@@ -2585,18 +2591,18 @@ l2572 = sub_c2571+1
 ; *************************************************************************************
 .prepare_stage
     lda #0                                                                              ; 2900: a9 00       ..
-    sta cell_right                                                                      ; 2902: 85 78       .x
+    sta amount_to_increment_ptr_minus_one                                               ; 2902: 85 78       .x
     ldy cave_number                                                                     ; 2904: a4 87       ..
     lda fill_cell_in_lower_nybble_strip_value_to_skip_in_upper_for_each_cave,y          ; 2906: b9 90 4c    ..L
     and #&0f                                                                            ; 2909: 29 0f       ).
-    sta cell_below_left                                                                 ; 290b: 85 79       .y
+    sta value_to_clear_map_to                                                           ; 290b: 85 79       .y
     jsr clear_map_and_grid                                                              ; 290d: 20 56 22     V"
-    ; high nybbles in the cave colour arrays store the sprite to use for three basic
-    ; block types. copy them into cell_above_left/cell_above/cell_above_right
+    ; the high nybbles in the cave colour arrays store the sprite to use for three
+    ; basic block types. copy them into cell_above_left/cell_above/cell_above_right
     ldy cave_number                                                                     ; 2910: a4 87       ..
     ldx #1                                                                              ; 2912: a2 01       ..
 .loop_three_times
-    lda colour_1_lower_nybble_block_type_1_upper_for_each_cave,y                        ; 2914: b9 a4 4c    ..L
+    lda colour_1_lower_nybble_cell_type_1_upper_for_each_cave,y                         ; 2914: b9 a4 4c    ..L
     lsr a                                                                               ; 2917: 4a          J
     lsr a                                                                               ; 2918: 4a          J
     lsr a                                                                               ; 2919: 4a          J
@@ -2703,7 +2709,7 @@ l2572 = sub_c2571+1
     ldy cave_number                                                                     ; 29ac: a4 87       ..
     ldx #1                                                                              ; 29ae: a2 01       ..
 .set_palette_loop
-    lda colour_1_lower_nybble_block_type_1_upper_for_each_cave,y                        ; 29b0: b9 a4 4c    ..L
+    lda colour_1_lower_nybble_cell_type_1_upper_for_each_cave,y                         ; 29b0: b9 a4 4c    ..L
     and #&0f                                                                            ; 29b3: 29 0f       ).
     jsr set_palette_colour_ax                                                           ; 29b5: 20 35 2a     5*
     tya                                                                                 ; 29b8: 98          .
@@ -5429,7 +5435,7 @@ which_status_bar_address2_low = store_in_status_bar+1
     equb &11                                                                            ; 4ca1: 11          .              ; Cave R
     equb 0                                                                              ; 4ca2: 00          .              ; Cave S
     equb &11                                                                            ; 4ca3: 11          .              ; Cave T
-.colour_1_lower_nybble_block_type_1_upper_for_each_cave
+.colour_1_lower_nybble_cell_type_1_upper_for_each_cave
     equb &15                                                                            ; 4ca4: 15          .              ; Cave A
     equb &15                                                                            ; 4ca5: 15          .              ; Cave B
     equb &23                                                                            ; 4ca6: 23          #              ; Cave C
@@ -5450,7 +5456,7 @@ which_status_bar_address2_low = store_in_status_bar+1
     equb 5                                                                              ; 4cb5: 05          .              ; Cave R
     equb 4                                                                              ; 4cb6: 04          .              ; Cave S
     equb 5                                                                              ; 4cb7: 05          .              ; Cave T
-.colour_2_lower_nybble_block_type_2_upper_for_each_cave
+.colour_2_lower_nybble_cell_type_2_upper_for_each_cave
     equb &41                                                                            ; 4cb8: 41          A              ; Cave A
     equb &44                                                                            ; 4cb9: 44          D              ; Cave B
     equb &42                                                                            ; 4cba: 42          B              ; Cave C
@@ -5471,7 +5477,7 @@ which_status_bar_address2_low = store_in_status_bar+1
     equb 2                                                                              ; 4cc9: 02          .              ; Cave R
     equb 1                                                                              ; 4cca: 01          .              ; Cave S
     equb 4                                                                              ; 4ccb: 04          .              ; Cave T
-.colour_3_lower_nybble_block_type_3_upper_for_each_cave
+.colour_3_lower_nybble_cell_type_3_upper_for_each_cave
     equb &57                                                                            ; 4ccc: 57          W              ; Cave A
     equb &57                                                                            ; 4ccd: 57          W              ; Cave B
     equb &57                                                                            ; 4cce: 57          W              ; Cave C
