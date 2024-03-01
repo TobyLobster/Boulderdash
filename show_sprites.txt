@@ -1,0 +1,23 @@
+   10 ON ERROR CLOSE#0:REPORT:PRINT " at line ";ERL:END
+   20 MODE 5:PRINT:PRINT:PRINT
+   30 F%=OPENUP("___1___")
+   40 C%=1:REPEAT
+   50 PROCshow(C%)
+   60 PRINT TAB(0,3);C%;"    ";
+   70 *FX 15
+   80 A$=GET$:IFA$="Z" OR A$="z" C%=C%-1 ELSE C%=C%+1
+   90 PRINT
+  100 IF C%<0 C%=90
+  110 IF C%>90 C%=0
+  120 UNTIL A$="Q" OR A$="q"
+  130 CLOSE#F%
+  140 END
+  150 DEFPROCshow(A%)
+  160 PTR#F%=A%*32
+  170 FOR I%=0TO15
+  180 I%?&5800=BGET#F%
+  190 NEXT
+  200 FOR I%=0TO15
+  210 I%?&5940=BGET#F%
+  220 NEXT
+  230 ENDPROC

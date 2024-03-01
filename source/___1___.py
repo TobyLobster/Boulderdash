@@ -357,12 +357,12 @@ sprites = {
     34: "sprite_rockford_blinking3",
     35: "sprite_rockford_winking1",
     36: "sprite_rockford_winking2",
-    37: "sprite_rockford_moving_down1",
-    38: "sprite_rockford_moving_down2",
-    39: "sprite_rockford_moving_down3",
+    37: "sprite_rockford_tapping_foot1",
+    38: "sprite_rockford_tapping_foot2",
+    39: "sprite_rockford_tapping_foot3",
 
-    40: "sprite_rockford_moving_up1",
-    41: "sprite_rockford_moving_up2",
+    40: "sprite_rockford_tapping_foot4",
+    41: "sprite_rockford_tapping_foot5",
     42: "sprite_rockford_moving_left1",
     43: "sprite_rockford_moving_left2",
     44: "sprite_rockford_moving_left3",
@@ -384,7 +384,7 @@ sprites = {
     59: "sprite_9",
 
     60: "sprite_white",
-    61: "sprite_dash",
+    61: "sprite_equals",
     62: "sprite_slash",
     63: "sprite_comma",
     64: "sprite_full_stop",
@@ -583,10 +583,10 @@ constant(0x80, "map_unprocessed")
 comment(0x1e60, "magic_wall_state", inline=True)
 comment(0x1e61, "magic_wall_timer", inline=True)
 comment(0x1e62, "rockford_cell_value", inline=True)
-comment(0x1e63, "", inline=True)
-comment(0x1e64, "", inline=True)
+comment(0x1e63, "delay_trying_to_push_rock", inline=True)
+comment(0x1e64, "fungus_replacement", inline=True)
 comment(0x1e65, "fungus_growth_interval", inline=True)
-comment(0x1e66, "", inline=True)
+comment(0x1e66, "number_of_fungus_cells_found", inline=True)
 comment(0x1e67, "fungus_counter", inline=True)
 comment(0x1e68, "ticks_since_last_direction_key_pressed", inline=True)
 comment(0x1e69, "countdown_while_switching_palette", inline=True)
@@ -595,7 +595,7 @@ comment(0x1e6b, "current_rockford_sprite", inline=True)
 comment(0x1e6c, "sub_second_ticks", inline=True)
 comment(0x1e6d, "previous_direction_keys", inline=True)
 comment(0x1e6e, "just_pressed_direction_keys", inline=True)
-comment(0x1e6f, "", inline=True)
+comment(0x1e6f, "rockford_explosion_cell_type", inline=True)
 
 
 
@@ -611,8 +611,13 @@ for r in ranges:
 byte(0x1e40, 32)
 
 for i in range(16):
-    decimal(0x1e60+i)
     byte(0x1e60+i)
+
+decimal(0x1e61)
+decimal(0x1e65)
+decimal(0x1e68)
+decimal(0x1e6a)
+decimal(0x1e6c)
 
 addrs = [0] * 106
 for i in range(0, 97):
@@ -621,16 +626,18 @@ for i in range(0, 97):
         name  = sprite_addr[i]
         if addr not in addrs:
             addrs[i] = addr
-    else:
-        name  = "unused_sprite_addr_" + str(i)
-    label(addr, name)
+        label(addr, name)
+        expr(0x2000+i, make_lo(name))
+        expr(0x2080+i, make_hi(name))
+
     byte(0x2000+i)
     byte(0x2080+i)
-    expr(0x2000+i, make_lo(name))
-    expr(0x2080+i, make_hi(name))
 
 for i in range(64):
     byte(0x1e80+i)
+
+unused(0x205b)
+unused(0x20db)
 
 unused(0x2061)
 byte(0x2061, 0x2080-0x2061)
@@ -779,6 +786,7 @@ label(0x2007, "sprite_titanium_addressA")
 label(0x2060, "sprite_titanium_addressB")
 stars(0x2080, True)
 label(0x2080, "sprite_addresses_high")
+label(0x20e0, "sprite_titanium_addressC")
 blank(0x20e1)
 
 stars(0x2100, True)
