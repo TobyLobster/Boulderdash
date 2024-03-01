@@ -1202,7 +1202,7 @@ unused4
     !byte $22                                                                           ; 20ff: 22          "
 
 ; *************************************************************************************
-l2100
+cell_types_that_rocks_or_diamonds_will_fall_off
     !byte 0                                                                             ; 2100: 00          .              ; map_space
     !byte 0                                                                             ; 2101: 00          .              ; map_earth
     !byte 1                                                                             ; 2102: 01          .              ; map_wall
@@ -1267,7 +1267,7 @@ unused11
     !byte   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0     ; 216e: 00 00 00... ...
     !byte   0,   0,   0                                                                 ; 217d: 00 00 00    ...
 
-l2180
+reset_some_cell_types_when_below_a_space_vacated_by_a_rock_or_diamond
     !byte 0                                                                             ; 2180: 00          .              ; map_space
     !byte 0                                                                             ; 2181: 00          .              ; map_earth
     !byte 0                                                                             ; 2182: 00          .              ; map_wall
@@ -1293,23 +1293,39 @@ unused12
 
 ; *************************************************************************************
 handler_table_low
-    !byte                 <handler_basics,                 <handler_basics              ; 21c0: a5 a5       ..
-    !byte                 <handler_basics,                 <handler_basics              ; 21c2: a5 a5       ..
-    !byte                               0,                               0              ; 21c4: 00 00       ..
-    !byte   <handler_firefly_or_butterfly,                 <handler_fungus              ; 21c6: 00 9e       ..
-    !byte <handler_rockford_intro_or_exit,         <handler_firefly_in_box              ; 21c8: e3 ca       ..
-    !byte <handler_rockford_intro_or_exit,     <handler_for_vertical_strip              ; 21ca: e3 e0       ..
-    !byte   <handler_for_horizontal_strip,             <handler_magic_wall              ; 21cc: f0 ae       ..
-    !byte   <handler_firefly_or_butterfly,               <handler_rockford              ; 21ce: 00 00       ..
+    !byte <handler_basics                                                               ; 21c0: a5          .              ; map_space
+    !byte <handler_basics                                                               ; 21c1: a5          .              ; map_earth
+    !byte <handler_basics                                                               ; 21c2: a5          .              ; map_wall
+    !byte <handler_basics                                                               ; 21c3: a5          .              ; map_titanium_wall
+    !byte 0                                                                             ; 21c4: 00          .              ; map_diamond
+    !byte 0                                                                             ; 21c5: 00          .              ; map_rock
+    !byte <handler_firefly_or_butterfly                                                 ; 21c6: 00          .              ; map_firefly
+    !byte <handler_fungus                                                               ; 21c7: 9e          .              ; map_fungus
+    !byte <handler_rockford_intro_or_exit                                               ; 21c8: e3          .              ; map_rockford_appearing_or_end_position
+    !byte <handler_firefly_in_box                                                       ; 21c9: ca          .              ; map_earth_plus_firefly_4x4
+    !byte <handler_rockford_intro_or_exit                                               ; 21ca: e3          .              ; map_explosion
+    !byte <handler_for_vertical_strip                                                   ; 21cb: e0          .              ; map_vertical_strip
+    !byte <handler_for_horizontal_strip                                                 ; 21cc: f0          .              ; map_horizontal_strip
+    !byte <handler_magic_wall                                                           ; 21cd: ae          .              ; map_magic_wall
+    !byte <handler_firefly_or_butterfly                                                 ; 21ce: 00          .              ; map_butterfly
+    !byte <handler_rockford                                                             ; 21cf: 00          .              ; map_rockford
 handler_table_high
-    !byte                 >handler_basics,                 >handler_basics              ; 21d0: 22 22       ""
-    !byte                 >handler_basics,                 >handler_basics              ; 21d2: 22 22       ""
-    !byte                               0,                               0              ; 21d4: 00 00       ..
-    !byte   >handler_firefly_or_butterfly,                 >handler_fungus              ; 21d6: 25 25       %%
-    !byte >handler_rockford_intro_or_exit,         >handler_firefly_in_box              ; 21d8: 26 2b       &+
-    !byte >handler_rockford_intro_or_exit,     >handler_for_vertical_strip              ; 21da: 26 23       &#
-    !byte   >handler_for_horizontal_strip,             >handler_magic_wall              ; 21dc: 23 26       #&
-    !byte   >handler_firefly_or_butterfly,               >handler_rockford              ; 21de: 25 26       %&
+    !byte >handler_basics                                                               ; 21d0: 22          "              ; map_space
+    !byte >handler_basics                                                               ; 21d1: 22          "              ; map_earth
+    !byte >handler_basics                                                               ; 21d2: 22          "              ; map_wall
+    !byte >handler_basics                                                               ; 21d3: 22          "              ; map_titanium_wall
+    !byte 0                                                                             ; 21d4: 00          .              ; map_diamond
+    !byte 0                                                                             ; 21d5: 00          .              ; map_rock
+    !byte >handler_firefly_or_butterfly                                                 ; 21d6: 25          %              ; map_firefly
+    !byte >handler_fungus                                                               ; 21d7: 25          %              ; map_fungus
+    !byte >handler_rockford_intro_or_exit                                               ; 21d8: 26          &              ; map_rockford_appearing_or_end_position
+    !byte >handler_firefly_in_box                                                       ; 21d9: 2b          +              ; map_earth_plus_firefly_4x4
+    !byte >handler_rockford_intro_or_exit                                               ; 21da: 26          &              ; map_explosion
+    !byte >handler_for_vertical_strip                                                   ; 21db: 23          #              ; map_vertical_strip
+    !byte >handler_for_horizontal_strip                                                 ; 21dc: 23          #              ; map_horizontal_strip
+    !byte >handler_magic_wall                                                           ; 21dd: 26          &              ; map_magic_wall
+    !byte >handler_firefly_or_butterfly                                                 ; 21de: 25          %              ; map_butterfly
+    !byte >handler_rockford                                                             ; 21df: 26          &              ; map_rockford
 
 ; *************************************************************************************
 explosion_replacements
@@ -1776,7 +1792,7 @@ unused18
 ; *************************************************************************************
     ; set branch offset (self modifying code)
 update_map
-    ldy #update_map_space - branch_instruction - 2                                      ; 2400: a0 5f       ._
+    ldy #update_rock_or_diamond_that_can_fall - branch_instruction - 2                  ; 2400: a0 5f       ._
     bne scan_map                                                                        ; 2402: d0 02       ..             ; ALWAYS branch
 
 ; *************************************************************************************
@@ -1832,11 +1848,11 @@ tile_map_x_loop
     and #$0f                                                                            ; 2433: 29 0f       ).
     tay                                                                                 ; 2435: a8          .
     lda handler_table_high,y                                                            ; 2436: b9 d0 21    ..!
-    ; if we have an empty cell, branch (destination was set depending on where we
-    ; entered this routine)
+    ; if we have no handler for this cell type then branch (destination was set
+    ; depending on where we entered this routine)
 branch_instruction
 branch_offset = branch_instruction+1
-    beq update_map_space                                                                ; 2439: f0 5f       ._
+    beq update_rock_or_diamond_that_can_fall                                            ; 2439: f0 5f       ._
     sta handler_high                                                                    ; 243b: 8d 52 24    .R$
     lda handler_table_low,y                                                             ; 243e: b9 c0 21    ..!
     sta handler_low                                                                     ; 2441: 8d 51 24    .Q$
@@ -1913,14 +1929,14 @@ clear_top_bit_on_final_row_loop
 
 ; *************************************************************************************
 ; 
-; This is the update when we find a space in the map during gameplay
+; This is the update when we find a diamond or rock in the map during gameplay
 ; 
 ; *************************************************************************************
     ; get cell below
-update_map_space
+update_rock_or_diamond_that_can_fall
     ldy #$81                                                                            ; 249a: a0 81       ..
     lda (ptr_low),y                                                                     ; 249c: b1 8c       ..
-    beq space_below_is_also_a_space                                                     ; 249e: f0 34       .4
+    beq cell_below_is_a_space                                                           ; 249e: f0 34       .4
     ; check current cell
     cpx #$c0                                                                            ; 24a0: e0 c0       ..
     bmi not_c0_or_above                                                                 ; 24a2: 30 03       0.
@@ -1930,58 +1946,61 @@ not_c0_or_above
     tay                                                                                 ; 24a9: a8          .
     asl                                                                                 ; 24aa: 0a          .
     bmi mark_cell_above_as_processed_and_move_to_next_cell                              ; 24ab: 30 b4       0.
-    lda l2100,y                                                                         ; 24ad: b9 00 21    ..!
+    lda cell_types_that_rocks_or_diamonds_will_fall_off,y                               ; 24ad: b9 00 21    ..!
     beq mark_cell_above_as_processed_and_move_to_next_cell                              ; 24b0: f0 af       ..
     lda cell_left                                                                       ; 24b2: a5 76       .v
-    bne c24bc                                                                           ; 24b4: d0 06       ..
-    ; get below left cell
+    bne check_if_cell_right_is_empty                                                    ; 24b4: d0 06       ..
+    ; cell left is empty, now check below left cell
     ldy #$80                                                                            ; 24b6: a0 80       ..
     lda (ptr_low),y                                                                     ; 24b8: b1 8c       ..
-    beq below_left_or_right_is_empty                                                    ; 24ba: f0 0a       ..
-c24bc
+    beq rock_or_diamond_can_fall_left_or_right                                          ; 24ba: f0 0a       ..
+check_if_cell_right_is_empty
     lda cell_right                                                                      ; 24bc: a5 78       .x
     bne mark_cell_above_as_processed_and_move_to_next_cell                              ; 24be: d0 a1       ..
-    ; get below right cell
+    ; cell right is empty, now check below right cell
     ldy #$82                                                                            ; 24c0: a0 82       ..
     lda (ptr_low),y                                                                     ; 24c2: b1 8c       ..
     bne mark_cell_above_as_processed_and_move_to_next_cell                              ; 24c4: d0 9b       ..
-below_left_or_right_is_empty
+    ; take the rock or diamond, and set bit 6 to indicate it has been moved this scan
+    ; (so it won't be moved again). Then store it in the below left or below right cell
+rock_or_diamond_can_fall_left_or_right
     txa                                                                                 ; 24c6: 8a          .
     ora #$40                                                                            ; 24c7: 09 40       .@
-    ; Store in either cell_below_left or cell_below right depending on Y=$80 or $82,
+    ; Store in either cell_below_left or cell_below_right depending on Y=$80 or $82,
     ; since $fff6 = cell_below_left - $80
     sta lfff6,y                                                                         ; 24c9: 99 f6 ff    ...
     ; below left or right is set to $80, still a space, but marked as unprocessed
     lda #$80                                                                            ; 24cc: a9 80       ..
     sta (ptr_low),y                                                                     ; 24ce: 91 8c       ..
-set_to_space
+set_to_unprocessed_space
     ldx #$80                                                                            ; 24d0: a2 80       ..
     bne mark_cell_above_as_processed_and_move_to_next_cell                              ; 24d2: d0 8d       ..             ; ALWAYS branch
 
-    ; set bit six of the cell below to indicate cell above is also a space
-space_below_is_also_a_space
+    ; take the rock or diamond, and set bit 6 to indicate it has been moved this scan
+    ; (so it won't be moved again). Then store it in the cell below.
+cell_below_is_a_space
     txa                                                                                 ; 24d4: 8a          .
     ora #$40                                                                            ; 24d5: 09 40       .@
     sta (ptr_low),y                                                                     ; 24d7: 91 8c       ..
-    bne set_to_space                                                                    ; 24d9: d0 f5       ..             ; ALWAYS branch
+    bne set_to_unprocessed_space                                                        ; 24d9: d0 f5       ..             ; ALWAYS branch
 
 process_c0_or_above
     pha                                                                                 ; 24db: 48          H
     ; look up table based on type
     and #$0f                                                                            ; 24dc: 29 0f       ).
     tay                                                                                 ; 24de: a8          .
-    lda l2180,y                                                                         ; 24df: b9 80 21    ..!
-    beq dont_store_below                                                                ; 24e2: f0 04       ..
+    lda reset_some_cell_types_when_below_a_space_vacated_by_a_rock_or_diamond,y         ; 24df: b9 80 21    ..!
+    beq play_rock_or_diamond_fall_sound                                                 ; 24e2: f0 04       ..
     ; store in cell below
     ldy #$81                                                                            ; 24e4: a0 81       ..
     sta (ptr_low),y                                                                     ; 24e6: 91 8c       ..
-dont_store_below
+play_rock_or_diamond_fall_sound
     txa                                                                                 ; 24e8: 8a          .
     and #1                                                                              ; 24e9: 29 01       ).
     eor #sound5_active_flag                                                             ; 24eb: 49 4b       IK
     tay                                                                                 ; 24ed: a8          .
-    ; store $4b or $4c in location $4b or $4c. i.e. activate sound5_active_flag or
-    ; sound6_active_flag
+    ; store $4b or $4c (i.e. a non-zero value) in location $4b or $4c. i.e. activate
+    ; sound5_active_flag or sound6_active_flag
     sta page_0,y                                                                        ; 24ee: 99 00 00    ...
     ; mask off the top two bits for the current cell value
     txa                                                                                 ; 24f1: 8a          .
@@ -3177,10 +3196,11 @@ unused38
     !byte $a9,   1, $a0, $43, $91, $8c, $a0, $c4, $88, $91                              ; 2bc0: a9 01 a0... ...
 
 ; *************************************************************************************
-; store earth ('*') in the following locations around the current position, and clear
-; the others:
+; store earth ('*' in the diagram below) in the following locations around the current
+; position, and clear the others, and add the firefly ('+') or butterfly at the current
+; location:
 ; 00* 01* 02* 03*
-; 40* 41  42  43*
+; 40* 41+ 42  43*
 ; 80* 81  82  83*
 ; C0* C1* C2* C3*
 handler_firefly_in_box
@@ -3995,17 +4015,25 @@ demonstration_key_durations
     !byte   1, $14, $64, $ff, $ff, $ff                                                  ; 31ba: 01 14 64... ..d
 
 ; *************************************************************************************
+; 
+; Entry point
+; 
+; *************************************************************************************
+    ; copy 256 bytes which is the credits text into a different location. Since both
+    ; source and destination are within the bounds of this file, there is no reason why
+    ; this couldn't just be loaded in the correct location to start with.
 entry_point
     ldx #0                                                                              ; 31c0: a2 00       ..
-loop_c31c2
+copy_credits_loop
     lda tile_map_row_16,x                                                               ; 31c2: bd 00 54    ..T
     sta copy_of_credits,x                                                               ; 31c5: 9d 00 33    ..3
     dex                                                                                 ; 31c8: ca          .
-    bne loop_c31c2                                                                      ; 31c9: d0 f7       ..
-loop_c31cb
+    bne copy_credits_loop                                                               ; 31c9: d0 f7       ..
+main_menu_loop
     lda #>regular_status_bar                                                            ; 31cb: a9 32       .2
     sta status_text_address_high                                                        ; 31cd: 8d 3c 23    .<#
     jsr show_menu                                                                       ; 31d0: 20 00 3a     .:
+    ; show credits
     ; increment to point to credits text at $3300
     inc status_text_address_high                                                        ; 31d3: ee 3c 23    .<#
     lda #<regular_status_bar                                                            ; 31d6: a9 00       ..
@@ -4015,7 +4043,7 @@ show_credits_loop
     jsr wait_for_13_centiseconds_and_read_keys                                          ; 31dd: 20 90 2b     .+
     inc status_text_address_low                                                         ; 31e0: e6 69       .i
     bne show_credits_loop                                                               ; 31e2: d0 f6       ..
-    jmp loop_c31cb                                                                      ; 31e4: 4c cb 31    L.1
+    jmp main_menu_loop                                                                  ; 31e4: 4c cb 31    L.1
 
 unused52
     !byte $31, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff     ; 31e7: 31 ff ff... 1..
@@ -4294,7 +4322,7 @@ copy_of_credits
     !byte $0d, $ff                                                                      ; 336a: 0d ff       ..
 
 ; 
-; A fragment of the original source code (unused).
+; A fragment of the original source code.
 ; 
 ; 80 JSR 10829
 ; 90 JSR 8850:LDA #220:STA 105
@@ -4313,7 +4341,6 @@ copy_of_credits
 ; 120 LDA #&7D:LDY #&80:JSR &2329
 ; 130 JSR &2292:LDX
 ; 
-unused53
     !byte $50, $0e                                                                      ; 336c: 50 0e       P.
     !text " JSR 10829"                                                                  ; 336e: 20 4a 53...  JS
     !byte $0d,   0, $5a, $1e                                                            ; 3378: 0d 00 5a... ..Z
@@ -4565,7 +4592,7 @@ show_rockford_again_and_play_game
 return15
     rts                                                                                 ; 3ae1: 60          `
 
-unused54
+unused53
     !byte $65, $20,   0, $3b, $4c,   0, $3a, $60, $ff, $ff, $ff, $ff, $ff, $ff, $ff     ; 3ae2: 65 20 00... e .
     !byte $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff     ; 3af1: ff ff ff... ...
 
@@ -4690,7 +4717,7 @@ set_cave_number_and_difficulty_level_from_status_bar
 return16
     rts                                                                                 ; 3bcc: 60          `
 
-unused55
+unused54
     !byte $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff     ; 3bcd: ff ff ff... ...
     !byte $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff     ; 3bdc: ff ff ff... ...
     !byte $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff     ; 3beb: ff ff ff... ...
@@ -5096,7 +5123,7 @@ strip_data_for_cave_T
     !byte $a1, $25, $41, $0b, $0a, $a1, $25, $1a, $a1, $2d, $0a, $71,   5, $11, $20     ; 4acb: a1 25 41... .%A
     !byte $0a, $81,   5,   1, $20, $0a, $91,   5, $20, $0a, $a1, $2d, $0a, $a1, $20     ; 4ada: 0a 81 05... ...
     !byte $0a, $a1, $20, $0a, $f3, $23, $0b, $9a                                        ; 4ae9: 0a a1 20... ..
-unused56
+unused55
     !byte $90, $6a, $90, $0e, $0a, $f3, $23, $0b, $9a, $2a,   3, $34,   3, $3e,   3     ; 4af1: 90 6a 90... .j.
 
 ; *************************************************************************************
@@ -5714,7 +5741,7 @@ data_set_12
     !byte $55, $41,   0,   0                                                            ; 4df0: 55 41 00... UA.            ; Difficulty 4: basics=0x4e55, map_start=0x5041, patch_addr=0x0
     !byte $26, $3f, $54, $43                                                            ; 4df4: 26 3f 54... &?T            ; Difficulty 5: basics=0x4e26, map_start=0x503f, patch_addr=0x4354=patch_for_data_set_12_difficulty_5
 
-unused57
+unused56
     !byte   9,   4,   0, $0c, $11,   5,   1, $18,   9,   2, $0b, $23, $1b,   7,   2     ; 4df8: 09 04 00... ...
     !byte $19, $0c                                                                      ; 4e07: 19 0c       ..
 
@@ -5810,7 +5837,7 @@ basics_for_data_set_11_difficulty_4
     !byte $0c, $50, $c5, $c0,   0, $c7,   0,   4, $1c, $30,   4, $0c,   0, $33, $c0     ; 4f2d: 0c 50 c5... .P.
     !byte   1, $0c, $40, $43, $14                                                       ; 4f3c: 01 0c 40... ..@
 
-unused58
+unused57
     !byte $31, $40, $60, $33, $c0, $31, $0e, $0c,   1,   3,   0, $0c, $e0,   0, $c0     ; 4f41: 31 40 60... 1@`
     !byte $50, $10, $c4, $33, $c0, $40, $0c, $e0,   0, $43, $12,   0, $40,   4, $50     ; 4f50: 50 10 c4... P..
     !byte   0, $5c, $31, $10, $1c,   3, $0c, $c0, $11, $40,   0, $5c, $30, $94,   4     ; 4f5f: 00 5c 31... .\1
@@ -5843,7 +5870,7 @@ current_status_bar_sprites
     !text "REYALP"                                                                      ; 5034: 52 45 59... REY
     !byte sprite_space                                                                  ; 503a: 00          .
     !byte sprite_1                                                                      ; 503b: 33          3
-unused59
+unused58
     !byte $83, $83, $83,   1                                                            ; 503c: 83 83 83... ...
 
 ; *************************************************************************************
@@ -5867,7 +5894,7 @@ default_status_bar
     !text "A"                                                                           ; 5079: 41          A
     !byte sprite_slash                                                                  ; 507a: 3e          >
     !byte sprite_2                                                                      ; 507b: 34          4
-unused60
+unused59
     !byte $83, $83, $83, $83                                                            ; 507c: 83 83 83... ...
 
 ; *************************************************************************************
@@ -5877,7 +5904,7 @@ tile_map_row_2
     !byte $81, $81, $81, $81, $81, $81, $81, $81, $81, $81                              ; 5094: 81 81 81... ...
     !byte $81, $81, $81, $81, $81, $81, $81, $81, $81, $83                              ; 509e: 81 81 81... ...
 
-unused61
+unused60
     !byte   1, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83     ; 50a8: 01 83 83... ...
     !byte $83, $83, $83, $83, $83, $83, $83, $83, $83                                   ; 50b7: 83 83 83... ...
 
@@ -5888,7 +5915,7 @@ tile_map_row_3
     !byte $81, $81, $81, $81, $81, $81, $81, $81, $81, $81                              ; 50d4: 81 81 81... ...
     !byte $81, $81, $81, $81, $81, $81, $81, $81, $81, $83                              ; 50de: 81 81 81... ...
 
-unused62
+unused61
     !byte   1, $83, $83, $83, $83, $83, $83,   8, $83, $83,   2, $83, $83, $83, $83     ; 50e8: 01 83 83... ...
     !byte $83,   5, $83,   5,   4, $83, $83, $83, $83                                   ; 50f7: 83 05 83... ...
 
@@ -5924,7 +5951,7 @@ tile_map_row_6
     !byte $80, $81, $85, $81, $85, $81, $85, $81, $85, $81                              ; 5194: 80 81 85... ...
     !byte $85, $81, $85, $81, $81, $81, $81, $81, $81, $83                              ; 519e: 85 81 85... ...
 
-unused63
+unused62
     !byte $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83     ; 51a8: 83 83 83... ...
     !byte $83, $83, $83, $83, $83, $83, $83, $83, $83                                   ; 51b7: 83 83 83... ...
 
@@ -5935,7 +5962,7 @@ tile_map_row_7
     !byte $80, $81, $81, $81, $81, $81, $81, $81, $81, $81                              ; 51d4: 80 81 81... ...
     !byte $81, $81, $81, $81, $81, $81, $81, $81, $81, $83                              ; 51de: 81 81 81... ...
 
-unused64
+unused63
     !byte $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83     ; 51e8: 83 83 83... ...
     !byte $83, $83, $83, $83, $83, $83, $83, $83, $83                                   ; 51f7: 83 83 83... ...
 
@@ -5946,7 +5973,7 @@ tile_map_row_8
     !byte $80, $81, $81, $81, $81, $81, $81, $81, $81, $81                              ; 5214: 80 81 81... ...
     !byte $81, $81, $81, $81, $81, $81, $81, $81, $81, $83                              ; 521e: 81 81 81... ...
 
-unused65
+unused64
     !byte $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83     ; 5228: 83 83 83... ...
     !byte $83, $83, $83, $83, $83, $83, $83, $83, $83                                   ; 5237: 83 83 83... ...
 
@@ -5957,7 +5984,7 @@ tile_map_row_9
     !byte $84, $80, $81, $81, $81, $81, $81, $81, $81, $81                              ; 5254: 84 80 81... ...
     !byte $81, $81, $81, $81, $81, $81, $81, $81, $81, $83                              ; 525e: 81 81 81... ...
 
-unused66
+unused65
     !byte $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83     ; 5268: 83 83 83... ...
     !byte $83, $83, $83, $83, $83, $83, $83, $83, $83                                   ; 5277: 83 83 83... ...
 
@@ -5968,7 +5995,7 @@ tile_map_row_10
     !byte $81, $80, $81, $81, $81, $81, $81, $81, $81, $81                              ; 5294: 81 80 81... ...
     !byte $81, $81, $81, $81, $81, $81, $81, $81, $81, $83                              ; 529e: 81 81 81... ...
 
-unused67
+unused66
     !byte $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83     ; 52a8: 83 83 83... ...
     !byte $83, $83, $83, $83, $83, $83, $83, $83, $83                                   ; 52b7: 83 83 83... ...
 
@@ -5979,7 +6006,7 @@ tile_map_row_11
     !byte $81, $80, $81, $81, $81, $81, $81, $81, $81, $81                              ; 52d4: 81 80 81... ...
     !byte $81, $81, $81, $81, $81, $81, $81, $81, $81, $83                              ; 52de: 81 81 81... ...
 
-unused68
+unused67
     !byte $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83     ; 52e8: 83 83 83... ...
     !byte $83, $83, $83, $83, $83, $83, $83, $83, $83                                   ; 52f7: 83 83 83... ...
 
@@ -5990,7 +6017,7 @@ tile_map_row_12
     !byte $81, $80, $81, $81, $81, $81, $81, $81, $81, $81                              ; 5314: 81 80 81... ...
     !byte $81, $81, $81, $81, $81, $81, $81, $81, $81, $83                              ; 531e: 81 81 81... ...
 
-unused69
+unused68
     !byte $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83     ; 5328: 83 83 83... ...
     !byte $83, $83, $83, $83, $83, $83, $83, $83, $83                                   ; 5337: 83 83 83... ...
 
@@ -6001,7 +6028,7 @@ tile_map_row_13
     !byte $81, $80, $81, $81, $81, $81, $81, $81, $81, $81                              ; 5354: 81 80 81... ...
     !byte $81, $81, $81, $81, $81, $81, $81, $81, $81, $83                              ; 535e: 81 81 81... ...
 
-unused70
+unused69
     !byte $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83     ; 5368: 83 83 83... ...
     !byte $83, $83, $83, $83, $83, $83, $83, $83, $83                                   ; 5377: 83 83 83... ...
 
@@ -6012,7 +6039,7 @@ tile_map_row_14
     !byte $81, $80, $81, $81, $81, $81, $81, $81, $81, $81                              ; 5394: 81 80 81... ...
     !byte $81, $81, $81, $81, $81, $81, $81, $81, $81, $83                              ; 539e: 81 81 81... ...
 
-unused71
+unused70
     !byte $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83     ; 53a8: 83 83 83... ...
     !byte $83, $83, $83, $83, $83, $83, $83, $83, $83                                   ; 53b7: 83 83 83... ...
 
@@ -6023,7 +6050,7 @@ tile_map_row_15
     !byte $81, $80, $81, $81, $81, $81, $81, $81, $81, $81                              ; 53d4: 81 80 81... ...
     !byte $81, $81, $81, $81, $81, $81, $81, $81, $81, $83                              ; 53de: 81 81 81... ...
 
-unused72
+unused71
     !byte $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83     ; 53e8: 83 83 83... ...
     !byte $83, $83, $83, $83, $83, $83, $83, $83, $83                                   ; 53f7: 83 83 83... ...
 
@@ -6138,7 +6165,7 @@ tile_map_row_20
     !byte $81, $81, $81, $81, $81, $81, $81, $81, $81, $81                              ; 5514: 81 81 81... ...
     !byte $81, $81, $81, $81, $81, $81, $81, $81, $81, $83                              ; 551e: 81 81 81... ...
 
-unused73
+unused72
     !byte   1, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83, $83     ; 5528: 01 83 83... ...
     !byte $83, $83, $83, $83, $83, $83, $83, $83, $83                                   ; 5537: 83 83 83... ...
 
@@ -6151,16 +6178,16 @@ tile_map_row_21
 
 
 ; unused copy of routine at $5700
-unused74
+unused73
     lda #osbyte_flush_buffer_class                                                      ; 5568: a9 0f       ..
     ldx #0                                                                              ; 556a: a2 00       ..
     jsr osbyte                                                                          ; 556c: 20 f4 ff     ..            ; Flush all buffers (X=0)
     ldx #5                                                                              ; 556f: a2 05       ..
-loop_c5571
+unused76
     lda tune_start_position_per_channel,x                                               ; 5571: bd e8 56    ..V
     sta tune_position_per_channel,x                                                     ; 5574: 9d d0 56    ..V
     dex                                                                                 ; 5577: ca          .
-    bpl loop_c5571                                                                      ; 5578: 10 f7       ..
+    bpl unused76                                                                        ; 5578: 10 f7       ..
     rts                                                                                 ; 557a: 60          `
 
 unused77
@@ -6173,7 +6200,7 @@ tile_map_row_22
     !byte $8a, $85, $8f, $bd, $d0, $d6, $a8, $e0, $80, $d0                              ; 5594: 8a 85 8f... ...
     !byte $84, $c0, $c1, $f0, $c5, $b9, $80, $d6, $c9, $83                              ; 559e: 84 c0 c1... ...
 
-unused75
+unused74
     !byte $90, $1a, $a8, $bd, $d3, $56, $d0,   6, $b9, $1a, $56, $9d, $d3, $56, $b9     ; 55a8: 90 1a a8... ...
     !byte $0e, $56, $48, $b9, $14, $56, $a8, $68, $de                                   ; 55b7: 0e 56 48... .VH
 
@@ -6184,7 +6211,7 @@ tile_map_row_23
     !byte   9,   1, $48, $bd, $d3, $56, $d0,   3, $fe, $d0                              ; 55d4: 09 01 48... ..H
     !byte $56, $68, $a6, $8f, $9d, $bc, $56, $98, $9d, $be                              ; 55de: 56 68 a6... Vh.
 
-unused76
+unused75
     !byte $56, $8a, $18, $69, $b8, $aa, $a0, $56, $a9,   7, $20, $f1, $ff, $e6, $8e     ; 55e8: 56 8a 18... V..
     !byte $26, $8e, $e0,   3, $d0, $82, $60, $83, $83                                   ; 55f7: 26 8e e0... &..
 
@@ -7532,6 +7559,6 @@ pydis_end
 !if (total_caves) != $14 {
     !error "Assertion failed: total_caves == $14"
 }
-!if (update_map_space - branch_instruction - 2) != $5f {
-    !error "Assertion failed: update_map_space - branch_instruction - 2 == $5f"
+!if (update_rock_or_diamond_that_can_fall - branch_instruction - 2) != $5f {
+    !error "Assertion failed: update_rock_or_diamond_that_can_fall - branch_instruction - 2 == $5f"
 }
