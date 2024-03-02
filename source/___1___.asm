@@ -684,6 +684,7 @@ initial_values_of_variables_from_0x50
     !byte 0                                                                             ; 1e6f: 00          .              ; rockford_explosion_cell_type
 set_clock_value
     !byte 5, 0, 0, 0, 0                                                                 ; 1e70: 05 00 00... ...            ; Five byte clock value (low byte to high byte)
+
 unused8
     !byte   0,   0,   0,   0, $ee, $e0, $0c,   0,   0,   0,   0                         ; 1e75: 00 00 00... ...
 
@@ -758,11 +759,11 @@ idle_animation_data
     !byte 16*(sprite_rockford_winking1-0x20) + sprite_rockford_tapping_foot1-0x20       ; 1ebf: 35          5
 
 ; *************************************************************************************
+unused9
     !byte $35, $ff, $fb, $f7, $fd, $fe, $7f, $ff, $b7, $af, $bf, $bf, $bf, $bf, $bf     ; 1ec0: 35 ff fb... 5..
     !byte $9f,   8,   8,   4,   8,   4,   8,   4,   1, $ff, $ff, $ff, $ff, $ff, $ff     ; 1ecf: 9f 08 08... ...
     !byte $ff, $ff                                                                      ; 1ede: ff ff       ..
 
-unused9
     !byte sprite_0                                                                      ; 1ee0: 32          2
     !byte sprite_0                                                                      ; 1ee1: 32          2
     !byte sprite_diamond1                                                               ; 1ee2: 03          .
@@ -2787,7 +2788,7 @@ prepare_stage
     lda #0                                                                              ; 2900: a9 00       ..
     sta amount_to_increment_ptr_minus_one                                               ; 2902: 85 78       .x
     ldy cave_number                                                                     ; 2904: a4 87       ..
-    lda fill_cell_in_lower_nybble_strip_value_to_skip_in_upper_for_each_cave,y          ; 2906: b9 90 4c    ..L
+    lda fill_cell_in_lower_nybble_strip_value_to_skip_in_upper_nybble_for_each_cave,y   ; 2906: b9 90 4c    ..L
     and #$0f                                                                            ; 2909: 29 0f       ).
     sta value_to_clear_map_to                                                           ; 290b: 85 79       .y
     jsr clear_map_and_grid                                                              ; 290d: 20 56 22     V"
@@ -2796,7 +2797,7 @@ prepare_stage
     ldy cave_number                                                                     ; 2910: a4 87       ..
     ldx #1                                                                              ; 2912: a2 01       ..
 loop_three_times
-    lda colour_1_lower_nybble_cell_type_1_upper_for_each_cave,y                         ; 2914: b9 a4 4c    ..L
+    lda colour_1_in_lower_nybble_cell_type_1_in_upper_nybble_for_each_cave,y            ; 2914: b9 a4 4c    ..L
     lsr                                                                                 ; 2917: 4a          J
     lsr                                                                                 ; 2918: 4a          J
     lsr                                                                                 ; 2919: 4a          J
@@ -2880,7 +2881,7 @@ add_strips
     sta ptr_high                                                                        ; 2988: 85 8d       ..
     ; get value to skip when writing strips to the map
     ldy cave_number                                                                     ; 298a: a4 87       ..
-    lda fill_cell_in_lower_nybble_strip_value_to_skip_in_upper_for_each_cave,y          ; 298c: b9 90 4c    ..L
+    lda fill_cell_in_lower_nybble_strip_value_to_skip_in_upper_nybble_for_each_cave,y   ; 298c: b9 90 4c    ..L
     lsr                                                                                 ; 298f: 4a          J
     lsr                                                                                 ; 2990: 4a          J
     lsr                                                                                 ; 2991: 4a          J
@@ -2903,7 +2904,7 @@ set_palette
     ldy cave_number                                                                     ; 29ac: a4 87       ..
     ldx #1                                                                              ; 29ae: a2 01       ..
 set_palette_loop
-    lda colour_1_lower_nybble_cell_type_1_upper_for_each_cave,y                         ; 29b0: b9 a4 4c    ..L
+    lda colour_1_in_lower_nybble_cell_type_1_in_upper_nybble_for_each_cave,y            ; 29b0: b9 a4 4c    ..L
     and #$0f                                                                            ; 29b3: 29 0f       ).
     jsr set_palette_colour_ax                                                           ; 29b5: 20 35 2a     5*
     tya                                                                                 ; 29b8: 98          .
@@ -5638,7 +5639,7 @@ length_of_strip_data_for_each_cave
     !byte $67                                                                           ; 4c8d: 67          g              ; Cave R
     !byte $14                                                                           ; 4c8e: 14          .              ; Cave S
     !byte $26                                                                           ; 4c8f: 26          &              ; Cave T
-fill_cell_in_lower_nybble_strip_value_to_skip_in_upper_for_each_cave
+fill_cell_in_lower_nybble_strip_value_to_skip_in_upper_nybble_for_each_cave
     !byte $11                                                                           ; 4c90: 11          .              ; Cave A
     !byte $11                                                                           ; 4c91: 11          .              ; Cave B
     !byte $11                                                                           ; 4c92: 11          .              ; Cave C
@@ -5659,7 +5660,7 @@ fill_cell_in_lower_nybble_strip_value_to_skip_in_upper_for_each_cave
     !byte $11                                                                           ; 4ca1: 11          .              ; Cave R
     !byte 0                                                                             ; 4ca2: 00          .              ; Cave S
     !byte $11                                                                           ; 4ca3: 11          .              ; Cave T
-colour_1_lower_nybble_cell_type_1_upper_for_each_cave
+colour_1_in_lower_nybble_cell_type_1_in_upper_nybble_for_each_cave
     !byte $15                                                                           ; 4ca4: 15          .              ; Cave A
     !byte $15                                                                           ; 4ca5: 15          .              ; Cave B
     !byte $23                                                                           ; 4ca6: 23          #              ; Cave C
@@ -5680,7 +5681,7 @@ colour_1_lower_nybble_cell_type_1_upper_for_each_cave
     !byte 5                                                                             ; 4cb5: 05          .              ; Cave R
     !byte 4                                                                             ; 4cb6: 04          .              ; Cave S
     !byte 5                                                                             ; 4cb7: 05          .              ; Cave T
-colour_2_lower_nybble_cell_type_2_upper_for_each_cave
+colour_2_in_lower_nybble_cell_type_2_in_upper_nybble_for_each_cave
     !byte $41                                                                           ; 4cb8: 41          A              ; Cave A
     !byte $44                                                                           ; 4cb9: 44          D              ; Cave B
     !byte $42                                                                           ; 4cba: 42          B              ; Cave C
@@ -5701,7 +5702,7 @@ colour_2_lower_nybble_cell_type_2_upper_for_each_cave
     !byte 2                                                                             ; 4cc9: 02          .              ; Cave R
     !byte 1                                                                             ; 4cca: 01          .              ; Cave S
     !byte 4                                                                             ; 4ccb: 04          .              ; Cave T
-colour_3_lower_nybble_cell_type_3_upper_for_each_cave
+colour_3_in_lower_nybble_cell_type_3_in_upper_nybble_for_each_cave
     !byte $57                                                                           ; 4ccc: 57          W              ; Cave A
     !byte $57                                                                           ; 4ccd: 57          W              ; Cave B
     !byte $57                                                                           ; 4cce: 57          W              ; Cave C
@@ -5722,7 +5723,7 @@ colour_3_lower_nybble_cell_type_3_upper_for_each_cave
     !byte 7                                                                             ; 4cdd: 07          .              ; Cave R
     !byte 7                                                                             ; 4cde: 07          .              ; Cave S
     !byte 7                                                                             ; 4cdf: 07          .              ; Cave T
-; each cave has a data set, except for the bonus levels
+; each cave can have a data set, which helps define the level
 cave_to_data_set
     !byte 0                                                                             ; 4ce0: 00          .              ; Cave A
     !byte 1                                                                             ; 4ce1: 01          .              ; Cave B
@@ -5745,6 +5746,27 @@ cave_to_data_set
     !byte $ff                                                                           ; 4cf2: ff          .              ; Cave S
     !byte $ff                                                                           ; 4cf3: ff          .              ; Cave T
 
+; *************************************************************************************
+; 
+; Data sets.
+; 
+; A data set helps define each of the 5 stages of a cave.
+; Which data set is used for each cave is specified by the 'cave_to_data_set' table.
+; 
+; Each data set consists of five entries of four bytes each.
+; The five entries are for the five difficulty levels of the cave.
+; We decode the four bytes "a,b,c,d" of each entry as:
+; 
+;     basics_addr = $4e00 + a + 2*(b&128)
+;     map_start = $5000 + b & 127
+;     if d != 0:
+;         patches_addr = c + (256*d)
+; 
+; The 'basics' is a 2 bit per cell definition of the stage, writing to the map starting
+; at map_start. If present, the 'patches' is a set of specific cells to overwrite with
+; new values. The map is then preprocessed twice (scanned) making some changes along
+; the way.
+; 
 ; *************************************************************************************
 data_set_0
 data_sets

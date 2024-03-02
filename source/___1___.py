@@ -611,6 +611,7 @@ comment(0x1e6f, "rockford_explosion_cell_type", inline=True)
 
 
 
+blank(0x1e75)
 blank(0x1e80)
 stars(0x1e80)
 label(0x1e80, "idle_animation_data")    # put this before the "sprite_addr_" labels so it takes precedence.
@@ -757,7 +758,7 @@ label(0x1e60, "initial_values_of_variables_from_0x50")
 expr(0x2e21, "initial_values_of_variables_from_0x50")
 comment(0x1e80, "Sprites to use for idle animation of rockford. They are encoded into the nybbles of each byte. First it cycles through the bottom nybbles until near the end of the idle animation, then cycles through through the top nybbles")
 stars(0x1ec0, True)
-unused(0x1ee0)
+unused(0x1ec0)
 blank(0x1ee0)
 
 label(0x1f00, "sprite_to_next_sprite")
@@ -2108,23 +2109,37 @@ label(0x4c68, "number_of_difficuly_levels_available_in_menu_for_each_cave")
 cave_comments(0x4c68)
 label(0x4c7c, "length_of_strip_data_for_each_cave")
 cave_comments(0x4c7c)
-label(0x4c90, "fill_cell_in_lower_nybble_strip_value_to_skip_in_upper_for_each_cave")
+label(0x4c90, "fill_cell_in_lower_nybble_strip_value_to_skip_in_upper_nybble_for_each_cave")
 cave_comments(0x4c90)
-label(0x4ca4, "colour_1_lower_nybble_cell_type_1_upper_for_each_cave")
+label(0x4ca4, "colour_1_in_lower_nybble_cell_type_1_in_upper_nybble_for_each_cave")
 cave_comments(0x4ca4)
-label(0x4ca4+20*1, "colour_2_lower_nybble_cell_type_2_upper_for_each_cave")
+label(0x4ca4+20*1, "colour_2_in_lower_nybble_cell_type_2_in_upper_nybble_for_each_cave")
 cave_comments(0x4ca4+20*1)
-label(0x4ca4+20*2, "colour_3_lower_nybble_cell_type_3_upper_for_each_cave")
+label(0x4ca4+20*2, "colour_3_in_lower_nybble_cell_type_3_in_upper_nybble_for_each_cave")
 cave_comments(0x4ca4+20*2)
 label(0x4ca4+20*3, "cave_to_data_set")
 cave_comments(0x4ca4+20*3)
-comment(0x4ce0, "each cave has a data set, except for the bonus levels")
+comment(0x4ce0, "each cave can have a data set, which helps define the level")
 decimal(0x4cec)
 decimal(0x4cee)
 decimal(0x4cef)
-stars(0x4cf4, True)
+blank(0x4cf4)
 label(0x4cf4, "data_sets")
+stars(0x4cf4, """Data sets.
 
+A data set helps define each of the 5 stages of a cave.
+Which data set is used for each cave is specified by the 'cave_to_data_set' table.
+
+Each data set consists of five entries of four bytes each.
+The five entries are for the five difficulty levels of the cave.
+We decode the four bytes "a,b,c,d" of each entry as:
+
+    basics_addr = $4e00 + a + 2*(b&128)
+    map_start = $5000 + b & 127
+    if d != 0:
+        patches_addr = c + (256*d)
+
+The 'basics' is a 2 bit per cell definition of the stage, writing to the map starting at map_start. If present, the 'patches' is a set of specific cells to overwrite with new values. The map is then preprocessed twice (scanned) making some changes along the way.""")
 unused(0x4df8)
 blank(0x4df8)
 
