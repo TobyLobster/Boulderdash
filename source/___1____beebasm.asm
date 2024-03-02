@@ -75,7 +75,6 @@
 ;   $23 = map_large_explosion_state2
 ;   $13 = map_large_explosion_state1
 ;
-;
 ; *************************************************************************************
 
 ; Constants
@@ -767,155 +766,150 @@ lfff6                                   = &fff6
     equb &7a, &7b, &7c, &7d, &7e, &7f                                                   ; 1f7a: 7a 7b 7c... z{|
 
 ; *************************************************************************************
+; 
+; Table to convert a cell type 0-$7f into a sprite number.
+; 
+; Not all possible cell types are used (see the top of file for the valid cell types).
+; By changing the entries of this table on the fly, this table allows the sprite to
+; animate without the underlying cell type needing to change.
+; 
+; *************************************************************************************
 .cell_type_to_sprite
-    equb sprite_space                                                                   ; 1f80: 00          .
-    equb sprite_earth2                                                                  ; 1f81: 1e          .
-    equb sprite_wall2                                                                   ; 1f82: 0b          .
-    equb sprite_titanium_wall2                                                          ; 1f83: 08          .
-    equb sprite_diamond1                                                                ; 1f84: 03          .
-    equb sprite_boulder1                                                                ; 1f85: 01          .
-    equb sprite_firefly4                                                                ; 1f86: 1c          .
-.fungus_animated_sprites1a
-    equb sprite_fungus1                                                                 ; 1f87: 14          .
-    equb sprite_earth2                                                                  ; 1f88: 1e          .
-    equb sprite_titanium_wall1                                                          ; 1f89: 07          .
-    equs "LDA"                                                                          ; 1f8a: 4c 44 41    LDA
-    equb sprite_wall2                                                                   ; 1f8d: 0b          .
-    equb sprite_butterfly1                                                              ; 1f8e: 16          .
+    equb sprite_space                                                                   ; 1f80: 00          .              ; cell type $00 = map_space
+    equb sprite_earth2                                                                  ; 1f81: 1e          .              ; cell type $01 = map_earth
+    equb sprite_wall2                                                                   ; 1f82: 0b          .              ; cell type $02 = map_wall
+    equb sprite_titanium_wall2                                                          ; 1f83: 08          .              ; cell type $03 = map_titanium_wall
+    equb sprite_diamond1                                                                ; 1f84: 03          .              ; cell type $04 = map_diamond
+    equb sprite_boulder1                                                                ; 1f85: 01          .              ; cell type $05 = map_rock
+    equb sprite_firefly4                                                                ; 1f86: 1c          .              ; cell type $06 = map_firefly
+.fungus_animated_sprite0
+    equb sprite_fungus1                                                                 ; 1f87: 14          .              ; cell type $07 = map_fungus
+    equb sprite_earth2                                                                  ; 1f88: 1e          .              ; cell type $08 = map_rockford_appearing_or_end_position
+    equb sprite_titanium_wall1                                                          ; 1f89: 07          .              ; cell type $09 = map_firefly_in_earth_box
+    equs "LDA"                                                                          ; 1f8a: 4c 44 41    LDA            ; cell type $0A = map_explosion; cell type $0B = map_vertical_strip; cell type $0C = map_horizontal_strip
+    equb sprite_wall2                                                                   ; 1f8d: 0b          .              ; cell type $0D = map_magic_wall
+    equb sprite_butterfly1                                                              ; 1f8e: 16          .              ; cell type $0E = map_butterfly
 .rockford_sprite
-    equb sprite_rockford_tapping_foot1                                                  ; 1f8f: 25          %
+    equb sprite_rockford_tapping_foot1                                                  ; 1f8f: 25          %              ; cell type $0F = map_rockford
 
-; *************************************************************************************
-    equb sprite_explosion4                                                              ; 1f90: 0f          .
-    equb sprite_explosion4                                                              ; 1f91: 0f          .
-    equb sprite_explosion4                                                              ; 1f92: 0f          .
-    equb sprite_explosion4                                                              ; 1f93: 0f          .
-    equb sprite_rockford_winking2                                                       ; 1f94: 24          $
-    equb sprite_rockford_moving_right4                                                  ; 1f95: 31          1
-    equb sprite_firefly4                                                                ; 1f96: 1c          .
-.fungus_animated_sprites1b
-    equb sprite_fungus1                                                                 ; 1f97: 14          .
-    equb sprite_box                                                                     ; 1f98: 09          .
-    equb sprite_slash                                                                   ; 1f99: 3e          >
-    equb sprite_firefly4                                                                ; 1f9a: 1c          .
-    equb sprite_butterfly2                                                              ; 1f9b: 17          .
-    equb sprite_fungus1                                                                 ; 1f9c: 14          .
-    equb sprite_magic_wall1                                                             ; 1f9d: 10          .
-    equb sprite_butterfly1                                                              ; 1f9e: 16          .
-    equb sprite_rockford_moving_left3                                                   ; 1f9f: 2c          ,
+    equb sprite_explosion4                                                              ; 1f90: 0f          .              ; cell type $10 = map_space | map_anim_state1
+    equb sprite_explosion4                                                              ; 1f91: 0f          .              ; cell type $11 = map_earth | map_anim_state1
+    equb sprite_explosion4                                                              ; 1f92: 0f          .              ; cell type $12 = map_wall | map_anim_state1
+    equb sprite_explosion4                                                              ; 1f93: 0f          .              ; cell type $13 = map_large_explosion_state1
+    equb sprite_rockford_winking2                                                       ; 1f94: 24          $              ; cell type $14 = map_diamond | map_anim_state1
+    equb sprite_rockford_moving_right4                                                  ; 1f95: 31          1              ; cell type $15 = map_rock | map_anim_state1
+    equb sprite_firefly4                                                                ; 1f96: 1c          .              ; cell type $16 = map_firefly | map_anim_state1
+    equb sprite_fungus1                                                                 ; 1f97: 14          .              ; cell type $17 = map_fungus | map_anim_state1
+    equb sprite_box                                                                     ; 1f98: 09          .              ; cell type $18 = map_active_exit
+    equb sprite_slash                                                                   ; 1f99: 3e          >              ; cell type $19 = map_firefly_in_earth_box | map_anim_state1
+    equb sprite_firefly4                                                                ; 1f9a: 1c          .              ; cell type $1A = map_explosion | map_anim_state1
+    equb sprite_butterfly2                                                              ; 1f9b: 17          .              ; cell type $1B = map_vertical_strip | map_anim_state1
+    equb sprite_fungus1                                                                 ; 1f9c: 14          .              ; cell type $1C = map_horizontal_strip | map_anim_state1
+    equb sprite_magic_wall1                                                             ; 1f9d: 10          .              ; cell type $1D = map_magic_wall | map_anim_state1
+    equb sprite_butterfly1                                                              ; 1f9e: 16          .              ; cell type $1E = map_butterfly | map_anim_state1
+    equb sprite_rockford_moving_left3                                                   ; 1f9f: 2c          ,              ; cell type $1F = map_rockford | map_anim_state1
 
-; *************************************************************************************
-    equb sprite_explosion3                                                              ; 1fa0: 0e          .
-    equb sprite_explosion3                                                              ; 1fa1: 0e          .
-    equb sprite_explosion3                                                              ; 1fa2: 0e          .
-    equb sprite_explosion3                                                              ; 1fa3: 0e          .
-    equb sprite_diamond2                                                                ; 1fa4: 04          .
-    equb sprite_rockford_moving_right4                                                  ; 1fa5: 31          1
-    equb sprite_firefly4                                                                ; 1fa6: 1c          .
-.fungus_animated_sprites1c
-    equb sprite_fungus2                                                                 ; 1fa7: 15          .
-    equb sprite_firefly2                                                                ; 1fa8: 1a          .
-    equb &61                                                                            ; 1fa9: 61          a
-    equb sprite_firefly4                                                                ; 1faa: 1c          .
-    equb sprite_butterfly2                                                              ; 1fab: 17          .
-    equb sprite_fungus1                                                                 ; 1fac: 14          .
-    equb sprite_wall2                                                                   ; 1fad: 0b          .
-    equb sprite_butterfly1                                                              ; 1fae: 16          .
-    equb sprite_rockford_moving_right4                                                  ; 1faf: 31          1
+    equb sprite_explosion3                                                              ; 1fa0: 0e          .              ; cell type $20 = map_space | map_anim_state2
+    equb sprite_explosion3                                                              ; 1fa1: 0e          .              ; cell type $21 = map_earth | map_anim_state2
+    equb sprite_explosion3                                                              ; 1fa2: 0e          .              ; cell type $22 = map_wall | map_anim_state2
+    equb sprite_explosion3                                                              ; 1fa3: 0e          .              ; cell type $23 = map_large_explosion_state2
+    equb sprite_diamond2                                                                ; 1fa4: 04          .              ; cell type $24 = map_diamond | map_anim_state2
+    equb sprite_rockford_moving_right4                                                  ; 1fa5: 31          1              ; cell type $25 = map_rock | map_anim_state2
+    equb sprite_firefly4                                                                ; 1fa6: 1c          .              ; cell type $26 = map_firefly | map_anim_state2
+    equb sprite_fungus2                                                                 ; 1fa7: 15          .              ; cell type $27 = map_fungus | map_anim_state2
+    equb sprite_firefly2                                                                ; 1fa8: 1a          .              ; cell type $28 = map_rockford_appearing_or_end_position | map_anim_state2
+    equb &61                                                                            ; 1fa9: 61          a              ; cell type $29 = map_firefly_in_earth_box | map_anim_state2
+    equb sprite_firefly4                                                                ; 1faa: 1c          .              ; cell type $2A = map_explosion | map_anim_state2
+    equb sprite_butterfly2                                                              ; 1fab: 17          .              ; cell type $2B = map_vertical_strip | map_anim_state2
+    equb sprite_fungus1                                                                 ; 1fac: 14          .              ; cell type $2C = map_horizontal_strip | map_anim_state2
+    equb sprite_wall2                                                                   ; 1fad: 0b          .              ; cell type $2D = map_magic_wall | map_anim_state2
+    equb sprite_butterfly1                                                              ; 1fae: 16          .              ; cell type $2E = map_butterfly | map_anim_state2
+    equb sprite_rockford_moving_right4                                                  ; 1faf: 31          1              ; cell type $2F = map_rockford | map_anim_state2
 
-; *************************************************************************************
-    equb sprite_explosion2                                                              ; 1fb0: 0d          .
-    equb sprite_explosion2                                                              ; 1fb1: 0d          .
-    equb sprite_explosion2                                                              ; 1fb2: 0d          .
-    equb sprite_explosion2                                                              ; 1fb3: 0d          .
-    equb sprite_diamond2                                                                ; 1fb4: 04          .
-    equb sprite_rockford_moving_right4                                                  ; 1fb5: 31          1
-    equb sprite_firefly4                                                                ; 1fb6: 1c          .
-.fungus_animated_sprites1d
-    equb sprite_fungus2                                                                 ; 1fb7: 15          .
-    equb sprite_firefly2                                                                ; 1fb8: 1a          .
-    equb sprite_wall2                                                                   ; 1fb9: 0b          .
-    equb sprite_firefly4                                                                ; 1fba: 1c          .
-    equb sprite_butterfly2                                                              ; 1fbb: 17          .
-    equb sprite_fungus1                                                                 ; 1fbc: 14          .
-    equb sprite_wall2                                                                   ; 1fbd: 0b          .
-    equb sprite_butterfly1                                                              ; 1fbe: 16          .
-    equb sprite_rockford_tapping_foot4                                                  ; 1fbf: 28          (
+    equb sprite_explosion2                                                              ; 1fb0: 0d          .              ; cell type $30 = map_space | map_anim_state3
+    equb sprite_explosion2                                                              ; 1fb1: 0d          .              ; cell type $31 = map_earth | map_anim_state3
+    equb sprite_explosion2                                                              ; 1fb2: 0d          .              ; cell type $32 = map_wall | map_anim_state3
+    equb sprite_explosion2                                                              ; 1fb3: 0d          .              ; cell type $33 = map_large_explosion_state3
+    equb sprite_diamond2                                                                ; 1fb4: 04          .              ; cell type $34 = map_diamond | map_anim_state3
+    equb sprite_rockford_moving_right4                                                  ; 1fb5: 31          1              ; cell type $35 = map_rock | map_anim_state3
+    equb sprite_firefly4                                                                ; 1fb6: 1c          .              ; cell type $36 = map_firefly | map_anim_state3
+    equb sprite_fungus2                                                                 ; 1fb7: 15          .              ; cell type $37 = map_fungus | map_anim_state3
+    equb sprite_firefly2                                                                ; 1fb8: 1a          .              ; cell type $38 = map_rockford_appearing_or_end_position | map_anim_state3
+    equb sprite_wall2                                                                   ; 1fb9: 0b          .              ; cell type $39 = map_firefly_in_earth_box | map_anim_state3
+    equb sprite_firefly4                                                                ; 1fba: 1c          .              ; cell type $3A = map_explosion | map_anim_state3
+    equb sprite_butterfly2                                                              ; 1fbb: 17          .              ; cell type $3B = map_vertical_strip | map_anim_state3
+    equb sprite_fungus1                                                                 ; 1fbc: 14          .              ; cell type $3C = map_horizontal_strip | map_anim_state3
+    equb sprite_wall2                                                                   ; 1fbd: 0b          .              ; cell type $3D = map_magic_wall | map_anim_state3
+    equb sprite_butterfly1                                                              ; 1fbe: 16          .              ; cell type $3E = map_butterfly | map_anim_state3
+    equb sprite_rockford_tapping_foot4                                                  ; 1fbf: 28          (              ; cell type $3F = map_rockford | map_anim_state3
 
-; *************************************************************************************
-    equb sprite_explosion1                                                              ; 1fc0: 0c          .
-    equb sprite_explosion1                                                              ; 1fc1: 0c          .
-    equb sprite_explosion1                                                              ; 1fc2: 0c          .
-    equb sprite_explosion1                                                              ; 1fc3: 0c          .
-    equb sprite_diamond1                                                                ; 1fc4: 03          .
-    equb sprite_boulder1                                                                ; 1fc5: 01          .
-    equb sprite_explosion1                                                              ; 1fc6: 0c          .
-.fungus_animated_sprites2a
-    equb sprite_fungus2                                                                 ; 1fc7: 15          .
-    equb sprite_rockford_moving_right4                                                  ; 1fc8: 31          1
-    equb sprite_rockford_blinking1                                                      ; 1fc9: 20
-    equb sprite_firefly4                                                                ; 1fca: 1c          .
-    equb sprite_butterfly2                                                              ; 1fcb: 17          .
-    equs "KB"                                                                           ; 1fcc: 4b 42       KB
-    equb sprite_butterfly2                                                              ; 1fce: 17          .
-    equb sprite_rockford_moving_right3                                                  ; 1fcf: 30          0
+    equb sprite_explosion1                                                              ; 1fc0: 0c          .              ; cell type $40 = map_space | map_anim_state4
+    equb sprite_explosion1                                                              ; 1fc1: 0c          .              ; cell type $41 = map_earth | map_anim_state4
+    equb sprite_explosion1                                                              ; 1fc2: 0c          .              ; cell type $42 = map_wall | map_anim_state4
+    equb sprite_explosion1                                                              ; 1fc3: 0c          .              ; cell type $43 = map_titanium_wall | map_anim_state4
+    equb sprite_diamond1                                                                ; 1fc4: 03          .              ; cell type $44 = map_diamond | map_anim_state4
+    equb sprite_boulder1                                                                ; 1fc5: 01          .              ; cell type $45 = map_rock | map_anim_state4
+    equb sprite_explosion1                                                              ; 1fc6: 0c          .              ; cell type $46 = map_start_large_explosion
+.fungus_animated_sprites4
+    equb sprite_fungus2                                                                 ; 1fc7: 15          .              ; cell type $47 = map_fungus | map_anim_state4
+    equb sprite_rockford_moving_right4                                                  ; 1fc8: 31          1              ; cell type $48 = map_rockford_appearing_or_end_position | map_anim_state4
+    equb sprite_rockford_blinking1                                                      ; 1fc9: 20                         ; cell type $49 = map_firefly_in_earth_box | map_anim_state4
+    equb sprite_firefly4                                                                ; 1fca: 1c          .              ; cell type $4A = map_explosion | map_anim_state4
+    equb sprite_butterfly2                                                              ; 1fcb: 17          .              ; cell type $4B = map_vertical_strip | map_anim_state4
+    equs "KB"                                                                           ; 1fcc: 4b 42       KB             ; cell type $4C = map_horizontal_strip | map_anim_state4; cell type $4D = map_magic_wall | map_anim_state4
+    equb sprite_butterfly2                                                              ; 1fce: 17          .              ; cell type $4E = map_butterfly | map_anim_state4
+    equb sprite_rockford_moving_right3                                                  ; 1fcf: 30          0              ; cell type $4F = map_rockford | map_anim_state4
 
-; *************************************************************************************
-    equb sprite_explosion2                                                              ; 1fd0: 0d          .
-    equb sprite_explosion2                                                              ; 1fd1: 0d          .
-    equb sprite_explosion2                                                              ; 1fd2: 0d          .
-    equb sprite_explosion2                                                              ; 1fd3: 0d          .
-    equb sprite_rockford_winking2                                                       ; 1fd4: 24          $
-    equb sprite_rockford_moving_right4                                                  ; 1fd5: 31          1
-    equb sprite_firefly2                                                                ; 1fd6: 1a          .
-.fungus_animated_sprites2b
-    equb sprite_fungus1                                                                 ; 1fd7: 14          .
-    equb sprite_rockford_moving_right4                                                  ; 1fd8: 31          1
-    equb sprite_slash                                                                   ; 1fd9: 3e          >
-    equb sprite_firefly4                                                                ; 1fda: 1c          .
-    equb sprite_butterfly2                                                              ; 1fdb: 17          .
-    equb sprite_magic_wall2                                                             ; 1fdc: 11          .
-    equb sprite_magic_wall2                                                             ; 1fdd: 11          .
-    equb sprite_butterfly2                                                              ; 1fde: 17          .
-    equb sprite_rockford_moving_left2                                                   ; 1fdf: 2b          +
+    equb sprite_explosion2                                                              ; 1fd0: 0d          .              ; cell type $50 = map_space | map_anim_state5
+    equb sprite_explosion2                                                              ; 1fd1: 0d          .              ; cell type $51 = map_earth | map_anim_state5
+    equb sprite_explosion2                                                              ; 1fd2: 0d          .              ; cell type $52 = map_wall | map_anim_state5
+    equb sprite_explosion2                                                              ; 1fd3: 0d          .              ; cell type $53 = map_titanium_wall | map_anim_state5
+    equb sprite_rockford_winking2                                                       ; 1fd4: 24          $              ; cell type $54 = map_diamond | map_anim_state5
+    equb sprite_rockford_moving_right4                                                  ; 1fd5: 31          1              ; cell type $55 = map_rock | map_anim_state5
+    equb sprite_firefly2                                                                ; 1fd6: 1a          .              ; cell type $56 = map_firefly | map_anim_state5
+    equb sprite_fungus1                                                                 ; 1fd7: 14          .              ; cell type $57 = map_fungus | map_anim_state5
+    equb sprite_rockford_moving_right4                                                  ; 1fd8: 31          1              ; cell type $58 = map_rockford_appearing_or_end_position | map_anim_state5
+    equb sprite_slash                                                                   ; 1fd9: 3e          >              ; cell type $59 = map_firefly_in_earth_box | map_anim_state5
+    equb sprite_firefly4                                                                ; 1fda: 1c          .              ; cell type $5A = map_explosion | map_anim_state5
+    equb sprite_butterfly2                                                              ; 1fdb: 17          .              ; cell type $5B = map_vertical_strip | map_anim_state5
+    equb sprite_magic_wall2                                                             ; 1fdc: 11          .              ; cell type $5C = map_horizontal_strip | map_anim_state5
+    equb sprite_magic_wall2                                                             ; 1fdd: 11          .              ; cell type $5D = map_magic_wall | map_anim_state5
+    equb sprite_butterfly2                                                              ; 1fde: 17          .              ; cell type $5E = map_butterfly | map_anim_state5
+    equb sprite_rockford_moving_left2                                                   ; 1fdf: 2b          +              ; cell type $5F = map_rockford | map_anim_state5
 
-; *************************************************************************************
-    equb sprite_explosion3                                                              ; 1fe0: 0e          .
-    equb sprite_explosion3                                                              ; 1fe1: 0e          .
-    equb sprite_explosion3                                                              ; 1fe2: 0e          .
-    equb sprite_explosion3                                                              ; 1fe3: 0e          .
-    equb sprite_diamond1                                                                ; 1fe4: 03          .
-    equb sprite_rockford_moving_right4                                                  ; 1fe5: 31          1
-    equb sprite_firefly2                                                                ; 1fe6: 1a          .
-.fungus_animated_sprites2c
-    equb sprite_fungus1                                                                 ; 1fe7: 14          .
-    equb sprite_rockford_moving_right4                                                  ; 1fe8: 31          1
-    equb &61                                                                            ; 1fe9: 61          a
-    equb sprite_firefly4                                                                ; 1fea: 1c          .
-    equb sprite_butterfly2                                                              ; 1feb: 17          .
-    equb sprite_magic_wall2                                                             ; 1fec: 11          .
-    equb sprite_explosion2                                                              ; 1fed: 0d          .
-    equb sprite_butterfly2                                                              ; 1fee: 17          .
-    equb sprite_rockford_tapping_foot4                                                  ; 1fef: 28          (
+    equb sprite_explosion3                                                              ; 1fe0: 0e          .              ; cell type $60 = map_space | map_anim_state6
+    equb sprite_explosion3                                                              ; 1fe1: 0e          .              ; cell type $61 = map_earth | map_anim_state6
+    equb sprite_explosion3                                                              ; 1fe2: 0e          .              ; cell type $62 = map_wall | map_anim_state6
+    equb sprite_explosion3                                                              ; 1fe3: 0e          .              ; cell type $63 = map_titanium_wall | map_anim_state6
+    equb sprite_diamond1                                                                ; 1fe4: 03          .              ; cell type $64 = map_diamond | map_anim_state6
+    equb sprite_rockford_moving_right4                                                  ; 1fe5: 31          1              ; cell type $65 = map_rock | map_anim_state6
+    equb sprite_firefly2                                                                ; 1fe6: 1a          .              ; cell type $66 = map_firefly | map_anim_state6
+    equb sprite_fungus1                                                                 ; 1fe7: 14          .              ; cell type $67 = map_fungus | map_anim_state6
+    equb sprite_rockford_moving_right4                                                  ; 1fe8: 31          1              ; cell type $68 = map_rockford_appearing_or_end_position | map_anim_state6
+    equb &61                                                                            ; 1fe9: 61          a              ; cell type $69 = map_firefly_in_earth_box | map_anim_state6
+    equb sprite_firefly4                                                                ; 1fea: 1c          .              ; cell type $6A = map_explosion | map_anim_state6
+    equb sprite_butterfly2                                                              ; 1feb: 17          .              ; cell type $6B = map_vertical_strip | map_anim_state6
+    equb sprite_magic_wall2                                                             ; 1fec: 11          .              ; cell type $6C = map_horizontal_strip | map_anim_state6
+    equb sprite_explosion2                                                              ; 1fed: 0d          .              ; cell type $6D = map_magic_wall | map_anim_state6
+    equb sprite_butterfly2                                                              ; 1fee: 17          .              ; cell type $6E = map_butterfly | map_anim_state6
+    equb sprite_rockford_tapping_foot4                                                  ; 1fef: 28          (              ; cell type $6F = map_rockford | map_anim_state6
 
-; *************************************************************************************
-    equb sprite_explosion4                                                              ; 1ff0: 0f          .
-    equb sprite_explosion4                                                              ; 1ff1: 0f          .
-    equb sprite_explosion4                                                              ; 1ff2: 0f          .
-    equb sprite_explosion4                                                              ; 1ff3: 0f          .
-    equb sprite_diamond1                                                                ; 1ff4: 03          .
-    equb sprite_rockford_moving_right4                                                  ; 1ff5: 31          1
-    equb sprite_firefly2                                                                ; 1ff6: 1a          .
-.fungus_animated_sprites2d
-    equb sprite_fungus2                                                                 ; 1ff7: 15          .
-    equb sprite_rockford_moving_right4                                                  ; 1ff8: 31          1
-    equb sprite_wall2                                                                   ; 1ff9: 0b          .
-    equb sprite_firefly4                                                                ; 1ffa: 1c          .
-    equb sprite_butterfly2                                                              ; 1ffb: 17          .
-    equb sprite_earth2                                                                  ; 1ffc: 1e          .
-    equb sprite_explosion1                                                              ; 1ffd: 0c          .
-    equb sprite_butterfly2                                                              ; 1ffe: 17          .
-    equb sprite_explosion1                                                              ; 1fff: 0c          .
+    equb sprite_explosion4                                                              ; 1ff0: 0f          .              ; cell type $70 = map_space | map_anim_state7
+    equb sprite_explosion4                                                              ; 1ff1: 0f          .              ; cell type $71 = map_earth | map_anim_state7
+    equb sprite_explosion4                                                              ; 1ff2: 0f          .              ; cell type $72 = map_wall | map_anim_state7
+    equb sprite_explosion4                                                              ; 1ff3: 0f          .              ; cell type $73 = map_titanium_wall | map_anim_state7
+    equb sprite_diamond1                                                                ; 1ff4: 03          .              ; cell type $74 = map_diamond | map_anim_state7
+    equb sprite_rockford_moving_right4                                                  ; 1ff5: 31          1              ; cell type $75 = map_rock | map_anim_state7
+    equb sprite_firefly2                                                                ; 1ff6: 1a          .              ; cell type $76 = map_firefly | map_anim_state7
+    equb sprite_fungus2                                                                 ; 1ff7: 15          .              ; cell type $77 = map_fungus | map_anim_state7
+    equb sprite_rockford_moving_right4                                                  ; 1ff8: 31          1              ; cell type $78 = map_rockford_appearing_or_end_position | map_anim_state7
+    equb sprite_wall2                                                                   ; 1ff9: 0b          .              ; cell type $79 = map_firefly_in_earth_box | map_anim_state7
+    equb sprite_firefly4                                                                ; 1ffa: 1c          .              ; cell type $7A = map_explosion | map_anim_state7
+    equb sprite_butterfly2                                                              ; 1ffb: 17          .              ; cell type $7B = map_vertical_strip | map_anim_state7
+    equb sprite_earth2                                                                  ; 1ffc: 1e          .              ; cell type $7C = map_horizontal_strip | map_anim_state7
+    equb sprite_explosion1                                                              ; 1ffd: 0c          .              ; cell type $7D = map_magic_wall | map_anim_state7
+    equb sprite_butterfly2                                                              ; 1ffe: 17          .              ; cell type $7E = map_butterfly | map_anim_state7
+    equb sprite_explosion1                                                              ; 1fff: 0c          .              ; cell type $7F = map_rockford | map_anim_state7
 
 ; *************************************************************************************
 .sprite_addresses_low
@@ -1147,8 +1141,10 @@ lfff6                                   = &fff6
     equb 0                                                                              ; 210d: 00          .              ; map_magic_wall
     equb 0                                                                              ; 210e: 00          .              ; map_butterfly
     equb 0                                                                              ; 210f: 00          .              ; map_rockford
+
 .firefly_and_butterfly_next_direction_table
     equb 2, 3, 4, 5, 6, 7, 0, 1                                                         ; 2110: 02 03 04... ...
+
 .firefly_and_butterfly_cell_values
     equb   (map_unprocessed OR map_anim_state3) OR map_firefly                          ; 2118: b6          .
     equb (map_unprocessed OR map_anim_state3) OR map_butterfly                          ; 2119: be          .
@@ -1213,10 +1209,25 @@ lfff6                                   = &fff6
     equb map_unprocessed OR map_large_explosion_state3                                  ; 214e: b3          .              ; map_butterfly
     equb &ff                                                                            ; 214f: ff          .              ; map_rockford
 
-.index_to_cell_type
-    equb   4, &44,   6, &16, &26, &36                                                   ; 2150: 04 44 06... .D.
+; these are the cell types (indices into the table 'cell_type_to_sprite') that update
+; every tick due to animation
+.cell_types_that_always_animate
+    equb                    map_diamond                                                 ; 2150: 04          .
+    equb map_anim_state4 OR map_diamond                                                 ; 2151: 44          D
+    equb                    map_firefly                                                 ; 2152: 06          .
+    equb map_anim_state1 OR map_firefly                                                 ; 2153: 16          .
+    equb map_anim_state2 OR map_firefly                                                 ; 2154: 26          &
+    equb map_anim_state3 OR map_firefly                                                 ; 2155: 36          6
 .exit_cell_type
-    equb &18, &1d, &0e, &1e, &2e, &3e, &2f, &1f,   9                                    ; 2156: 18 1d 0e... ...
+    equb                   map_active_exit                                              ; 2156: 18          .
+    equb map_anim_state1 OR map_magic_wall                                              ; 2157: 1d          .
+    equb                     map_butterfly                                              ; 2158: 0e          .
+    equb  map_anim_state1 OR map_butterfly                                              ; 2159: 1e          .
+    equb  map_anim_state2 OR map_butterfly                                              ; 215a: 2e          .
+    equb  map_anim_state3 OR map_butterfly                                              ; 215b: 3e          >
+    equb   map_anim_state2 OR map_rockford                                              ; 215c: 2f          /
+    equb   map_anim_state1 OR map_rockford                                              ; 215d: 1f          .
+    equb          map_firefly_in_earth_box                                              ; 215e: 09          .
 
 .unused11
     equb   9, &0a,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0 ; 215f: 09 0a 00... ...
@@ -1354,8 +1365,10 @@ lfff6                                   = &fff6
     equb cell_left                                                                      ; 2221: 76          v
     equb cell_below                                                                     ; 2222: 7a          z
     equb cell_below                                                                     ; 2223: 7a          z
+
 .rockford_cell_value_for_direction
     equb &af, &9f,   0,   0                                                             ; 2224: af 9f 00... ...
+
 .inkey_keys_table
     equb inkey_key_escape                                                               ; 2228: 8f          .
     equb inkey_key_space                                                                ; 2229: 9d          .
@@ -2537,7 +2550,7 @@ lookup_table_address_low = read_from_table_instruction+1
     ldx #&0e                                                                            ; 2800: a2 0e       ..
     stx cell_current                                                                    ; 2802: 86 77       .w
 .update_sprites_to_use_loop
-    ldy index_to_cell_type,x                                                            ; 2804: bc 50 21    .P!
+    ldy cell_types_that_always_animate,x                                                ; 2804: bc 50 21    .P!
     ldx cell_type_to_sprite,y                                                           ; 2807: be 80 1f    ...
     ; look up the next sprite in the animation sequence
     lda sprite_to_next_sprite,x                                                         ; 280a: bd 00 1f    ...
@@ -2545,6 +2558,7 @@ lookup_table_address_low = read_from_table_instruction+1
     dec cell_current                                                                    ; 2810: c6 77       .w
     ldx cell_current                                                                    ; 2812: a6 77       .w
     bpl update_sprites_to_use_loop                                                      ; 2814: 10 ee       ..
+
     ; use the tick counter (bottom two bits scaled up by 16) to update fungus animation
     lda tick_counter                                                                    ; 2816: a5 5a       .Z
     and #3                                                                              ; 2818: 29 03       ).
@@ -2553,12 +2567,12 @@ lookup_table_address_low = read_from_table_instruction+1
     asl a                                                                               ; 281c: 0a          .
     asl a                                                                               ; 281d: 0a          .
     tax                                                                                 ; 281e: aa          .
-    lda fungus_animated_sprites1a,x                                                     ; 281f: bd 87 1f    ...
+    lda fungus_animated_sprite0,x                                                       ; 281f: bd 87 1f    ...
     eor #1                                                                              ; 2822: 49 01       I.
-    sta fungus_animated_sprites1a,x                                                     ; 2824: 9d 87 1f    ...
-    lda fungus_animated_sprites2a,x                                                     ; 2827: bd c7 1f    ...
+    sta fungus_animated_sprite0,x                                                       ; 2824: 9d 87 1f    ...
+    lda fungus_animated_sprites4,x                                                      ; 2827: bd c7 1f    ...
     eor #1                                                                              ; 282a: 49 01       I.
-    sta fungus_animated_sprites2a,x                                                     ; 282c: 9d c7 1f    ...
+    sta fungus_animated_sprites4,x                                                      ; 282c: 9d c7 1f    ...
     ; animate exit
     lda exit_cell_type                                                                  ; 282f: ad 56 21    .V!
     eor #&10                                                                            ; 2832: 49 10       I.
@@ -6642,16 +6656,28 @@ tile_map_row_19 = l54bc+4
     assert inkey_key_x == &bd
     assert inkey_key_z == &9e
     assert map_active_exit == &18
+    assert map_anim_state1 OR map_butterfly == &1e
+    assert map_anim_state1 OR map_firefly == &16
+    assert map_anim_state1 OR map_magic_wall == &1d
+    assert map_anim_state1 OR map_rockford == &1f
+    assert map_anim_state2 OR map_butterfly == &2e
+    assert map_anim_state2 OR map_firefly == &26
+    assert map_anim_state2 OR map_rockford == &2f
+    assert map_anim_state3 OR map_butterfly == &3e
+    assert map_anim_state3 OR map_firefly == &36
     assert map_anim_state3 OR map_magic_wall == &3d
     assert map_anim_state4 OR map_butterfly == &4e
+    assert map_anim_state4 OR map_diamond == &44
     assert map_anim_state7 OR map_magic_wall == &7d
     assert map_anim_state7 OR map_rockford == &7f
+    assert map_butterfly == &0e
     assert map_butterfly OR map_anim_state2 == &2e
     assert map_deadly == &c0
     assert map_diamond == &04
     assert map_diamond OR map_unprocessed == &84
     assert map_earth == &01
     assert map_firefly == &06
+    assert map_firefly_in_earth_box == &09
     assert map_rockford == &0f
     assert map_rockford OR map_unprocessed == &8f
     assert map_rockford_appearing_or_end_position == &08
