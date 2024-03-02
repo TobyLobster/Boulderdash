@@ -649,12 +649,7 @@ for i in range(0, 97):
 for i in range(64):
     byte(0x1e80+i)
 
-unused(0x205b)
-unused(0x20db)
-
-unused(0x2061)
 byte(0x2061, 0x2080-0x2061)
-unused(0x20e1)
 byte(0x20e1, 0x2100-0x20e1)
 
 i = 1
@@ -728,9 +723,6 @@ def cave_comments(addr):
         comment(addr+i, "Cave " + "ABCDEFGHIJKLMNOPQRST"[i], inline=True)
 
 byte(0x46bc, 0x46e8-0x46bc)
-unused(0x3de4)
-unused(0x42e8)
-unused(0x46e8)
 blank(0x46e8)
 
 constant(20, "total_caves")
@@ -744,6 +736,7 @@ label(0x0c00, "grid_of_currently_displayed_sprites")
 label(0x1300, "initial_clock_value")
 
 stars(0x1e60, True)
+blank(0x1e70)
 label(0x1e70, "set_clock_value")
 byte(0x1e70,5)
 unused(0x1e75)
@@ -819,11 +812,15 @@ stars(0x1f80, "Table to convert a cell type 0-$7f into a sprite number.\n\nNot a
 stars(0x2000, True)
 label(0x2000, "sprite_addresses_low")
 label(0x2007, "sprite_titanium_addressA")
+unused(0x205b)
+unused(0x2061)
 label(0x2060, "sprite_titanium_addressB")
 stars(0x2080, True)
 label(0x2080, "sprite_addresses_high")
+unused(0x20db)
 label(0x20e0, "sprite_titanium_addressC")
 blank(0x20e1)
+unused(0x20e1)
 
 stars(0x2100, True)
 label(0x2100, "cell_types_that_rocks_or_diamonds_will_fall_off")
@@ -976,7 +973,7 @@ label(0x2208, "map_offset_for_direction")
 byte(0x2208, 4)
 unused(0x220c)
 blank(0x220c)
-byte(0x220c, 16, 8)
+byte(0x220c, 16)
 blank(0x221c)
 comment(0x221c, "Next table has even offsets progressing clockwise, odd offsets progress anti-clockwise", indent=1)
 label(0x221c, "firefly_neighbour_variables")
@@ -2028,6 +2025,9 @@ The top five bits of each byte is the offset to the next patch byte (add one for
 5 = store value 5 (map_rock)
 6 = store value 6 (map_firefly)
 7 = store value 1 (map_earth)""")
+unused(0x3de4)
+unused(0x42e8)
+unused(0x46e8)
 
 blank(0x4700)
 stars(0x4700)
