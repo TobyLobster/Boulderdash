@@ -38,32 +38,39 @@
 ;   Each player has a status bar, and different status bars are shown while paused.
 ;
 ; Cell values in tile_map:
+;   $00 = map_space
+;   $01 = map_earth
+;   $02 = map_wall
+;   $03 = map_titanium_wall       (as seen on the border of the whole map)
+;   $04 = map_diamond
+;   $05 = map_rock
+;   $06 = map_firefly             (with animation states $06, $16, $26, $36)
+;   $07 = map_fungus              (states $07, $17, $27, $37, $47, $57, $67, and $77 as the fungus grows)
+;   $08 = map_rockford_appearing_or_end_position
+;   $09 = map_firefly_in_earth_box
+;   $0a = map_explosion
+;   $0b = map_vertical_strip      (in preprocessing: value above is filled down to the next $0b)
+;   $0c = map_horizontal_strip    (in preprocessing: value is copied to the end of the row)
+;   $0d = map_magic_wall
+;   $0e = map_butterfly           (with animation states $0e, $1e, $2e, $3e)
+;   $0f = map_rockford            ($0f=waiting, $1f=walking left, $2f=walking right)
 ;
-; $00 = empty space
-; $01 = earth
-; $02 = wall
-; $03 = titanium wall      (as seen on the border of the whole map)
-; $04 = diamond
-; $05 = rock
-; $06 = firefly            (with animation states $06, $16, $26, $36)
-; $07 = fungus             (states $07, $17, $27, $37, $47, $57, $67, and $77 as the
-;                           fungus grows)
-; $08 = animated player appearing
-; $09 = 4x4 earth square with firefly pacing inside (or butterfly on cave D)
-; $0a = animated player exploding
-; $0b = vertical strip     (in preprocessing: value above is filled down to the next $0b)
-; $0c = horizontal strip   (in preprocessing: value is copied to the end of the row)
-; $0d = magic wall
-; $0e = butterfly          (with animation states $0e, $1e, $2e, $3e)
-; $0f = player             ($0f=waiting, $1f=walking left, $2f=walking right)
+; Upper nybble sometimes holds an animation state, and top bit is a flag depending on context:
+;   $00 = map_anim_state0
+;   $10 = map_anim_state1
+;   $20 = map_anim_state2
+;   $30 = map_anim_state3
+;   $80 = map_unprocessed
+;   $c0 = map_deadly              (cell is deadly, below a rock that fell)
 ;
-; $18 = flashing exit
-; $21 = intro explosion frame #1
-; $11 = intro explosion frame #2
-; $43 = explosion out effect #1
-; $33 = explosion out effect #2
-; $23 = explosion out effect #3
-; $13 = explosion out effect #4
+; Special cases:
+;   $18 = map_active_exit         (exit is available and flashing)
+;
+;   $46 = map_start_death_explosion   (first state of the death explosion)
+;   $33 = map_large_explosion_state3
+;   $23 = map_large_explosion_state2
+;   $13 = map_large_explosion_state1
+;
 ;
 ; *************************************************************************************
 
@@ -76,23 +83,29 @@ inkey_key_slash                          = 151
 inkey_key_space                          = 157
 inkey_key_x                              = 189
 inkey_key_z                              = 158
+map_active_exit                          = 24
 map_anim_state0                          = 0
 map_anim_state1                          = 16
 map_anim_state2                          = 32
 map_anim_state3                          = 48
 map_butterfly                            = 14
+map_deadly                               = 192
 map_diamond                              = 4
 map_earth                                = 1
-map_earth_plus_firefly_4x4               = 9
 map_explosion                            = 10
 map_firefly                              = 6
+map_firefly_in_earth_box                 = 9
 map_fungus                               = 7
 map_horizontal_strip                     = 12
+map_large_explosion_state1               = 19
+map_large_explosion_state2               = 35
+map_large_explosion_state3               = 51
 map_magic_wall                           = 13
 map_rock                                 = 5
 map_rockford                             = 15
 map_rockford_appearing_or_end_position   = 8
 map_space                                = 0
+map_start_death_explosion                = 70
 map_titanium_wall                        = 3
 map_unprocessed                          = 128
 map_vertical_strip                       = 11
@@ -1119,14 +1132,14 @@ lfff6                                   = &fff6
     equb 0                                                                              ; 2106: 00          .              ; map_firefly
     equb 1                                                                              ; 2107: 01          .              ; map_fungus
     equb 0                                                                              ; 2108: 00          .              ; map_rockford_appearing_or_end_position
-    equb 0                                                                              ; 2109: 00          .              ; map_earth_plus_firefly_4x4
+    equb 0                                                                              ; 2109: 00          .              ; map_firefly_in_earth_box
     equb 0                                                                              ; 210a: 00          .              ; map_explosion
     equb 0                                                                              ; 210b: 00          .              ; map_vertical_strip
     equb 1                                                                              ; 210c: 01          .              ; map_horizontal_strip
     equb 0                                                                              ; 210d: 00          .              ; map_magic_wall
     equb 0                                                                              ; 210e: 00          .              ; map_butterfly
     equb 0                                                                              ; 210f: 00          .              ; map_rockford
-.fireflay_and_butterfly_directions_array
+.firefly_and_butterfly_next_direction_table
     equb 2, 3, 4, 5, 6, 7, 0, 1                                                         ; 2110: 02 03 04... ...
 .firefly_and_butterfly_cell_values
     equb   (map_unprocessed OR map_anim_state3) OR map_firefly                          ; 2118: b6          .
@@ -1143,12 +1156,12 @@ lfff6                                   = &fff6
     equb 0                                                                              ; 2121: 00          .              ; map_earth
     equb 0                                                                              ; 2122: 00          .              ; map_wall
     equb 0                                                                              ; 2123: 00          .              ; map_titanium_wall
-    equb map_unprocessed + map_rock                                                     ; 2124: 85          .              ; map_diamond
-    equb map_unprocessed + map_diamond                                                  ; 2125: 84          .              ; map_rock
+    equb map_unprocessed OR map_rock                                                    ; 2124: 85          .              ; map_diamond
+    equb map_unprocessed OR map_diamond                                                 ; 2125: 84          .              ; map_rock
     equb 0                                                                              ; 2126: 00          .              ; map_firefly
     equb 0                                                                              ; 2127: 00          .              ; map_fungus
     equb 0                                                                              ; 2128: 00          .              ; map_rockford_appearing_or_end_position
-    equb 0                                                                              ; 2129: 00          .              ; map_earth_plus_firefly_4x4
+    equb 0                                                                              ; 2129: 00          .              ; map_firefly_in_earth_box
     equb 0                                                                              ; 212a: 00          .              ; map_explosion
     equb 0                                                                              ; 212b: 00          .              ; map_vertical_strip
     equb 0                                                                              ; 212c: 00          .              ; map_horizontal_strip
@@ -1156,11 +1169,41 @@ lfff6                                   = &fff6
     equb 0                                                                              ; 212e: 00          .              ; map_butterfly
     equb 0                                                                              ; 212f: 00          .              ; map_rockford
 
-.some_array_of_cells
-    equb &84, &84, &84,   0, &84, &84, &84, &84,   0,   0,   0, &84, &84, &84, &84, &ff ; 2130: 84 84 84... ...
+.cell_types_that_will_turn_into_diamonds
+    equb map_unprocessed OR map_diamond                                                 ; 2130: 84          .              ; map_space
+    equb map_unprocessed OR map_diamond                                                 ; 2131: 84          .              ; map_earth
+    equb map_unprocessed OR map_diamond                                                 ; 2132: 84          .              ; map_wall
+    equb 0                                                                              ; 2133: 00          .              ; map_titanium_wall
+    equb map_unprocessed OR map_diamond                                                 ; 2134: 84          .              ; map_diamond
+    equb map_unprocessed OR map_diamond                                                 ; 2135: 84          .              ; map_rock
+    equb map_unprocessed OR map_diamond                                                 ; 2136: 84          .              ; map_firefly
+    equb map_unprocessed OR map_diamond                                                 ; 2137: 84          .              ; map_fungus
+    equb 0                                                                              ; 2138: 00          .              ; map_rockford_appearing_or_end_position
+    equb 0                                                                              ; 2139: 00          .              ; map_firefly_in_earth_box
+    equb 0                                                                              ; 213a: 00          .              ; map_explosion
+    equb map_unprocessed OR map_diamond                                                 ; 213b: 84          .              ; map_vertical_strip
+    equb map_unprocessed OR map_diamond                                                 ; 213c: 84          .              ; map_horizontal_strip
+    equb map_unprocessed OR map_diamond                                                 ; 213d: 84          .              ; map_magic_wall
+    equb map_unprocessed OR map_diamond                                                 ; 213e: 84          .              ; map_butterfly
+    equb &ff                                                                            ; 213f: ff          .              ; map_rockford
 
-.another_array_of_cells
-    equb &b3, &b3, &b3,   0, &b3, &b3, &b3, &b3,   0,   0,   0, &b3, &b3, &b3, &b3, &ff ; 2140: b3 b3 b3... ...
+.cell_types_that_will_turn_into_large_explosion
+    equb map_unprocessed OR map_large_explosion_state3                                  ; 2140: b3          .              ; map_space
+    equb map_unprocessed OR map_large_explosion_state3                                  ; 2141: b3          .              ; map_earth
+    equb map_unprocessed OR map_large_explosion_state3                                  ; 2142: b3          .              ; map_wall
+    equb 0                                                                              ; 2143: 00          .              ; map_titanium_wall
+    equb map_unprocessed OR map_large_explosion_state3                                  ; 2144: b3          .              ; map_diamond
+    equb map_unprocessed OR map_large_explosion_state3                                  ; 2145: b3          .              ; map_rock
+    equb map_unprocessed OR map_large_explosion_state3                                  ; 2146: b3          .              ; map_firefly
+    equb map_unprocessed OR map_large_explosion_state3                                  ; 2147: b3          .              ; map_fungus
+    equb 0                                                                              ; 2148: 00          .              ; map_rockford_appearing_or_end_position
+    equb 0                                                                              ; 2149: 00          .              ; map_firefly_in_earth_box
+    equb 0                                                                              ; 214a: 00          .              ; map_explosion
+    equb map_unprocessed OR map_large_explosion_state3                                  ; 214b: b3          .              ; map_vertical_strip
+    equb map_unprocessed OR map_large_explosion_state3                                  ; 214c: b3          .              ; map_horizontal_strip
+    equb map_unprocessed OR map_large_explosion_state3                                  ; 214d: b3          .              ; map_magic_wall
+    equb map_unprocessed OR map_large_explosion_state3                                  ; 214e: b3          .              ; map_butterfly
+    equb &ff                                                                            ; 214f: ff          .              ; map_rockford
 
 .index_to_cell_type
     equb   4, &44,   6, &16, &26, &36                                                   ; 2150: 04 44 06... .D.
@@ -1182,7 +1225,7 @@ lfff6                                   = &fff6
     equb &46                                                                            ; 2186: 46          F              ; map_firefly
     equb 0                                                                              ; 2187: 00          .              ; map_fungus
     equb 0                                                                              ; 2188: 00          .              ; map_rockford_appearing_or_end_position
-    equb 0                                                                              ; 2189: 00          .              ; map_earth_plus_firefly_4x4
+    equb 0                                                                              ; 2189: 00          .              ; map_firefly_in_earth_box
     equb 0                                                                              ; 218a: 00          .              ; map_explosion
     equb &7d                                                                            ; 218b: 7d          }              ; map_vertical_strip
     equb 0                                                                              ; 218c: 00          .              ; map_horizontal_strip
@@ -1206,7 +1249,7 @@ lfff6                                   = &fff6
     equb <handler_firefly_or_butterfly                                                  ; 21c6: 00          .              ; map_firefly
     equb <handler_fungus                                                                ; 21c7: 9e          .              ; map_fungus
     equb <handler_rockford_intro_or_exit                                                ; 21c8: e3          .              ; map_rockford_appearing_or_end_position
-    equb <handler_firefly_in_box                                                        ; 21c9: ca          .              ; map_earth_plus_firefly_4x4
+    equb <handler_firefly_in_box                                                        ; 21c9: ca          .              ; map_firefly_in_earth_box
     equb <handler_rockford_intro_or_exit                                                ; 21ca: e3          .              ; map_explosion
     equb <handler_for_vertical_strip                                                    ; 21cb: e0          .              ; map_vertical_strip
     equb <handler_for_horizontal_strip                                                  ; 21cc: f0          .              ; map_horizontal_strip
@@ -1223,7 +1266,7 @@ lfff6                                   = &fff6
     equb >handler_firefly_or_butterfly                                                  ; 21d6: 25          %              ; map_firefly
     equb >handler_fungus                                                                ; 21d7: 25          %              ; map_fungus
     equb >handler_rockford_intro_or_exit                                                ; 21d8: 26          &              ; map_rockford_appearing_or_end_position
-    equb >handler_firefly_in_box                                                        ; 21d9: 2b          +              ; map_earth_plus_firefly_4x4
+    equb >handler_firefly_in_box                                                        ; 21d9: 2b          +              ; map_firefly_in_earth_box
     equb >handler_rockford_intro_or_exit                                                ; 21da: 26          &              ; map_explosion
     equb >handler_for_vertical_strip                                                    ; 21db: 23          #              ; map_vertical_strip
     equb >handler_for_horizontal_strip                                                  ; 21dc: 23          #              ; map_horizontal_strip
@@ -1264,7 +1307,7 @@ lfff6                                   = &fff6
     equb 0                                                                              ; 21f6: 00          .              ; map_firefly
     equb 0                                                                              ; 21f7: 00          .              ; map_fungus
     equb 0                                                                              ; 21f8: 00          .              ; map_rockford_appearing_or_end_position
-    equb 0                                                                              ; 21f9: 00          .              ; map_earth_plus_firefly_4x4
+    equb 0                                                                              ; 21f9: 00          .              ; map_firefly_in_earth_box
     equb &ff                                                                            ; 21fa: ff          .              ; map_explosion
     equb 0                                                                              ; 21fb: 00          .              ; map_vertical_strip
     equb 0                                                                              ; 21fc: 00          .              ; map_horizontal_strip
@@ -1292,7 +1335,9 @@ lfff6                                   = &fff6
     equb   0, &10, &20, &26, &40, &50, &60, &70                                         ; 220c: 00 10 20... ..
     equb &80, &90, &a0, &b0,   1, &d0, &e0, &f0                                         ; 2214: 80 90 a0... ...
 
-.firefly_cell_values
+    ; Next table has even offsets progressing clockwise, odd offsets progress anti-
+    ; clockwise
+.firefly_neighbour_variables
     equb cell_left                                                                      ; 221c: 76          v
     equb cell_right                                                                     ; 221d: 78          x
     equb cell_above                                                                     ; 221e: 74          t
@@ -1847,7 +1892,7 @@ handler_high = jsr_handler_instruction+2
     lda (ptr_low),y                                                                     ; 249c: b1 8c       ..
     beq cell_below_is_a_space                                                           ; 249e: f0 34       .4
     ; check current cell
-    cpx #&c0                                                                            ; 24a0: e0 c0       ..
+    cpx #map_deadly                                                                     ; 24a0: e0 c0       ..
     bmi not_c0_or_above                                                                 ; 24a2: 30 03       0.
     jsr process_c0_or_above                                                             ; 24a4: 20 db 24     .$
 .not_c0_or_above
@@ -1911,7 +1956,7 @@ handler_high = jsr_handler_instruction+2
     ; store $4b or $4c (i.e. a non-zero value) in location $4b or $4c. i.e. activate
     ; sound5_active_flag or sound6_active_flag
     sta page_0,y                                                                        ; 24ee: 99 00 00    ...
-    ; mask off the top two bits for the current cell value
+    ; mask off bit 6 for the current cell value
     txa                                                                                 ; 24f1: 8a          .
     and #&bf                                                                            ; 24f2: 29 bf       ).
     tax                                                                                 ; 24f4: aa          .
@@ -1923,56 +1968,64 @@ handler_high = jsr_handler_instruction+2
 
 ; *************************************************************************************
 .handler_firefly_or_butterfly
-    cpx #&c0                                                                            ; 2500: e0 c0       ..
-    bpl c0_or_above                                                                     ; 2502: 10 3e       .>
+    cpx #map_deadly                                                                     ; 2500: e0 c0       ..
+    bpl show_large_explosion                                                            ; 2502: 10 3e       .>
+    ; check directions in order: cell_below, cell_right, cell_left, cell_up
     ldy #8                                                                              ; 2504: a0 08       ..
-.loop_c2506
+.look_for_fungus_or_player_loop
     lda cell_above_left-1,y                                                             ; 2506: b9 72 00    .r.
     bne unnecessary_branch                                                              ; 2509: d0 00       ..             ; redundant instruction
 .unnecessary_branch
     and #7                                                                              ; 250b: 29 07       ).
     eor #7                                                                              ; 250d: 49 07       I.
-    beq c0_or_above                                                                     ; 250f: f0 31       .1
+    beq show_large_explosion                                                            ; 250f: f0 31       .1
     dey                                                                                 ; 2511: 88          .
     dey                                                                                 ; 2512: 88          .
-    bne loop_c2506                                                                      ; 2513: d0 f1       ..
+    bne look_for_fungus_or_player_loop                                                  ; 2513: d0 f1       ..
+    ; calculate direction to move in Y
     txa                                                                                 ; 2515: 8a          .
     lsr a                                                                               ; 2516: 4a          J
     lsr a                                                                               ; 2517: 4a          J
     lsr a                                                                               ; 2518: 4a          J
     and #7                                                                              ; 2519: 29 07       ).
     tay                                                                                 ; 251b: a8          .
-    ldx firefly_cell_values,y                                                           ; 251c: be 1c 22    .."
+    ; branch if the desired direction is empty
+    ldx firefly_neighbour_variables,y                                                   ; 251c: be 1c 22    .."
     lda page_0,x                                                                        ; 251f: b5 00       ..
-    beq c2534                                                                           ; 2521: f0 11       ..
-    lda fireflay_and_butterfly_directions_array,y                                       ; 2523: b9 10 21    ..!
+    beq set_firefly_or_butterfly                                                        ; 2521: f0 11       ..
+    ; get the next direction in Y
+    lda firefly_and_butterfly_next_direction_table,y                                    ; 2523: b9 10 21    ..!
     tay                                                                                 ; 2526: a8          .
-    ldx firefly_cell_values,y                                                           ; 2527: be 1c 22    .."
+    ; branch if the second desired direction is empty
+    ldx firefly_neighbour_variables,y                                                   ; 2527: be 1c 22    .."
     lda page_0,x                                                                        ; 252a: b5 00       ..
-    beq c2534                                                                           ; 252c: f0 06       ..
+    beq set_firefly_or_butterfly                                                        ; 252c: f0 06       ..
+    ; set X=0 to force the use of the final possible direction
     ldx #0                                                                              ; 252e: a2 00       ..
-    lda fireflay_and_butterfly_directions_array,y                                       ; 2530: b9 10 21    ..!
+    ; get the last cardinal direction that isn't a u-turn
+    lda firefly_and_butterfly_next_direction_table,y                                    ; 2530: b9 10 21    ..!
     tay                                                                                 ; 2533: a8          .
-.c2534
+.set_firefly_or_butterfly
     lda firefly_and_butterfly_cell_values,y                                             ; 2534: b9 18 21    ..!
     cpx #0                                                                              ; 2537: e0 00       ..
-    bne c253d                                                                           ; 2539: d0 02       ..
+    bne store_firefly_and_clear_current_cell                                            ; 2539: d0 02       ..
     tax                                                                                 ; 253b: aa          .
     rts                                                                                 ; 253c: 60          `
 
-.c253d
+.store_firefly_and_clear_current_cell
     sta page_0,x                                                                        ; 253d: 95 00       ..
     ldx #0                                                                              ; 253f: a2 00       ..
     rts                                                                                 ; 2541: 60          `
 
-.c0_or_above
+.show_large_explosion
     txa                                                                                 ; 2542: 8a          .
-    ldx #<another_array_of_cells                                                        ; 2543: a2 40       .@
+    ldx #<cell_types_that_will_turn_into_large_explosion                                ; 2543: a2 40       .@
     and #8                                                                              ; 2545: 29 08       ).
-    beq c254b                                                                           ; 2547: f0 02       ..
-    ldx #<some_array_of_cells                                                           ; 2549: a2 30       .0
-.c254b
-    stx l2572                                                                           ; 254b: 8e 72 25    .r%
+    beq set_explosion_type                                                              ; 2547: f0 02       ..
+    ldx #<cell_types_that_will_turn_into_diamonds                                       ; 2549: a2 30       .0
+.set_explosion_type
+    stx lookup_table_address_low                                                        ; 254b: 8e 72 25    .r%
+    ; activate explosion sound
     stx sound6_active_flag                                                              ; 254e: 86 4c       .L
     ; read above left cell
     ldy #0                                                                              ; 2550: a0 00       ..
@@ -1992,20 +2045,21 @@ handler_high = jsr_handler_instruction+2
     ldy #&82                                                                            ; 2564: a0 82       ..
     lda (ptr_low),y                                                                     ; 2566: b1 8c       ..
     sta cell_below_right                                                                ; 2568: 85 7b       .{
-    ; loop 9 times
+    ; loop 9 times to replace all the neighbour cells with diamonds or large explosion
     ldx #9                                                                              ; 256a: a2 09       ..
-.loop_c256c
+.replace_neighbours_loop
     lda cell_above_left-1,x                                                             ; 256c: b5 72       .r
     and #&0f                                                                            ; 256e: 29 0f       ).
     tay                                                                                 ; 2570: a8          .
-.sub_c2571
-l2572 = sub_c2571+1
-    lda another_array_of_cells,y                                                        ; 2571: b9 40 21    .@!
-    beq c2578                                                                           ; 2574: f0 02       ..
+.read_from_table_instruction
+lookup_table_address_low = read_from_table_instruction+1
+    lda cell_types_that_will_turn_into_large_explosion,y                                ; 2571: b9 40 21    .@!
+    beq skip_storing_explosion_into_cell                                                ; 2574: f0 02       ..
     sta cell_above_left-1,x                                                             ; 2576: 95 72       .r
-.c2578
+.skip_storing_explosion_into_cell
     dex                                                                                 ; 2578: ca          .
-    bne loop_c256c                                                                      ; 2579: d0 f1       ..
+    bne replace_neighbours_loop                                                         ; 2579: d0 f1       ..
+    ; write new values back into the corner cells
     ; write to above left cell
     ldy #0                                                                              ; 257b: a0 00       ..
     lda cell_above_left                                                                 ; 257d: a5 73       .s
@@ -2035,6 +2089,7 @@ l2572 = sub_c2571+1
 .handler_fungus
     lda fungus_replacement                                                              ; 259e: a5 54       .T
     beq update_fungus                                                                   ; 25a0: f0 04       ..
+    ; play fungus sound
     tax                                                                                 ; 25a2: aa          .
     sta sound6_active_flag                                                              ; 25a3: 85 4c       .L
     rts                                                                                 ; 25a5: 60          `
@@ -2060,17 +2115,21 @@ l2572 = sub_c2571+1
     bne return3                                                                         ; 25c4: d0 2f       ./
     lda #0                                                                              ; 25c6: a9 00       ..
     sta fungus_counter                                                                  ; 25c8: 85 57       .W
+    ; calculate direction to grow based on current fungus state in top bits
     txa                                                                                 ; 25ca: 8a          .
     lsr a                                                                               ; 25cb: 4a          J
     lsr a                                                                               ; 25cc: 4a          J
     lsr a                                                                               ; 25cd: 4a          J
     and #6                                                                              ; 25ce: 29 06       ).
+    ; Y is set to 0,2,4, or 6 for the compass directions
     tay                                                                                 ; 25d0: a8          .
-    cpx #&c0                                                                            ; 25d1: e0 c0       ..
-    bmi c25e2                                                                           ; 25d3: 30 0d       0.
+    cpx #map_deadly                                                                     ; 25d1: e0 c0       ..
+    bmi check_for_space_or_earth                                                        ; 25d3: 30 0d       0.
+    ; get cell value for direction Y
     lda cell_above,y                                                                    ; 25d5: b9 74 00    .t.
-    beq c25e9                                                                           ; 25d8: f0 0f       ..
-.c25da
+    beq found_space_or_earth_to_grow_into                                               ; 25d8: f0 0f       ..
+    ; move fungus onto next state (add 16)
+.increment_top_nybble_of_fungus
     txa                                                                                 ; 25da: 8a          .
     clc                                                                                 ; 25db: 18          .
     adc #&10                                                                            ; 25dc: 69 10       i.
@@ -2078,16 +2137,18 @@ l2572 = sub_c2571+1
     tax                                                                                 ; 25e0: aa          .
     rts                                                                                 ; 25e1: 60          `
 
-.c25e2
+    ; get cell value for direction Y
+.check_for_space_or_earth
     lda cell_above,y                                                                    ; 25e2: b9 74 00    .t.
+    ; branch if 0 or 1 (space or earth)
     and #&0e                                                                            ; 25e5: 29 0e       ).
-    bne c25da                                                                           ; 25e7: d0 f1       ..
-.c25e9
+    bne increment_top_nybble_of_fungus                                                  ; 25e7: d0 f1       ..
+.found_space_or_earth_to_grow_into
     lda tick_counter                                                                    ; 25e9: a5 5a       .Z
     lsr a                                                                               ; 25eb: 4a          J
-    bcc c25f1                                                                           ; 25ec: 90 03       ..
-    jsr c25da                                                                           ; 25ee: 20 da 25     .%
-.c25f1
+    bcc store_x                                                                         ; 25ec: 90 03       ..
+    jsr increment_top_nybble_of_fungus                                                  ; 25ee: 20 da 25     .%
+.store_x
     txa                                                                                 ; 25f1: 8a          .
     sta cell_above,y                                                                    ; 25f2: 99 74 00    .t.
 .return3
@@ -2111,7 +2172,7 @@ l2572 = sub_c2571+1
     inx                                                                                 ; 2606: e8          .
     bne check_for_direction_key_pressed                                                 ; 2607: d0 05       ..
 .start_death_explosion
-    ldx #&46                                                                            ; 2609: a2 46       .F
+    ldx #map_start_death_explosion                                                      ; 2609: a2 46       .F
     stx rockford_explosion_cell_type                                                    ; 260b: 86 5f       ._
     rts                                                                                 ; 260d: 60          `
 
@@ -2233,7 +2294,7 @@ l2572 = sub_c2571+1
     lda items_produced_by_the_magic_wall,y                                              ; 26ba: b9 20 21    . !
     beq skip_storing_space_above                                                        ; 26bd: f0 04       ..
     ; something will fall into the wall, clear the cell above
-    ldy #map_unprocessed + map_space                                                    ; 26bf: a0 80       ..
+    ldy #map_unprocessed OR map_space                                                   ; 26bf: a0 80       ..
     sty cell_above                                                                      ; 26c1: 84 74       .t
 .skip_storing_space_above
     cpx #&2d                                                                            ; 26c3: e0 2d       .-
@@ -2269,7 +2330,7 @@ l2572 = sub_c2571+1
     and #&7f                                                                            ; 26e4: 29 7f       ).
     tax                                                                                 ; 26e6: aa          .
     ; branch if on exit
-    cpx #&18                                                                            ; 26e7: e0 18       ..
+    cpx #map_active_exit                                                                ; 26e7: e0 18       ..
     beq return4                                                                         ; 26e9: f0 12       ..
     ; we have found the intro square
     lda #0                                                                              ; 26eb: a9 00       ..
@@ -2309,6 +2370,7 @@ l2572 = sub_c2571+1
     sta status_text_address_low                                                         ; 2713: 85 69       .i
     sta current_fungus_cell_type                                                        ; 2715: 85 60       .`
     sta neighbour_cell_contents                                                         ; 2717: 85 64       .d
+    ; activate movement sound
     lda #&41                                                                            ; 2719: a9 41       .A
     sta sound2_active_flag                                                              ; 271b: 85 48       .H
     ; reset number of fungus cells found, and if already zero then clear the
@@ -2435,7 +2497,7 @@ l2572 = sub_c2571+1
     lda rockford_explosion_cell_type                                                    ; 27cd: a5 5f       ._
     bne check_if_pause_is_available                                                     ; 27cf: d0 04       ..
     ; start death explosion
-    lda #&46                                                                            ; 27d1: a9 46       .F
+    lda #map_start_death_explosion                                                      ; 27d1: a9 46       .F
     sta rockford_explosion_cell_type                                                    ; 27d3: 85 5f       ._
     ; branch if on a bonus stage (no pause available)
 .check_if_pause_is_available
@@ -3114,8 +3176,7 @@ l2572 = sub_c2571+1
     lda #map_earth                                                                      ; 2bca: a9 01       ..
     ldy #&43                                                                            ; 2bcc: a0 43       .C
     sta (ptr_low),y                                                                     ; 2bce: 91 8c       ..
-    ; this next loop runs four times from $c3 to $c0, then four times more from $03 to
-    ; $00
+    ; this next loop runs four times from $c3 to $c0, then four more from $03 to $00
     ldy #&c4                                                                            ; 2bd0: a0 c4       ..
 .store_earth_loop
     dey                                                                                 ; 2bd2: 88          .
@@ -3155,14 +3216,13 @@ l2572 = sub_c2571+1
 ; *************************************************************************************
 ; Sound data packed into single bytes: channel, amplitude, pitch, duration
 ; Sound 0 = Fungus ambient sound
-; Sound 1 = TODO
+; Sound 1 = Magic wall sound
 ; Sound 2 = Movement sound
 ; Sound 3 = Got earth sound
 ; Sound 4 = Rock landing/Rockford appearing sound
-; Sound 5 = TODO
+; Sound 5 = Diamond landing
 ; Sound 6 = Got all required diamonds / rockford exploding sound
-; Sound 7 = TODO
-; Sound 8 = TODO
+; Sound 7 = Fungus sound
 .in_game_sound_data
     equb &12,   5,   8,   5                                                             ; 2c00: 12 05 08... ...
     equb &12, &f7, &c8,   1                                                             ; 2c04: 12 f7 c8... ...
@@ -3639,7 +3699,7 @@ which_status_bar_address2_low = store_in_status_bar+1
     sta required_diamonds_on_status_bar                                                 ; 2f2a: 8d 01 32    ..2
     ; open the exit
     ldy #0                                                                              ; 2f2d: a0 00       ..
-    lda #&18                                                                            ; 2f2f: a9 18       ..
+    lda #map_active_exit                                                                ; 2f2f: a9 18       ..
     sta (map_rockford_end_position_addr_low),y                                          ; 2f31: 91 6a       .j
     ; set total diamonds to zero
     lda #sprite_0                                                                       ; 2f33: a9 32       .2
@@ -6308,9 +6368,10 @@ tile_map_row_19 = l54bc+4
     assert <(set_clock_value) == &70
     assert <(sprite_addr_space) == &00
     assert <(tile_map_row_1-1) == &3f
-    assert <another_array_of_cells == &40
     assert <big_rockford_destination_screen_address == &00
     assert <bonus_life_text == &64
+    assert <cell_types_that_will_turn_into_diamonds == &30
+    assert <cell_types_that_will_turn_into_large_explosion == &40
     assert <current_status_bar_sprites == &28
     assert <data_sets == &f4
     assert <demonstration_mode_text == &a0
@@ -6336,7 +6397,6 @@ tile_map_row_19 = l54bc+4
     assert <screen_addr_row_28 == &00
     assert <screen_addr_row_30 == &80
     assert <screen_addr_row_6 == &80
-    assert <some_array_of_cells == &30
     assert <sound1 == &b8
     assert <sprite_addr_0 == &40
     assert <sprite_addr_1 == &60
@@ -6573,7 +6633,9 @@ tile_map_row_19 = l54bc+4
     assert inkey_key_space == &9d
     assert inkey_key_x == &bd
     assert inkey_key_z == &9e
+    assert map_active_exit == &18
     assert map_butterfly OR map_anim_state2 == &2e
+    assert map_deadly == &c0
     assert map_diamond == &04
     assert map_diamond OR map_unprocessed == &84
     assert map_earth == &01
@@ -6582,10 +6644,11 @@ tile_map_row_19 = l54bc+4
     assert map_rockford OR map_unprocessed == &8f
     assert map_rockford_appearing_or_end_position == &08
     assert map_space == &00
-    assert map_unprocessed + map_diamond == &84
-    assert map_unprocessed + map_rock == &85
-    assert map_unprocessed + map_space == &80
+    assert map_start_death_explosion == &46
+    assert map_unprocessed OR map_diamond == &84
+    assert map_unprocessed OR map_large_explosion_state3 == &b3
     assert map_unprocessed OR map_rock == &85
+    assert map_unprocessed OR map_space == &80
     assert map_vertical_strip == &0b
     assert mark_cell_above_as_processed_and_move_to_next_cell - branch_instruction - 2 == &26
     assert opcode_dex == &ca

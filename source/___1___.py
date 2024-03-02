@@ -562,7 +562,7 @@ map_cell_types = {
     0x6: "map_firefly",
     0x7: "map_fungus",
     0x8: "map_rockford_appearing_or_end_position",
-    0x9: "map_earth_plus_firefly_4x4",
+    0x9: "map_firefly_in_earth_box",
     0xa: "map_explosion",
     0xb: "map_vertical_strip",
     0xc: "map_horizontal_strip",
@@ -580,6 +580,13 @@ constant(0x20, "map_anim_state2")
 constant(0x30, "map_anim_state3")
 constant(0x80, "map_unprocessed")
 
+constant(0x46, "map_start_death_explosion")
+constant(0x33, "map_large_explosion_state3")
+constant(0x23, "map_large_explosion_state2")
+constant(0x13, "map_large_explosion_state1")
+
+constant(0x18, "map_active_exit")
+constant(0xc0, "map_deadly")
 
 comment(0x1e60, "magic_wall_state", inline=True)
 comment(0x1e61, "magic_wall_timer", inline=True)
@@ -793,7 +800,7 @@ blank(0x20e1)
 stars(0x2100, True)
 label(0x2100, "cell_types_that_rocks_or_diamonds_will_fall_off")
 map_comments(0x2100)
-label(0x2110, "fireflay_and_butterfly_directions_array")
+label(0x2110, "firefly_and_butterfly_next_direction_table")
 label(0x2118, "firefly_and_butterfly_cell_values")
 expr(0x2118, make_or(make_or("map_unprocessed", "map_anim_state3"), "map_firefly"))
 expr(0x2119, make_or(make_or("map_unprocessed", "map_anim_state3"), "map_butterfly"))
@@ -806,20 +813,44 @@ expr(0x211f, make_or(make_or("map_unprocessed", "map_anim_state2"), "map_butterf
 blank(0x2120)
 #byte(0x2120, 16, 1)
 map_comments(0x2120)
-map_comments(0x2180)
 label(0x2120, "items_produced_by_the_magic_wall")
-expr(0x2124, make_add("map_unprocessed", "map_rock"))
-expr(0x2125, make_add("map_unprocessed", "map_diamond"))
+expr(0x2124, make_or("map_unprocessed", "map_rock"))
+expr(0x2125, make_or("map_unprocessed", "map_diamond"))
 blank(0x2130)
-label(0x2130, "some_array_of_cells")
+label(0x2130, "cell_types_that_will_turn_into_diamonds")
+expr(0x2130, make_or("map_unprocessed", "map_diamond"))
+expr(0x2131, make_or("map_unprocessed", "map_diamond"))
+expr(0x2132, make_or("map_unprocessed", "map_diamond"))
+expr(0x2134, make_or("map_unprocessed", "map_diamond"))
+expr(0x2135, make_or("map_unprocessed", "map_diamond"))
+expr(0x2136, make_or("map_unprocessed", "map_diamond"))
+expr(0x2137, make_or("map_unprocessed", "map_diamond"))
+expr(0x213b, make_or("map_unprocessed", "map_diamond"))
+expr(0x213c, make_or("map_unprocessed", "map_diamond"))
+expr(0x213d, make_or("map_unprocessed", "map_diamond"))
+expr(0x213e, make_or("map_unprocessed", "map_diamond"))
+expr(0x2140, make_or("map_unprocessed", "map_large_explosion_state3"))
+expr(0x2141, make_or("map_unprocessed", "map_large_explosion_state3"))
+expr(0x2142, make_or("map_unprocessed", "map_large_explosion_state3"))
+expr(0x2144, make_or("map_unprocessed", "map_large_explosion_state3"))
+expr(0x2145, make_or("map_unprocessed", "map_large_explosion_state3"))
+expr(0x2146, make_or("map_unprocessed", "map_large_explosion_state3"))
+expr(0x2147, make_or("map_unprocessed", "map_large_explosion_state3"))
+expr(0x214b, make_or("map_unprocessed", "map_large_explosion_state3"))
+expr(0x214c, make_or("map_unprocessed", "map_large_explosion_state3"))
+expr(0x214d, make_or("map_unprocessed", "map_large_explosion_state3"))
+expr(0x214e, make_or("map_unprocessed", "map_large_explosion_state3"))
+map_comments(0x2130)
 blank(0x2140)
-label(0x2140, "another_array_of_cells")
+label(0x2140, "cell_types_that_will_turn_into_large_explosion")
+map_comments(0x2140)
 blank(0x2150)
 label(0x2150, "index_to_cell_type")
 label(0x2156, "exit_cell_type")
 byte(0x2156, 9)
 blank(0x215f)
 unused(0x215f)
+map_comments(0x2180)
 blank(0x2180)
 label(0x2180, "update_some_cell_types_when_below_a_space_vacated_by_a_rock_or_diamond")
 blank(0x2190)
@@ -894,7 +925,8 @@ unused(0x220c)
 blank(0x220c)
 byte(0x220c, 16, 8)
 blank(0x221c)
-label(0x221c, "firefly_cell_values")
+comment(0x221c, "Next table has even offsets progressing clockwise, odd offsets progress anti-clockwise", indent=1)
+label(0x221c, "firefly_neighbour_variables")
 for i in range(8):
     expr(0x221c+i, cell_directions)
     byte(0x221c+i)
@@ -1087,6 +1119,7 @@ stars(0x249a, "This is the update when we find a diamond or rock in the map duri
 label(0x249a, "update_rock_or_diamond_that_can_fall")
 comment(0x249a, "get cell below", indent=1)
 comment(0x24a0, "check current cell", indent=1)
+expr(0x24a1, "map_deadly")
 label(0x24a7, "not_c0_or_above")
 comment(0x24b6, "cell left is empty, now check below left cell", indent=1)
 label(0x24bc, "check_if_cell_right_is_empty")
@@ -1106,37 +1139,68 @@ comment(0x24e4, "store in cell below", indent=1)
 label(0x24e8, "play_rock_or_diamond_fall_sound")
 expr(0x24ec, "sound5_active_flag")
 comment(0x24ee, "store $4b or $4c (i.e. a non-zero value) in location $4b or $4c. i.e. activate sound5_active_flag or sound6_active_flag", indent=1)
-comment(0x24f1, "mask off the top two bits for the current cell value", indent=1)
+comment(0x24f1, "mask off bit 6 for the current cell value", indent=1)
 unused(0x24f7)
 
+expr(0x2501, "map_deadly")
+comment(0x2504, "check directions in order: cell_below, cell_right, cell_left, cell_up", indent=1)
+label(0x2506, "look_for_fungus_or_player_loop")
 expr(0x2507, "cell_above_left-1")
 ri(0x2509)
 label(0x250b, "unnecessary_branch")
-label(0x2542, "c0_or_above")
-expr(0x2544, make_lo("another_array_of_cells"))
-expr(0x254a, make_lo("some_array_of_cells"))
+comment(0x2515, "calculate direction to move in Y", indent=1)
+comment(0x251c, "branch if the desired direction is empty", indent=1)
+comment(0x2523, "get the next direction in Y", indent=1)
+comment(0x2527, "branch if the second desired direction is empty", indent=1)
+comment(0x252e, "set X=0 to force the use of the final possible direction", indent=1)
+comment(0x2530, "get the last cardinal direction that isn't a u-turn", indent=1)
+label(0x2534, "set_firefly_or_butterfly")
+label(0x253d, "store_firefly_and_clear_current_cell")
+label(0x2542, "show_large_explosion")
+expr(0x2544, make_lo("cell_types_that_will_turn_into_large_explosion"))
+expr(0x254a, make_lo("cell_types_that_will_turn_into_diamonds"))
+label(0x254b, "set_explosion_type")
+comment(0x254e, "activate explosion sound", indent=1)
 comment(0x2550, "read above left cell", indent=1)
 comment(0x2556, "reset current cell to zero", indent=1)
 comment(0x2558, "read above right cell", indent=1)
 comment(0x255e, "read below left cell", indent=1)
 comment(0x2564, "read below right cell", indent=1)
-comment(0x256a, "loop 9 times", indent=1)
+comment(0x256a, "loop 9 times to replace all the neighbour cells with diamonds or large explosion", indent=1)
+label(0x256c, "replace_neighbours_loop")
 expr(0x256d, "cell_above_left-1")
+label(0x2571, "read_from_table_instruction")
+label(0x2572, "lookup_table_address_low")
 expr(0x2577, "cell_above_left-1")
+label(0x2578, "skip_storing_explosion_into_cell")
+comment(0x257b, "write new values back into the corner cells", indent=1)
 comment(0x257b, "write to above left cell", indent=1)
 comment(0x2583, "write to above right cell", indent=1)
 comment(0x2589, "write to below left cell", indent=1)
 comment(0x258f, "write to below right cell", indent=1)
 entry(0x2598)
 unused(0x2598)
+comment(0x25a2, "play fungus sound", indent=1)
 label(0x25a6, "update_fungus")
 comment(0x25a8, "check for surrounding space or earth allowing the fungus to grow", indent=1)
+comment(0x25ca, "calculate direction to grow based on current fungus state in top bits", indent=1)
+comment(0x25d0, "Y is set to 0,2,4, or 6 for the compass directions", indent=1)
+expr(0x25d2, "map_deadly")
+comment(0x25d5, "get cell value for direction Y", indent=1)
+label(0x25da, "increment_top_nybble_of_fungus")
+comment(0x25da, "move fungus onto next state (add 16)", indent=1)
+label(0x25e2, "check_for_space_or_earth")
+comment(0x25e2, "get cell value for direction Y", indent=1)
+comment(0x25e5, "branch if 0 or 1 (space or earth)", indent=1)
+label(0x25e9, "found_space_or_earth_to_grow_into")
+label(0x25f1, "store_x")
 ret(0x25f5)
 unused_entry(0x25f6)
 label(0x25ba, "fungus_can_grow")
 unused_entry(0x25fc)
 
 label(0x2609, "start_death_explosion")
+expr(0x260a, "map_start_death_explosion")
 label(0x260e, "check_for_direction_key_pressed")
 comment(0x2614, "player is not moving in any direction", indent=1)
 label(0x2616, "update_player_at_current_location")
@@ -1161,7 +1225,7 @@ unused(0x26ab)
 comment(0x26b5, "read what's above the wall, getting the cell type from the lower nybble", indent=1)
 comment(0x26ba, "read what cell types are allowed to fall through and what is produced as a result (rocks turn into diamonds and vice versa)", indent=1)
 comment(0x26bf, "something will fall into the wall, clear the cell above", indent=1)
-expr(0x26c0, make_add("map_unprocessed", "map_space"))
+expr(0x26c0, make_or("map_unprocessed", "map_space"))
 label(0x26c3, "skip_storing_space_above")
 comment(0x26c7, "if the cell below isn't empty, then don't store the item below", indent=1)
 comment(0x26cb, "store the item that has fallen through the wall below", indent=1)
@@ -1172,6 +1236,7 @@ label(0x26da, "check_if_magic_wall_is_active")
 unused(0x26df)
 comment(0x26e3, "mark rockford cell as visible", indent=1)
 comment(0x26e7, "branch if on exit", indent=1)
+expr(0x26e8, "map_active_exit")
 comment(0x26eb, "we have found the intro square", indent=1)
 comment(0x26ef, "wait for flashing rockford animation to finish", indent=1)
 comment(0x26f5, "start the explosion just before gameplay starts", indent=1)
@@ -1183,6 +1248,8 @@ stars(0x2700)
 label(0x2700, "start_gameplay")
 comment(0x2707, "Set A=0", indent=1)
 label(0x270a, "gameplay_loop")
+comment(0x2719, "activate movement sound", indent=1)
+expr(0x27d2, "map_start_death_explosion")
 label(0x27ec, "gameplay_loop_local")
 comment(0x270c, "clear sound", indent=1)
 label(0x270e, "zero_eight_bytes_loop")
@@ -1435,7 +1502,7 @@ C0* C1* C2* C3*""")
 expr(0x2bcb, "map_earth")
 label(0x2bdf, "loop_done")
 ab(0x2bdd, True)
-comment(0x2bd0, "this next loop runs four times from $c3 to $c0, then four times more from $03 to $00", indent=1)
+comment(0x2bd0, "this next loop runs four times from $c3 to $c0, then four more from $03 to $00", indent=1)
 label(0x2bd2, "store_earth_loop")
 comment(0x2beb, "set A=0 to clear cells in the middle", indent=1)
 comment(0x2bf3, "set firefly, or butterfly on cave D", indent=1)
@@ -1451,14 +1518,13 @@ for i in range(0, 9):
 stars(0x2c00, True)
 comment(0x2c00, "Sound data packed into single bytes: channel, amplitude, pitch, duration")
 comment(0x2c00, "Sound 0 = Fungus ambient sound")
-comment(0x2c00, "Sound 1 = TODO")
+comment(0x2c00, "Sound 1 = Magic wall sound")
 comment(0x2c00, "Sound 2 = Movement sound")
 comment(0x2c00, "Sound 3 = Got earth sound")
 comment(0x2c00, "Sound 4 = Rock landing/Rockford appearing sound")
-comment(0x2c00, "Sound 5 = TODO")
+comment(0x2c00, "Sound 5 = Diamond landing")
 comment(0x2c00, "Sound 6 = Got all required diamonds / rockford exploding sound")
-comment(0x2c00, "Sound 7 = TODO")
-comment(0x2c00, "Sound 8 = TODO")
+comment(0x2c00, "Sound 7 = Fungus sound")
 label(0x2c00, "in_game_sound_data")
 label(0x2c24, "in_game_sound_block")
 label(0x2c26, "in_game_sound_amplitude")
@@ -1614,6 +1680,7 @@ label(0x2f00, "got_diamond_so_update_status_bar")
 expr(0x2f0a, "sprite_0")
 expr(0x2f15, "sprite_0")
 comment(0x2f2d, "open the exit", indent=1)
+expr(0x2f30, "map_active_exit")
 comment(0x2f33, "set total diamonds to zero", indent=1)
 comment(0x2f3b, "show score per diamond on status bar", indent=1)
 comment(0x2f45, "play sound 6", indent=1)
@@ -2143,34 +2210,42 @@ print("""; *********************************************************************
 ;   Each player has a status bar, and different status bars are shown while paused.
 ;
 ; Cell values in tile_map:
+;   $00 = map_space
+;   $01 = map_earth
+;   $02 = map_wall
+;   $03 = map_titanium_wall       (as seen on the border of the whole map)
+;   $04 = map_diamond
+;   $05 = map_rock
+;   $06 = map_firefly             (with animation states $06, $16, $26, $36)
+;   $07 = map_fungus              (states $07, $17, $27, $37, $47, $57, $67, and $77 as the fungus grows)
+;   $08 = map_rockford_appearing_or_end_position
+;   $09 = map_firefly_in_earth_box
+;   $0a = map_explosion
+;   $0b = map_vertical_strip      (in preprocessing: value above is filled down to the next $0b)
+;   $0c = map_horizontal_strip    (in preprocessing: value is copied to the end of the row)
+;   $0d = map_magic_wall
+;   $0e = map_butterfly           (with animation states $0e, $1e, $2e, $3e)
+;   $0f = map_rockford            ($0f=waiting, $1f=walking left, $2f=walking right)
 ;
-; $00 = empty space
-; $01 = earth
-; $02 = wall
-; $03 = titanium wall      (as seen on the border of the whole map)
-; $04 = diamond
-; $05 = rock
-; $06 = firefly            (with animation states $06, $16, $26, $36)
-; $07 = fungus             (states $07, $17, $27, $37, $47, $57, $67, and $77 as the
-;                           fungus grows)
-; $08 = animated player appearing
-; $09 = 4x4 earth square with firefly pacing inside (or butterfly on cave D)
-; $0a = animated player exploding
-; $0b = vertical strip     (in preprocessing: value above is filled down to the next $0b)
-; $0c = horizontal strip   (in preprocessing: value is copied to the end of the row)
-; $0d = magic wall
-; $0e = butterfly          (with animation states $0e, $1e, $2e, $3e)
-; $0f = player             ($0f=waiting, $1f=walking left, $2f=walking right)
+; Upper nybble sometimes holds an animation state, and top bit is a flag depending on context:
+;   $00 = map_anim_state0
+;   $10 = map_anim_state1
+;   $20 = map_anim_state2
+;   $30 = map_anim_state3
+;   $80 = map_unprocessed
+;   $c0 = map_deadly              (cell is deadly, below a rock that fell)
 ;
-; $18 = flashing exit
-; $21 = intro explosion frame #1
-; $11 = intro explosion frame #2
-; $43 = explosion out effect #1
-; $33 = explosion out effect #2
-; $23 = explosion out effect #3
-; $13 = explosion out effect #4
+; Special cases:
+;   $18 = map_active_exit         (exit is available and flashing)
+;
+;   $46 = map_start_death_explosion   (first state of the death explosion)
+;   $33 = map_large_explosion_state3
+;   $23 = map_large_explosion_state2
+;   $13 = map_large_explosion_state1
+;
 ;
 ; *************************************************************************************
 """)
+
 
 go()
