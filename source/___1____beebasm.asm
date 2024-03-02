@@ -60,13 +60,17 @@
 ;   $10 = map_anim_state1
 ;   $20 = map_anim_state2
 ;   $30 = map_anim_state3
+;   $40 = map_anim_state4
+;   $50 = map_anim_state5
+;   $60 = map_anim_state6
+;   $70 = map_anim_state7
 ;   $80 = map_unprocessed
-;   $c0 = map_deadly              (cell is deadly, below a rock that fell)
+;   $c0 = map_deadly              (cell is deadly, directly below a rock or diamond that fell)
 ;
 ; Special cases:
 ;   $18 = map_active_exit         (exit is available and flashing)
 ;
-;   $46 = map_start_death_explosion   (first state of the death explosion)
+;   $46 = map_start_large_explosion   (first state of the 'death' explosion for rockford / firefly / butterfly)
 ;   $33 = map_large_explosion_state3
 ;   $23 = map_large_explosion_state2
 ;   $13 = map_large_explosion_state1
@@ -88,6 +92,10 @@ map_anim_state0                          = 0
 map_anim_state1                          = 16
 map_anim_state2                          = 32
 map_anim_state3                          = 48
+map_anim_state4                          = 64
+map_anim_state5                          = 80
+map_anim_state6                          = 96
+map_anim_state7                          = 112
 map_butterfly                            = 14
 map_deadly                               = 192
 map_diamond                              = 4
@@ -105,7 +113,7 @@ map_rock                                 = 5
 map_rockford                             = 15
 map_rockford_appearing_or_end_position   = 8
 map_space                                = 0
-map_start_death_explosion                = 70
+map_start_large_explosion                = 70
 map_titanium_wall                        = 3
 map_unprocessed                          = 128
 map_vertical_strip                       = 11
@@ -1215,23 +1223,23 @@ lfff6                                   = &fff6
     equb   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0 ; 216f: 00 00 00... ...
     equb   0                                                                            ; 217f: 00          .
 
-.update_some_cell_types_when_below_a_space_vacated_by_a_rock_or_diamond
+.update_cell_type_when_below_a_falling_rock_or_diamond
     equb 0                                                                              ; 2180: 00          .              ; map_space
     equb 0                                                                              ; 2181: 00          .              ; map_earth
     equb 0                                                                              ; 2182: 00          .              ; map_wall
     equb 0                                                                              ; 2183: 00          .              ; map_titanium_wall
     equb 0                                                                              ; 2184: 00          .              ; map_diamond
     equb 0                                                                              ; 2185: 00          .              ; map_rock
-    equb &46                                                                            ; 2186: 46          F              ; map_firefly
+    equb map_start_large_explosion                                                      ; 2186: 46          F              ; map_firefly
     equb 0                                                                              ; 2187: 00          .              ; map_fungus
     equb 0                                                                              ; 2188: 00          .              ; map_rockford_appearing_or_end_position
     equb 0                                                                              ; 2189: 00          .              ; map_firefly_in_earth_box
     equb 0                                                                              ; 218a: 00          .              ; map_explosion
-    equb &7d                                                                            ; 218b: 7d          }              ; map_vertical_strip
+    equb map_anim_state7 OR map_magic_wall                                              ; 218b: 7d          }              ; map_vertical_strip
     equb 0                                                                              ; 218c: 00          .              ; map_horizontal_strip
-    equb &3d                                                                            ; 218d: 3d          =              ; map_magic_wall
-    equb &4e                                                                            ; 218e: 4e          N              ; map_butterfly
-    equb &7f                                                                            ; 218f: 7f          .              ; map_rockford
+    equb map_anim_state3 OR map_magic_wall                                              ; 218d: 3d          =              ; map_magic_wall
+    equb map_anim_state4 OR map_butterfly                                               ; 218e: 4e          N              ; map_butterfly
+    equb map_anim_state7 OR map_rockford                                                ; 218f: 7f          .              ; map_rockford
 
 .unused12
     equb &91, &a1, &e1,   0, &f1, &d1, &b6, &c1,   0,   0, &d1, &f1, &c1, &71,   0, &71 ; 2190: 91 a1 e1... ...
@@ -1943,7 +1951,7 @@ handler_high = jsr_handler_instruction+2
     ; look up table based on type
     and #&0f                                                                            ; 24dc: 29 0f       ).
     tay                                                                                 ; 24de: a8          .
-    lda update_some_cell_types_when_below_a_space_vacated_by_a_rock_or_diamond,y        ; 24df: b9 80 21    ..!
+    lda update_cell_type_when_below_a_falling_rock_or_diamond,y                         ; 24df: b9 80 21    ..!
     beq play_rock_or_diamond_fall_sound                                                 ; 24e2: f0 04       ..
     ; store in cell below
     ldy #&81                                                                            ; 24e4: a0 81       ..
@@ -2168,11 +2176,11 @@ lookup_table_address_low = read_from_table_instruction+1
 .handler_rockford
     stx current_rockford_sprite                                                         ; 2600: 86 5b       .[
     lda rockford_explosion_cell_type                                                    ; 2602: a5 5f       ._
-    bne start_death_explosion                                                           ; 2604: d0 03       ..
+    bne start_large_explosion                                                           ; 2604: d0 03       ..
     inx                                                                                 ; 2606: e8          .
     bne check_for_direction_key_pressed                                                 ; 2607: d0 05       ..
-.start_death_explosion
-    ldx #map_start_death_explosion                                                      ; 2609: a2 46       .F
+.start_large_explosion
+    ldx #map_start_large_explosion                                                      ; 2609: a2 46       .F
     stx rockford_explosion_cell_type                                                    ; 260b: 86 5f       ._
     rts                                                                                 ; 260d: 60          `
 
@@ -2497,7 +2505,7 @@ lookup_table_address_low = read_from_table_instruction+1
     lda rockford_explosion_cell_type                                                    ; 27cd: a5 5f       ._
     bne check_if_pause_is_available                                                     ; 27cf: d0 04       ..
     ; start death explosion
-    lda #map_start_death_explosion                                                      ; 27d1: a9 46       .F
+    lda #map_start_large_explosion                                                      ; 27d1: a9 46       .F
     sta rockford_explosion_cell_type                                                    ; 27d3: 85 5f       ._
     ; branch if on a bonus stage (no pause available)
 .check_if_pause_is_available
@@ -2855,7 +2863,7 @@ lookup_table_address_low = read_from_table_instruction+1
 .set_ptr_high_to_start_of_map
     lda #>tile_map_row_1                                                                ; 2a1e: a9 50       .P
     sta ptr_high                                                                        ; 2a20: 85 8d       ..
-    lda #&14                                                                            ; 2a22: a9 14       ..
+    lda #20                                                                             ; 2a22: a9 14       ..
     sta x_loop_counter                                                                  ; 2a24: 85 7c       .|
     ldy #0                                                                              ; 2a26: a0 00       ..
     rts                                                                                 ; 2a28: 60          `
@@ -3219,7 +3227,7 @@ lookup_table_address_low = read_from_table_instruction+1
 ; Sound 1 = Magic wall sound
 ; Sound 2 = Movement sound
 ; Sound 3 = Got earth sound
-; Sound 4 = Rock landing/Rockford appearing sound
+; Sound 4 = Rock landing / rockford appearing sound
 ; Sound 5 = Diamond landing
 ; Sound 6 = Got all required diamonds / rockford exploding sound
 ; Sound 7 = Fungus sound
@@ -6634,6 +6642,10 @@ tile_map_row_19 = l54bc+4
     assert inkey_key_x == &bd
     assert inkey_key_z == &9e
     assert map_active_exit == &18
+    assert map_anim_state3 OR map_magic_wall == &3d
+    assert map_anim_state4 OR map_butterfly == &4e
+    assert map_anim_state7 OR map_magic_wall == &7d
+    assert map_anim_state7 OR map_rockford == &7f
     assert map_butterfly OR map_anim_state2 == &2e
     assert map_deadly == &c0
     assert map_diamond == &04
@@ -6644,7 +6656,7 @@ tile_map_row_19 = l54bc+4
     assert map_rockford OR map_unprocessed == &8f
     assert map_rockford_appearing_or_end_position == &08
     assert map_space == &00
-    assert map_start_death_explosion == &46
+    assert map_start_large_explosion == &46
     assert map_unprocessed OR map_diamond == &84
     assert map_unprocessed OR map_large_explosion_state3 == &b3
     assert map_unprocessed OR map_rock == &85

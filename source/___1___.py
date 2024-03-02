@@ -578,9 +578,13 @@ constant(0x00, "map_anim_state0")
 constant(0x10, "map_anim_state1")
 constant(0x20, "map_anim_state2")
 constant(0x30, "map_anim_state3")
+constant(0x40, "map_anim_state4")
+constant(0x50, "map_anim_state5")
+constant(0x60, "map_anim_state6")
+constant(0x70, "map_anim_state7")
 constant(0x80, "map_unprocessed")
 
-constant(0x46, "map_start_death_explosion")
+constant(0x46, "map_start_large_explosion")
 constant(0x33, "map_large_explosion_state3")
 constant(0x23, "map_large_explosion_state2")
 constant(0x13, "map_large_explosion_state1")
@@ -852,7 +856,12 @@ blank(0x215f)
 unused(0x215f)
 map_comments(0x2180)
 blank(0x2180)
-label(0x2180, "update_some_cell_types_when_below_a_space_vacated_by_a_rock_or_diamond")
+label(0x2180, "update_cell_type_when_below_a_falling_rock_or_diamond")
+expr(0x2186, "map_start_large_explosion")
+expr(0x218b, make_or("map_anim_state7", "map_magic_wall"))
+expr(0x218d, make_or("map_anim_state3", "map_magic_wall"))
+expr(0x218e, make_or("map_anim_state4", "map_butterfly"))
+expr(0x218f, make_or("map_anim_state7", "map_rockford"))
 blank(0x2190)
 unused(0x2190)
 stars(0x21c0, True)
@@ -1199,8 +1208,8 @@ unused_entry(0x25f6)
 label(0x25ba, "fungus_can_grow")
 unused_entry(0x25fc)
 
-label(0x2609, "start_death_explosion")
-expr(0x260a, "map_start_death_explosion")
+label(0x2609, "start_large_explosion")
+expr(0x260a, "map_start_large_explosion")
 label(0x260e, "check_for_direction_key_pressed")
 comment(0x2614, "player is not moving in any direction", indent=1)
 label(0x2616, "update_player_at_current_location")
@@ -1249,7 +1258,7 @@ label(0x2700, "start_gameplay")
 comment(0x2707, "Set A=0", indent=1)
 label(0x270a, "gameplay_loop")
 comment(0x2719, "activate movement sound", indent=1)
-expr(0x27d2, "map_start_death_explosion")
+expr(0x27d2, "map_start_large_explosion")
 label(0x27ec, "gameplay_loop_local")
 comment(0x270c, "clear sound", indent=1)
 label(0x270e, "zero_eight_bytes_loop")
@@ -1393,6 +1402,7 @@ expr(0x2a1b, make_lo("tile_map_row_1"))
 label(0x2a1c, "set_ptr_high_to_start_of_map_with_offset_a")
 label(0x2a1e, "set_ptr_high_to_start_of_map")
 expr(0x2a1f, make_hi("tile_map_row_1"))
+decimal(0x2a23)
 stars(0x2a29)
 label(0x2a29, "palette_block")
 byte(0x2a29)
@@ -1521,7 +1531,7 @@ comment(0x2c00, "Sound 0 = Fungus ambient sound")
 comment(0x2c00, "Sound 1 = Magic wall sound")
 comment(0x2c00, "Sound 2 = Movement sound")
 comment(0x2c00, "Sound 3 = Got earth sound")
-comment(0x2c00, "Sound 4 = Rock landing/Rockford appearing sound")
+comment(0x2c00, "Sound 4 = Rock landing / rockford appearing sound")
 comment(0x2c00, "Sound 5 = Diamond landing")
 comment(0x2c00, "Sound 6 = Got all required diamonds / rockford exploding sound")
 comment(0x2c00, "Sound 7 = Fungus sound")
@@ -2232,13 +2242,17 @@ print("""; *********************************************************************
 ;   $10 = map_anim_state1
 ;   $20 = map_anim_state2
 ;   $30 = map_anim_state3
+;   $40 = map_anim_state4
+;   $50 = map_anim_state5
+;   $60 = map_anim_state6
+;   $70 = map_anim_state7
 ;   $80 = map_unprocessed
-;   $c0 = map_deadly              (cell is deadly, below a rock that fell)
+;   $c0 = map_deadly              (cell is deadly, directly below a rock or diamond that fell)
 ;
 ; Special cases:
 ;   $18 = map_active_exit         (exit is available and flashing)
 ;
-;   $46 = map_start_death_explosion   (first state of the death explosion)
+;   $46 = map_start_large_explosion   (first state of the 'death' explosion for rockford / firefly / butterfly)
 ;   $33 = map_large_explosion_state3
 ;   $23 = map_large_explosion_state2
 ;   $13 = map_large_explosion_state1

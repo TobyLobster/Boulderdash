@@ -60,13 +60,17 @@
 ;   $10 = map_anim_state1
 ;   $20 = map_anim_state2
 ;   $30 = map_anim_state3
+;   $40 = map_anim_state4
+;   $50 = map_anim_state5
+;   $60 = map_anim_state6
+;   $70 = map_anim_state7
 ;   $80 = map_unprocessed
-;   $c0 = map_deadly              (cell is deadly, below a rock that fell)
+;   $c0 = map_deadly              (cell is deadly, directly below a rock or diamond that fell)
 ;
 ; Special cases:
 ;   $18 = map_active_exit         (exit is available and flashing)
 ;
-;   $46 = map_start_death_explosion   (first state of the death explosion)
+;   $46 = map_start_large_explosion   (first state of the 'death' explosion for rockford / firefly / butterfly)
 ;   $33 = map_large_explosion_state3
 ;   $23 = map_large_explosion_state2
 ;   $13 = map_large_explosion_state1
@@ -88,6 +92,10 @@ map_anim_state0                          = 0
 map_anim_state1                          = 16
 map_anim_state2                          = 32
 map_anim_state3                          = 48
+map_anim_state4                          = 64
+map_anim_state5                          = 80
+map_anim_state6                          = 96
+map_anim_state7                          = 112
 map_butterfly                            = 14
 map_deadly                               = 192
 map_diamond                              = 4
@@ -105,7 +113,7 @@ map_rock                                 = 5
 map_rockford                             = 15
 map_rockford_appearing_or_end_position   = 8
 map_space                                = 0
-map_start_death_explosion                = 70
+map_start_large_explosion                = 70
 map_titanium_wall                        = 3
 map_unprocessed                          = 128
 map_vertical_strip                       = 11
@@ -1308,23 +1316,23 @@ unused11
     !byte   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0     ; 216e: 00 00 00... ...
     !byte   0,   0,   0                                                                 ; 217d: 00 00 00    ...
 
-update_some_cell_types_when_below_a_space_vacated_by_a_rock_or_diamond
+update_cell_type_when_below_a_falling_rock_or_diamond
     !byte 0                                                                             ; 2180: 00          .              ; map_space
     !byte 0                                                                             ; 2181: 00          .              ; map_earth
     !byte 0                                                                             ; 2182: 00          .              ; map_wall
     !byte 0                                                                             ; 2183: 00          .              ; map_titanium_wall
     !byte 0                                                                             ; 2184: 00          .              ; map_diamond
     !byte 0                                                                             ; 2185: 00          .              ; map_rock
-    !byte $46                                                                           ; 2186: 46          F              ; map_firefly
+    !byte map_start_large_explosion                                                     ; 2186: 46          F              ; map_firefly
     !byte 0                                                                             ; 2187: 00          .              ; map_fungus
     !byte 0                                                                             ; 2188: 00          .              ; map_rockford_appearing_or_end_position
     !byte 0                                                                             ; 2189: 00          .              ; map_firefly_in_earth_box
     !byte 0                                                                             ; 218a: 00          .              ; map_explosion
-    !byte $7d                                                                           ; 218b: 7d          }              ; map_vertical_strip
+    !byte map_anim_state7 | map_magic_wall                                              ; 218b: 7d          }              ; map_vertical_strip
     !byte 0                                                                             ; 218c: 00          .              ; map_horizontal_strip
-    !byte $3d                                                                           ; 218d: 3d          =              ; map_magic_wall
-    !byte $4e                                                                           ; 218e: 4e          N              ; map_butterfly
-    !byte $7f                                                                           ; 218f: 7f          .              ; map_rockford
+    !byte map_anim_state3 | map_magic_wall                                              ; 218d: 3d          =              ; map_magic_wall
+    !byte map_anim_state4 | map_butterfly                                               ; 218e: 4e          N              ; map_butterfly
+    !byte map_anim_state7 | map_rockford                                                ; 218f: 7f          .              ; map_rockford
 
 unused12
     !byte $91, $a1, $e1,   0, $f1, $d1, $b6, $c1,   0,   0, $d1, $f1, $c1, $71,   0     ; 2190: 91 a1 e1... ...
@@ -2037,7 +2045,7 @@ process_c0_or_above
     ; look up table based on type
     and #$0f                                                                            ; 24dc: 29 0f       ).
     tay                                                                                 ; 24de: a8          .
-    lda update_some_cell_types_when_below_a_space_vacated_by_a_rock_or_diamond,y        ; 24df: b9 80 21    ..!
+    lda update_cell_type_when_below_a_falling_rock_or_diamond,y                         ; 24df: b9 80 21    ..!
     beq play_rock_or_diamond_fall_sound                                                 ; 24e2: f0 04       ..
     ; store in cell below
     ldy #$81                                                                            ; 24e4: a0 81       ..
@@ -2262,11 +2270,11 @@ unused23
 handler_rockford
     stx current_rockford_sprite                                                         ; 2600: 86 5b       .[
     lda rockford_explosion_cell_type                                                    ; 2602: a5 5f       ._
-    bne start_death_explosion                                                           ; 2604: d0 03       ..
+    bne start_large_explosion                                                           ; 2604: d0 03       ..
     inx                                                                                 ; 2606: e8          .
     bne check_for_direction_key_pressed                                                 ; 2607: d0 05       ..
-start_death_explosion
-    ldx #map_start_death_explosion                                                      ; 2609: a2 46       .F
+start_large_explosion
+    ldx #map_start_large_explosion                                                      ; 2609: a2 46       .F
     stx rockford_explosion_cell_type                                                    ; 260b: 86 5f       ._
     rts                                                                                 ; 260d: 60          `
 
@@ -2591,7 +2599,7 @@ check_for_escape_key_pressed_to_die
     lda rockford_explosion_cell_type                                                    ; 27cd: a5 5f       ._
     bne check_if_pause_is_available                                                     ; 27cf: d0 04       ..
     ; start death explosion
-    lda #map_start_death_explosion                                                      ; 27d1: a9 46       .F
+    lda #map_start_large_explosion                                                      ; 27d1: a9 46       .F
     sta rockford_explosion_cell_type                                                    ; 27d3: 85 5f       ._
     ; branch if on a bonus stage (no pause available)
 check_if_pause_is_available
@@ -2951,7 +2959,7 @@ set_ptr_high_to_start_of_map_with_offset_a
 set_ptr_high_to_start_of_map
     lda #>tile_map_row_1                                                                ; 2a1e: a9 50       .P
     sta ptr_high                                                                        ; 2a20: 85 8d       ..
-    lda #$14                                                                            ; 2a22: a9 14       ..
+    lda #20                                                                             ; 2a22: a9 14       ..
     sta x_loop_counter                                                                  ; 2a24: 85 7c       .|
     ldy #0                                                                              ; 2a26: a0 00       ..
     rts                                                                                 ; 2a28: 60          `
@@ -3315,7 +3323,7 @@ unused40
 ; Sound 1 = Magic wall sound
 ; Sound 2 = Movement sound
 ; Sound 3 = Got earth sound
-; Sound 4 = Rock landing/Rockford appearing sound
+; Sound 4 = Rock landing / rockford appearing sound
 ; Sound 5 = Diamond landing
 ; Sound 6 = Got all required diamonds / rockford exploding sound
 ; Sound 7 = Fungus sound
@@ -7397,6 +7405,18 @@ pydis_end
 !if (map_active_exit) != $18 {
     !error "Assertion failed: map_active_exit == $18"
 }
+!if (map_anim_state3 | map_magic_wall) != $3d {
+    !error "Assertion failed: map_anim_state3 | map_magic_wall == $3d"
+}
+!if (map_anim_state4 | map_butterfly) != $4e {
+    !error "Assertion failed: map_anim_state4 | map_butterfly == $4e"
+}
+!if (map_anim_state7 | map_magic_wall) != $7d {
+    !error "Assertion failed: map_anim_state7 | map_magic_wall == $7d"
+}
+!if (map_anim_state7 | map_rockford) != $7f {
+    !error "Assertion failed: map_anim_state7 | map_rockford == $7f"
+}
 !if (map_butterfly | map_anim_state2) != $2e {
     !error "Assertion failed: map_butterfly | map_anim_state2 == $2e"
 }
@@ -7427,8 +7447,8 @@ pydis_end
 !if (map_space) != $00 {
     !error "Assertion failed: map_space == $00"
 }
-!if (map_start_death_explosion) != $46 {
-    !error "Assertion failed: map_start_death_explosion == $46"
+!if (map_start_large_explosion) != $46 {
+    !error "Assertion failed: map_start_large_explosion == $46"
 }
 !if (map_unprocessed | map_diamond) != $84 {
     !error "Assertion failed: map_unprocessed | map_diamond == $84"
