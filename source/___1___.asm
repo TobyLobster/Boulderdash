@@ -2788,13 +2788,19 @@ unused27
 prepare_stage
     lda #0                                                                              ; 2900: a9 00       ..
     sta amount_to_increment_ptr_minus_one                                               ; 2902: 85 78       .x
+
+    ; STEP 1: The initial fill. Find the cell type to fill the map with initially, and
+    ; clear the map to that value
     ldy cave_number                                                                     ; 2904: a4 87       ..
     lda fill_cell_in_lower_nybble_strip_value_to_skip_in_upper_nybble_for_each_cave,y   ; 2906: b9 90 4c    ..L
     and #$0f                                                                            ; 2909: 29 0f       ).
     sta value_to_clear_map_to                                                           ; 290b: 85 79       .y
     jsr clear_map_and_grid                                                              ; 290d: 20 56 22     V"
-    ; the high nybbles in the cave colour arrays store the sprite to use for three
-    ; basic block types. copy them into cell_above_left/cell_above/cell_above_right
+
+    ; STEP 2: The 'basics'. This is a 2-bit-per-cell array that's copied into the map.
+    ; One value skips the cell so the initial fill value remains, the other three are
+    ; specified in the high nybbles in the cave colour arrays. Here we copy them into
+    ; cell_above_left/cell_above/cell_above_right
     ldy cave_number                                                                     ; 2910: a4 87       ..
     ldx #1                                                                              ; 2912: a2 01       ..
 loop_three_times
@@ -2813,9 +2819,11 @@ loop_three_times
     inx                                                                                 ; 2922: e8          .
     cpx #4                                                                              ; 2923: e0 04       ..
     bne loop_three_times                                                                ; 2925: d0 ed       ..
-    ; look up which data set needed from the cave number
+    ; STEP 2a: Find the right data set to use for the cave and difficulty level
+    ; look up which data set is needed from the cave number
     ldy cave_number                                                                     ; 2927: a4 87       ..
     lda cave_to_data_set,y                                                              ; 2929: b9 e0 4c    ..L
+    ; branch if no data set is present
     bmi add_strips                                                                      ; 292c: 30 54       0T
     tax                                                                                 ; 292e: aa          .
     ; start with ptr = data_sets
@@ -2832,9 +2840,10 @@ add_twenty_times_x_loop
     jsr add_a_to_ptr                                                                    ; 293c: 20 40 22     @"
     dex                                                                                 ; 293f: ca          .
     bne add_twenty_times_x_loop                                                         ; 2940: d0 f8       ..
+    ; remember pointer to data set
 got_data_set_X_address
     lda ptr_low                                                                         ; 2942: a5 8c       ..
-    sta sound0_active_flag                                                              ; 2944: 85 46       .F
+    sta data_set_ptr_low                                                                ; 2944: 85 46       .F
     ; set offset in Y = 4*(difficulty level-1)
     ldx difficulty_level                                                                ; 2946: a6 89       ..
     dex                                                                                 ; 2948: ca          .
@@ -2842,6 +2851,8 @@ got_data_set_X_address
     asl                                                                                 ; 294a: 0a          .
     asl                                                                                 ; 294b: 0a          .
     tay                                                                                 ; 294c: a8          .
+    ; STEP 2b: Now we have found the right data set, decode the four byte data set
+    ; entry
     lda ptr_high                                                                        ; 294d: a5 8d       ..
     sta data_set_ptr_high                                                               ; 294f: 85 47       .G
     ; set next_ptr = $4e00+?ptr, and if top bit of (ptr?1) is set, increment high byte
@@ -2859,22 +2870,28 @@ got_data_set_X_address
     ; set ptr_low = (ptr?1) AND &7F
 store_ptr_low_and_fill_with_basics
     sta ptr_low                                                                         ; 2964: 85 8c       ..
+    ; STEP 2c: now we have the correct data, actually fill with the basics
     jsr fill_with_basics                                                                ; 2966: 20 90 2d     .-
-    ; reset ptr to the start of the data_set_X
-    lda sound0_active_flag                                                              ; 2969: a5 46       .F
+
+    ; STEP 3: The 'patches'. Individual cells can be changed using patch data.
+    ; First reset ptr to the start of the data_set_X
+    lda data_set_ptr_low                                                                ; 2969: a5 46       .F
     sta ptr_low                                                                         ; 296b: 85 8c       ..
     lda data_set_ptr_high                                                               ; 296d: a5 47       .G
     sta ptr_high                                                                        ; 296f: 85 8d       ..
-    ; recall Y and read the next two bytes as an address. Can be zero. For details?
+    ; recall Y and read the next two bytes as an address. Can be zero. For patches.
     ldy remember_y                                                                      ; 2971: a4 48       .H
     iny                                                                                 ; 2973: c8          .
     lda (ptr_low),y                                                                     ; 2974: b1 8c       ..
     sta next_ptr_low                                                                    ; 2976: 85 82       ..
     iny                                                                                 ; 2978: c8          .
     lda (ptr_low),y                                                                     ; 2979: b1 8c       ..
+    ; branch if no patch data is present
     beq add_strips                                                                      ; 297b: f0 05       ..
     sta next_ptr_high                                                                   ; 297d: 85 83       ..
     jsr add_patches                                                                     ; 297f: 20 50 2d     P-
+
+    ; STEP 4: The 'strips'
 add_strips
     lda #<strip_data                                                                    ; 2982: a9 00       ..
     sta ptr_low                                                                         ; 2984: 85 8c       ..
@@ -2901,6 +2918,8 @@ found_strip_data_for_cave
     lda ptr_high                                                                        ; 29a5: a5 8d       ..
     sta next_ptr_high                                                                   ; 29a7: 85 83       ..
     jsr write_strips                                                                    ; 29a9: 20 00 2d     .-
+
+    ; STEP 5: Set palette
 set_palette
     ldy cave_number                                                                     ; 29ac: a4 87       ..
     ldx #1                                                                              ; 29ae: a2 01       ..
@@ -2910,7 +2929,7 @@ set_palette_loop
     jsr set_palette_colour_ax                                                           ; 29b5: 20 35 2a     5*
     tya                                                                                 ; 29b8: 98          .
     clc                                                                                 ; 29b9: 18          .
-    adc #$14                                                                            ; 29ba: 69 14       i.
+    adc #total_caves                                                                    ; 29ba: 69 14       i.
     tay                                                                                 ; 29bc: a8          .
     inx                                                                                 ; 29bd: e8          .
     cpx #4                                                                              ; 29be: e0 04       ..
