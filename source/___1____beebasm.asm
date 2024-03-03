@@ -14,7 +14,7 @@
 ;
 ; * A *stage* consists of a cave letter and difficulty level. e.g. A1 is a stage.
 ;
-; * The *tile map* is the 40x23 map of the entire stage.
+; * The *tile map* is the 40x22 map of the entire stage.
 ;   Map rows are separated by 64 bytes in memory, despite only being 40 bytes in length.
 ;   (This simplifies the conversion between row number and address and vice-versa).
 ;
