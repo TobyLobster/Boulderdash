@@ -74,6 +74,7 @@
 ;   $33 = map_large_explosion_state3
 ;   $23 = map_large_explosion_state2
 ;   $13 = map_large_explosion_state1
+;   $45 = rock that's just fallen this tick
 ;
 ; *************************************************************************************
 
@@ -237,7 +238,7 @@ timeout_until_demo_mode                 = &006a
 map_rockford_end_position_addr_high     = &006b
 diamonds_required                       = &006c
 time_remaining                          = &006d
-bonus_life_available                    = &006f
+bonus_life_available_flag               = &006f
 map_rockford_current_position_addr_low  = &0070
 map_rockford_current_position_addr_high = &0071
 amount_to_increment_status_bar          = &0072
@@ -2246,6 +2247,7 @@ lookup_table_address_low = read_from_table_instruction+1
     lda (ptr_low),y                                                                     ; 264f: b1 8c       ..
     bne check_if_value_is_empty                                                         ; 2651: d0 21       .!
     lda neighbour_cell_contents                                                         ; 2653: a5 64       .d
+    ; don't try pushing a rock that's just fallen this tick (bit 6 set at $24c7)
     cmp #&45                                                                            ; 2655: c9 45       .E
     beq check_if_value_is_empty                                                         ; 2657: f0 1b       ..
     dec delay_trying_to_push_rock                                                       ; 2659: c6 53       .S
@@ -2987,10 +2989,10 @@ lookup_table_address_low = read_from_table_instruction+1
     beq zero_or_five_in_hundreds_column                                                 ; 2a7e: f0 09       ..
     cmp #sprite_5                                                                       ; 2a80: c9 37       .7
     beq zero_or_five_in_hundreds_column                                                 ; 2a82: f0 05       ..
-    ; a bonus life only becomes available when the score doesn't have a zero or five in
-    ; the hundreds column
+    ; a bonus life only becomes possible after the score *doesn't* have a zero or five
+    ; in the hundreds column
     lda #&ff                                                                            ; 2a84: a9 ff       ..
-    sta bonus_life_available                                                            ; 2a86: 85 6f       .o
+    sta bonus_life_available_flag                                                       ; 2a86: 85 6f       .o
     rts                                                                                 ; 2a88: 60          `
 
 .zero_or_five_in_hundreds_column
@@ -3005,15 +3007,15 @@ lookup_table_address_low = read_from_table_instruction+1
     ; all the top digits are zero, including the hundreds column, which means we are
     ; not 500 or more, so not eligible for a bonus life
     lda #0                                                                              ; 2a97: a9 00       ..
-    sta bonus_life_available                                                            ; 2a99: 85 6f       .o
+    sta bonus_life_available_flag                                                       ; 2a99: 85 6f       .o
     rts                                                                                 ; 2a9b: 60          `
 
 .non_zero_digit_found_in_hundreds_column_or_above
-    lda bonus_life_available                                                            ; 2a9c: a5 6f       .o
+    lda bonus_life_available_flag                                                       ; 2a9c: a5 6f       .o
     beq return7                                                                         ; 2a9e: f0 14       ..
     ; award bonus life
     lda #0                                                                              ; 2aa0: a9 00       ..
-    sta bonus_life_available                                                            ; 2aa2: 85 6f       .o
+    sta bonus_life_available_flag                                                       ; 2aa2: 85 6f       .o
     ; set sprite for space to pathway
     lda #sprite_pathway                                                                 ; 2aa4: a9 1f       ..
     sta cell_type_to_sprite                                                             ; 2aa6: 8d 80 1f    ...
@@ -3395,6 +3397,11 @@ lookup_table_address_low = read_from_table_instruction+1
     equb &85, &a6, &a8, &91, &70, &60, &a2,   3, &bd, &e3, &20, &18, &69,   1, &c9, &0a ; 2cf0: 85 a6 a8... ...
 
 ; *************************************************************************************
+; 
+; Each byte holds a repeat count in the top nybble, and the value to store in the lower
+; nybble (with special values $Xa meaning skip to the start of the next row X times.)
+; 
+; *************************************************************************************
 .write_strips
     ldy #1                                                                              ; 2d00: a0 01       ..
     sty map_y                                                                           ; 2d02: 84 8b       ..
@@ -3422,12 +3429,13 @@ lookup_table_address_low = read_from_table_instruction+1
     sta lower_nybble_value                                                              ; 2d1c: 85 7c       .|
 .write_strip_loop
     lda lower_nybble_value                                                              ; 2d1e: a5 7c       .|
-    ; a value of 10 means move to the next row
+    ; a value of 10 means move to the next row (repeatedly)
     cmp #&0a                                                                            ; 2d20: c9 0a       ..
     beq move_to_next_row                                                                ; 2d22: f0 0e       ..
     ; if it's this cave's skip value, then don't write to the map
     cmp cell_current                                                                    ; 2d24: c5 77       .w
     beq skip_write_to_map                                                               ; 2d26: f0 02       ..
+    ; write patch byte to map
     sta (map_address_low),y                                                             ; 2d28: 91 8c       ..
     ; move the map position one to the right, wrapping to the next row if needed
 .skip_write_to_map
@@ -3579,10 +3587,10 @@ lookup_table_address_low = read_from_table_instruction+1
 ; *************************************************************************************
 .play_one_life
     jsr prepare_stage                                                                   ; 2e00: 20 00 29     .)
-    ; a bonus life only becomes available when the score doesn't have a zero or five in
-    ; the hundreds column
+    ; a bonus life only becomes possible after the score *doesn't* have a zero or five
+    ; in the hundreds column
     lda #0                                                                              ; 2e03: a9 00       ..
-    sta bonus_life_available                                                            ; 2e05: 85 6f       .o
+    sta bonus_life_available_flag                                                       ; 2e05: 85 6f       .o
     sta cell_type_to_sprite                                                             ; 2e07: 8d 80 1f    ...
     ldx #<players_and_men_status_bar                                                    ; 2e0a: a2 14       ..
     lda cave_number                                                                     ; 2e0c: a5 87       ..
