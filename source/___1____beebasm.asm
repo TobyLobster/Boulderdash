@@ -3659,11 +3659,11 @@ lookup_table_address_low = read_from_table_instruction+1
     jsr start_gameplay                                                                  ; 2e70: 20 00 27     .'
     lda neighbour_cell_contents                                                         ; 2e73: a5 64       .d
     cmp #8                                                                              ; 2e75: c9 08       ..
-    beq play_scren_dissolve_to_solid                                                    ; 2e77: f0 44       .D
+    beq play_screen_dissolve_to_solid                                                   ; 2e77: f0 44       .D
     dec men_number_on_regular_status_bar                                                ; 2e79: ce 1e 32    ..2
     lda men_number_on_regular_status_bar                                                ; 2e7c: ad 1e 32    ..2
     cmp #sprite_0                                                                       ; 2e7f: c9 32       .2
-    bne play_scren_dissolve_to_solid                                                    ; 2e81: d0 3a       .:
+    bne play_screen_dissolve_to_solid                                                   ; 2e81: d0 3a       .:
     lda player_number_on_regular_status_bar                                             ; 2e83: ad 1b 32    ..2
     sta player_number_on_game_over_text                                                 ; 2e86: 8d 9e 32    ..2
     lda #<game_over_text                                                                ; 2e89: a9 8c       ..
@@ -3685,13 +3685,13 @@ lookup_table_address_low = read_from_table_instruction+1
 .compare
 which_status_bar_address1_low = compare+1
     cmp highscore_high_status_bar,x                                                     ; 2ea9: dd 50 32    .P2
-    bmi play_scren_dissolve_to_solid                                                    ; 2eac: 30 0f       0.
+    bmi play_screen_dissolve_to_solid                                                   ; 2eac: 30 0f       0.
     bne store_in_status_bar                                                             ; 2eae: d0 07       ..
 .goto_next_digit
     inx                                                                                 ; 2eb0: e8          .
     cpx #6                                                                              ; 2eb1: e0 06       ..
     bne compare_highscores_loop                                                         ; 2eb3: d0 ed       ..
-    beq play_scren_dissolve_to_solid                                                    ; 2eb5: f0 06       ..             ; ALWAYS branch
+    beq play_screen_dissolve_to_solid                                                   ; 2eb5: f0 06       ..             ; ALWAYS branch
 
 .store_in_status_bar
 which_status_bar_address2_low = store_in_status_bar+1
@@ -3699,7 +3699,7 @@ which_status_bar_address2_low = store_in_status_bar+1
     iny                                                                                 ; 2eba: c8          .
     bne goto_next_digit                                                                 ; 2ebb: d0 f3       ..
 
-.play_scren_dissolve_to_solid
+.play_screen_dissolve_to_solid
     lda #&80                                                                            ; 2ebd: a9 80       ..
 .play_screen_dissolve_effect
     sta dissolve_to_solid_flag                                                          ; 2ebf: 85 72       .r
